@@ -1,0 +1,30 @@
+[gd_scene load_steps=5 format=3 uid="uid://cepaf77ic4q03"]
+
+[ext_resource type="Script" uid="uid://d4ibmcipy3vnl" path="res://Scenes/Actors/clive.gd" id="1_iwdwx"]
+[ext_resource type="Texture2D" uid="uid://b0o30caqerh2g" path="res://Resources/Clive_Placeholder.PNG" id="1_oxjxs"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_iwdwx"]
+size = Vector2(581, 1556)
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_oxjxs"]
+radius = 276.0
+height = 1520.0
+
+[node name="Clive" type="CharacterBody2D"]
+scale = Vector2(0.05, 0.05)
+script = ExtResource("1_iwdwx")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(0, -1026)
+texture = ExtResource("1_oxjxs")
+
+[node name="CollisionBox" type="CollisionShape2D" parent="."]
+position = Vector2(70.5, -780)
+scale = Vector2(0.99999994, 0.99999994)
+shape = SubResource("RectangleShape2D_iwdwx")
+
+[node name="HurtBox" type="CollisionShape2D" parent="."]
+position = Vector2(73, -795)
+scale = Vector2(0.99999994, 0.99999994)
+shape = SubResource("CapsuleShape2D_oxjxs")
+debug_color = Color(0.63062656, 0.5243399, 0.216681, 0.41960785)
