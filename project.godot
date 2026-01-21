@@ -15,10 +15,22 @@ run/main_scene="uid://d1l0qt8blrdqy"
 config/features=PackedStringArray("4.5", "GL Compatibility")
 config/icon="res://icon.svg"
 
+[autoload]
+
+GameManager="*res://Scripts/Game/gameManager.gd"
+
 [display]
 
 window/size/viewport_width=1280
 window/size/viewport_height=720
+
+[file_customization]
+
+folder_colors={
+"res://Graphics/": "red",
+"res://Scenes/": "orange",
+"res://Scripts/": "blue"
+}
 
 [input]
 
