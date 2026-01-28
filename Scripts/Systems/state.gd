@@ -1,14 +1,14 @@
 class_name State
 extends RefCounted
 
-var stateName : String
+var state_name : String
 
 var _parent : StateMachine
 
 func _init(parent: StateMachine) -> void:
 	_parent = parent
 
-func getParent() -> StateMachine:
+func get_parent() -> StateMachine:
 	return _parent
 
 func enter(_previous_state: State, _data: Dictionary = {}) -> void:
