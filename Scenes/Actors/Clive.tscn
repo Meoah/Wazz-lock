@@ -64,7 +64,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"idle",
-"speed": 8.0
+"speed": 4.0
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_iwdwx"]
@@ -74,9 +74,10 @@ size = Vector2(200.00005, 460.00018)
 radius = 80.00001
 height = 400.00006
 
-[node name="Clive" type="CharacterBody2D"]
+[node name="Clive" type="CharacterBody2D" node_paths=PackedStringArray("sprite")]
 scale = Vector2(0.25, 0.25)
 script = ExtResource("1_iwdwx")
+sprite = NodePath("AnimatedSprite2D")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 scale = Vector2(0.99999994, 0.99999994)

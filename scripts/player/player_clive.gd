@@ -3,6 +3,7 @@ class_name Clive
 
 var manager : PlayerManager
 
+@export var sprite : AnimatedSprite2D
 @export var move_speed : float = 200.0
 var move_direction : Vector2 = Vector2.ZERO
 var initial_scale : Vector2 = Vector2.ZERO
@@ -20,6 +21,12 @@ func _ready() -> void:
 	manager = PlayerManager.new()
 	initial_scale = scale
 	
+func _process(_delta: float) -> void:
+	# TODO Should this stay in this script or to the manager?
+	if manager.get_current_state() == manager.walking_state:
+		sprite.sprite_frames.set_animation_speed("idle", 16.0)
+	if manager.get_current_state() == manager.idle_state:
+		sprite.sprite_frames.set_animation_speed("idle", 4.0)
 
 func _physics_process(delta) -> void:
 	manager.physics_update(delta, move_direction, roll_input, attack_input)
