@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://cpv5i74img1v3"]
+[gd_scene load_steps=5 format=3 uid="uid://cpv5i74img1v3"]
 
 [ext_resource type="Script" uid="uid://dbaxi2jjyn2im" path="res://scripts/game/game_manager.gd" id="1_hwd4i"]
 [ext_resource type="Script" uid="uid://dlyqy2ujtb70s" path="res://scripts/ui/pop_ups/popup_queue.gd" id="2_glms7"]
+[ext_resource type="PackedScene" uid="uid://1gbo7h5cshjx" path="res://scenes/screens/debug.tscn" id="2_oo155"]
 [ext_resource type="PackedScene" uid="uid://bo6oudf3dtprg" path="res://scenes/ui/pop_ups/blocker.tscn" id="3_udu3i"]
 
 [node name="GameManager" type="Control" node_paths=PackedStringArray("_scene_root", "_popup_queue")]
@@ -12,6 +13,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_hwd4i")
+_debug_scene = ExtResource("2_oo155")
 _scene_root = NodePath("SceneRoot")
 _popup_queue = NodePath("PopupQueue")
 

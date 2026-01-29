@@ -13,5 +13,5 @@ func _ready() -> void:
 	#TODO save file
 
 func _on_play_pressed():
-	pass
-	#GameManager.
+	# TODO THIS NEEDS TO BE CHANGED FROM DEBUG SCENE
+	GameManager.start_debug_room()

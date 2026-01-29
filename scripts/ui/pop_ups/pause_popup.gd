@@ -1,7 +1,7 @@
 extends BasePopup
 class_name PausePopup
 
-@export var _pause_label: Label
+@export var _pause_label : Label
 
 
 func _on_init() -> void:

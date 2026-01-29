@@ -1,5 +1,5 @@
-class_name StateMachine
 extends RefCounted
+class_name StateMachine
 
 var state_machine_name : String
 var current_state : State = null
@@ -15,12 +15,15 @@ func can_transition_to(new_state_name : String) -> bool:
 	return new_state_name in transitions.get(current_state.state_name, [])
 	
 func transition_to(new_state : State, transition_data : Dictionary = {}) -> bool:
+	if current_state == new_state:
+		return true
+	
 	if !can_transition_to(new_state.state_name):
 		print(state_machine_name, ": [Warning] Invalid state transition from %s to %s" % [current_state.state_name, new_state.state_name])
 		return false
 	
 	if current_state:
-		print(state_machine_name, ": exiting state: %s" % [current_state.state_name])
+		print(state_machine_name, ": Exiting state: %s" % [current_state.state_name])
 		current_state.exit(new_state)
 	
 	var previous_state : State = current_state
