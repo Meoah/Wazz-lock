@@ -5,6 +5,7 @@ var manager : PlayerManager
 
 @export var move_speed : float = 200.0
 var move_direction : Vector2 = Vector2.ZERO
+var initial_scale : Vector2 = Vector2.ZERO
 
 var move_inputs : Dictionary ={
 	"ui_up" : false,
@@ -17,17 +18,31 @@ var attack_input : bool = false
 
 func _ready() -> void:
 	manager = PlayerManager.new()
+	initial_scale = scale
+	
 
 func _physics_process(delta) -> void:
 	manager.physics_update(delta, move_direction, roll_input, attack_input)
 	
 	if manager.is_allow_movement():
 		velocity = move_direction * move_speed
+		if move_direction.x < 0:
+			flip_h(true)
+		elif move_direction.x > 0:
+			flip_h(false)
 	else:
 		velocity = Vector2.ZERO
 		
 	move_and_slide()
-	
+
+func flip_h(negative : bool = false) -> void:
+	if negative:
+		scale.y = -1 * initial_scale.y
+		rotation_degrees = 180.0
+	else:
+		scale.y = initial_scale.y
+		rotation_degrees = 0.0
+
 func _input(event : InputEvent) -> void:
 	var direction : bool = false
 	
