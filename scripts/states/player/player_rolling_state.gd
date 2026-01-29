@@ -1,4 +1,4 @@
-extends State
+extends PlayerState
 class_name PlayerRollingState
 
 const STATE_NAME : String = "PLAYER_ROLLING_STATE"

@@ -1,5 +1,5 @@
-class_name State
 extends RefCounted
+class_name State
 
 var state_name : String
 

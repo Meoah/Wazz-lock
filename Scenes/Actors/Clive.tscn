@@ -1,6 +1,6 @@
 [gd_scene load_steps=14 format=3 uid="uid://cepaf77ic4q03"]
 
-[ext_resource type="Script" uid="uid://d4ibmcipy3vnl" path="res://scripts/player/clive.gd" id="1_iwdwx"]
+[ext_resource type="Script" uid="uid://d4ibmcipy3vnl" path="res://scripts/player/player_clive.gd" id="1_iwdwx"]
 [ext_resource type="Texture2D" uid="uid://c5yf27ql1ronm" path="res://assets/textures/actors/clive/spritesheets/Clive_SpriteSheet_Idle.png" id="2_fi64q"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_ntpy2"]

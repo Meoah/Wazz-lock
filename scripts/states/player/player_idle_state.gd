@@ -1,4 +1,4 @@
-extends State
+extends PlayerState
 class_name PlayerIdleState
 
 const STATE_NAME : String = "PLAYER_IDLE_STATE"
@@ -15,3 +15,6 @@ func enter(previous_state: State, data: Dictionary = {}) -> void:
 
 func exit(next_state : State) -> void:
 	super.exit(next_state)
+
+func allows_movement() -> bool:
+	return true
