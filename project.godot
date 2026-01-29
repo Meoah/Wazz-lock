@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Wazz-lock"
-run/main_scene="uid://d1l0qt8blrdqy"
+run/main_scene="uid://33i3ugqxc7ho"
 config/features=PackedStringArray("4.5", "GL Compatibility")
 config/icon="res://icon.svg"
 
@@ -21,15 +21,15 @@ GameManager="*res://scripts/game/game_manager.gd"
 
 [display]
 
-window/size/viewport_width=1280
-window/size/viewport_height=720
+window/size/viewport_width=1920
+window/size/viewport_height=1080
 
 [file_customization]
 
 folder_colors={
-"res://assets/": "red",
-"res://scenes/": "orange",
-"res://scripts/": "blue"
+"res://assets/": "green",
+"res://scenes/": "yellow",
+"res://scripts/": "orange"
 }
 
 [input]

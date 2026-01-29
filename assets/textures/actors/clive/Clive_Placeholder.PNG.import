@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://b0o30caqerh2g"
-path="res://.godot/imported/Clive_Placeholder.PNG-68447bd4db1a4122353f239840aa8e4a.ctex"
+path="res://.godot/imported/Clive_Placeholder.PNG-189ed2b06c3dc9e81ef1ab99b7cd7acd.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/Clive_Placeholder.PNG"
-dest_files=["res://.godot/imported/Clive_Placeholder.PNG-68447bd4db1a4122353f239840aa8e4a.ctex"]
+source_file="res://assets/textures/actors/clive/Clive_Placeholder.PNG"
+dest_files=["res://.godot/imported/Clive_Placeholder.PNG-189ed2b06c3dc9e81ef1ab99b7cd7acd.ctex"]
 
 [params]
 

@@ -15,7 +15,7 @@ func can_transition_to(new_state_name : String) -> bool:
 	return new_state_name in transitions.get(current_state.state_name, [])
 	
 func transition_to(new_state : State, transition_data : Dictionary = {}) -> bool:
-	if !can_transition_to(new_state.stateName):
+	if !can_transition_to(new_state.state_name):
 		print(state_machine_name, ": [Warning] Invalid state transition from %s to %s" % [current_state.state_name, new_state.state_name])
 		return false
 	

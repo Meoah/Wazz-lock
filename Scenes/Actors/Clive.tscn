@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://cepaf77ic4q03"]
 
 [ext_resource type="Script" uid="uid://d4ibmcipy3vnl" path="res://scripts/player/clive.gd" id="1_iwdwx"]
-[ext_resource type="Texture2D" uid="uid://b0o30caqerh2g" path="res://assets/Clive_Placeholder.PNG" id="1_oxjxs"]
+[ext_resource type="Texture2D" uid="uid://b0o30caqerh2g" path="res://assets/textures/actors/clive/Clive_Placeholder.PNG" id="1_oxjxs"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_iwdwx"]
 size = Vector2(581, 1556)

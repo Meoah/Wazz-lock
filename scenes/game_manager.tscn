@@ -1,0 +1,31 @@
+[gd_scene load_steps=3 format=3 uid="uid://cpv5i74img1v3"]
+
+[ext_resource type="Script" uid="uid://dbaxi2jjyn2im" path="res://scripts/game/game_manager.gd" id="1_hwd4i"]
+[ext_resource type="Script" uid="uid://dlyqy2ujtb70s" path="res://scripts/ui/pop_ups/popup_queue.gd" id="2_glms7"]
+
+[node name="GameManager" type="Control" node_paths=PackedStringArray("_scene_root", "_popup_queue")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_hwd4i")
+_scene_root = NodePath("SceneRoot")
+_popup_queue = NodePath("PopupQueue")
+
+[node name="SceneRoot" type="Control" parent="."]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="PopupQueue" type="Control" parent="."]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("2_glms7")
+
+[node name="Blocker" type="Control" parent="PopupQueue"]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
