@@ -2,6 +2,7 @@ extends Node
 
 ## States
 var play_state : PlayState
+var pause_state: PauseState
 var main_menu_state : MainMenuState
 
 #TODO var _game_run : GameRun
@@ -20,7 +21,9 @@ func _ready() -> void:
 	if default and default.name == "default":
 		print("Current scene is default, freeing it.")
 		default.queue_free()
-		
+	
+	var _main_scene = get_tree().current_scene
+	
 	_setup_state_machine()
 
 func _setup_state_machine() -> void:
@@ -41,3 +44,31 @@ func get_current_state() -> State:
 	
 func clear_popup_queue() -> void:
 	_popup_queue.clear_queue()
+
+## Requests by other systems. Returns false if invalid transition
+func request_play() -> bool:
+	var success : bool = _state_machine.transition_to(play_state)
+	return success
+
+func request_pause() -> bool:
+	var success : bool = _state_machine.transition_to(pause_state)
+	return success
+
+func request_unpause() -> bool:
+	var success : bool = _state_machine.transition_to(play_state)
+	return success
+
+## Waits one frame to let allow signals to finalize.
+func change_scene_deferred(scene : PackedScene) -> void:
+	await get_tree().process_frame
+	change_scene_sync(scene)
+	
+	call_deferred("_add_version_display_to_scene")
+
+## Clears all scenes from the root and calls the requested scene afterwards
+func change_scene_sync(scene : PackedScene) -> void:
+	for child in _scene_root.get_children():
+		child.queue_free()
+	
+	var new_scene = scene.instantiate()
+	_scene_root.add_child(new_scene)

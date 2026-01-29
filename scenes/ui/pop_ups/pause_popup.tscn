@@ -1,0 +1,23 @@
+[gd_scene load_steps=2 format=3 uid="uid://dlavphbdpxnvr"]
+
+[ext_resource type="Script" uid="uid://dqsdjnunkuge3" path="res://scripts/ui/pop_ups/pause_popup.gd" id="1_5crv1"]
+
+[node name="PausePopup" type="Control" node_paths=PackedStringArray("_pause_label")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_5crv1")
+_pause_label = NodePath("Pause")
+
+[node name="Exit" type="Button" parent="."]
+layout_mode = 0
+offset_right = 8.0
+offset_bottom = 8.0
+
+[node name="Pause" type="Label" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
