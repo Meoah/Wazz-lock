@@ -18,6 +18,8 @@ config/icon="res://icon.svg"
 [autoload]
 
 GameManager="*res://scenes/game_manager.tscn"
+player_data="*res://scripts/systems/player_data.gd"
+signal_bus="*res://scripts/util/signal_bus.gd"
 
 [display]
 

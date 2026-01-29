@@ -2,8 +2,9 @@ extends Node
 
 ## States
 var play_state : PlayState
-var pause_state: PauseState
+var pause_state : PauseState
 var main_menu_state : MainMenuState
+var debug_state : DebugState
 
 #TODO var _game_run : GameRun
 var _state_machine : StateMachine
@@ -29,8 +30,10 @@ func _ready() -> void:
 
 func _setup_state_machine() -> void:
 	var transitions : Dictionary = {
-		MainMenuState.STATE_NAME : [PlayState.STATE_NAME],
-		PlayState.STATE_NAME : [MainMenuState.STATE_NAME]
+		MainMenuState.STATE_NAME : [PlayState.STATE_NAME, DebugState.STATE_NAME],
+		PlayState.STATE_NAME : [MainMenuState.STATE_NAME],
+		PauseState.STATE_NAME : [PlayState.STATE_NAME, DebugState.STATE_NAME],
+		DebugState.STATE_NAME : [PauseState.STATE_NAME, MainMenuState.STATE_NAME]
 	}
 	
 	_state_machine = StateMachine.new("game_state", transitions)
@@ -38,6 +41,7 @@ func _setup_state_machine() -> void:
 	main_menu_state = MainMenuState.new(_state_machine)
 	play_state = PlayState.new(_state_machine)
 	pause_state = PauseState.new(_state_machine)
+	debug_state = DebugState.new(_state_machine)
 	
 	_state_machine.transition_to(main_menu_state)
 
@@ -74,4 +78,5 @@ func change_scene_sync(scene : PackedScene) -> void:
 	_scene_root.add_child(new_scene)
 	
 func start_debug_room() -> void:
+	_state_machine.transition_to(debug_state)
 	change_scene_deferred(_debug_scene)
