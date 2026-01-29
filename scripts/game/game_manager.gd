@@ -62,8 +62,6 @@ func request_unpause() -> bool:
 func change_scene_deferred(scene : PackedScene) -> void:
 	await get_tree().process_frame
 	change_scene_sync(scene)
-	
-	call_deferred("_add_version_display_to_scene")
 
 ## Clears all scenes from the root and calls the requested scene afterwards
 func change_scene_sync(scene : PackedScene) -> void:
