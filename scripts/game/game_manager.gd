@@ -8,6 +8,7 @@ var main_menu_state : MainMenuState
 #TODO var _game_run : GameRun
 var _state_machine : StateMachine
 
+@export var _debug_scene : PackedScene
 @export var _scene_root : Control
 @export var _popup_queue : PopupQueue
 
@@ -36,6 +37,7 @@ func _setup_state_machine() -> void:
 	
 	main_menu_state = MainMenuState.new(_state_machine)
 	play_state = PlayState.new(_state_machine)
+	pause_state = PauseState.new(_state_machine)
 	
 	_state_machine.transition_to(main_menu_state)
 
@@ -70,3 +72,6 @@ func change_scene_sync(scene : PackedScene) -> void:
 	
 	var new_scene = scene.instantiate()
 	_scene_root.add_child(new_scene)
+	
+func start_debug_room() -> void:
+	change_scene_deferred(_debug_scene)
