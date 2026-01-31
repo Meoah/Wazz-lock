@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://dlavphbdpxnvr"]
+[gd_scene load_steps=2 format=3 uid="uid://dlavphbdpxnvr"]
 
 [ext_resource type="Script" uid="uid://dqsdjnunkuge3" path="res://scripts/ui/pop_ups/pause_popup.gd" id="1_5crv1"]
 

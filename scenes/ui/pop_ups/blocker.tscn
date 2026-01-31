@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://bo6oudf3dtprg"]
+[gd_scene load_steps=2 format=3 uid="uid://bo6oudf3dtprg"]
 
 [ext_resource type="Script" uid="uid://c176yiw6hpys4" path="res://scripts/ui/pop_ups/blocker.gd" id="1_amrue"]
 
