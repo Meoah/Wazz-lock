@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://33i3ugqxc7ho"]
 
-[node name="default" type="Node"]
+[node name="default" type="Node" unique_id=321823284]
 
-[node name="Label" type="Label" parent="."]
+[node name="Label" type="Label" parent="." unique_id=1093721060]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0

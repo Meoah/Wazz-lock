@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://cpv5i74img1v3"]
+[gd_scene format=3 uid="uid://cpv5i74img1v3"]
 
 [ext_resource type="Script" uid="uid://dbaxi2jjyn2im" path="res://scripts/game/game_manager.gd" id="1_hwd4i"]
 [ext_resource type="Script" uid="uid://dlyqy2ujtb70s" path="res://scripts/ui/pop_ups/popup_queue.gd" id="2_glms7"]
