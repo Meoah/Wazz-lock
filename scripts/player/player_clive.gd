@@ -42,6 +42,8 @@ func _physics_process(delta) -> void:
 		
 	move_and_slide()
 
+# Flips the entire node visuaully on the h axis. It has to be like this
+#	as negatives are converted back to positive each update tick.
 func flip_h(negative : bool = false) -> void:
 	if negative:
 		scale.y = -1 * initial_scale.y

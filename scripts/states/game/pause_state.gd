@@ -15,5 +15,5 @@ func enter(previous_state: State, data: Dictionary = {}) -> void:
 	
 	Engine.time_scale = 0.0
 
-func exit(next_state : State) -> void:
+func exit(_next_state : State) -> void:
 	Engine.time_scale = 1.0
