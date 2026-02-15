@@ -3,8 +3,10 @@ class_name Clive
 
 var manager : PlayerManager
 
+@export var sprite : AnimatedSprite2D
 @export var move_speed : float = 200.0
 var move_direction : Vector2 = Vector2.ZERO
+var initial_scale : Vector2 = Vector2.ZERO
 
 var move_inputs : Dictionary ={
 	"ui_up" : false,
@@ -17,17 +19,39 @@ var attack_input : bool = false
 
 func _ready() -> void:
 	manager = PlayerManager.new()
+	initial_scale = scale
+	
+func _process(_delta: float) -> void:
+	# TODO Should this stay in this script or to the manager?
+	if manager.get_current_state() == manager.walking_state:
+		sprite.sprite_frames.set_animation_speed("idle", 16.0)
+	if manager.get_current_state() == manager.idle_state:
+		sprite.sprite_frames.set_animation_speed("idle", 4.0)
 
 func _physics_process(delta) -> void:
 	manager.physics_update(delta, move_direction, roll_input, attack_input)
 	
 	if manager.is_allow_movement():
 		velocity = move_direction * move_speed
+		if move_direction.x < 0:
+			flip_h(true)
+		elif move_direction.x > 0:
+			flip_h(false)
 	else:
 		velocity = Vector2.ZERO
 		
 	move_and_slide()
-	
+
+# Flips the entire node visuaully on the h axis. It has to be like this
+#	as negatives are converted back to positive each update tick.
+func flip_h(negative : bool = false) -> void:
+	if negative:
+		scale.y = -1 * initial_scale.y
+		rotation_degrees = 180.0
+	else:
+		scale.y = initial_scale.y
+		rotation_degrees = 0.0
+
 func _input(event : InputEvent) -> void:
 	var direction : bool = false
 	

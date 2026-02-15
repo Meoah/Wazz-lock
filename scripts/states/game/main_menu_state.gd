@@ -12,7 +12,6 @@ func _init(parent : StateMachine) -> void:
 	
 func enter(previous_state : State, data : Dictionary = {}) -> void:
 	super.enter(previous_state, data)
-	
 	GameManager.clear_popup_queue()
 	GameManager.change_scene_deferred(MAIN_MENU_SCENE)
 	
