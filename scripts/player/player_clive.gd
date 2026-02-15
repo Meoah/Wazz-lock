@@ -1,21 +1,16 @@
 extends CharacterBody2D
 class_name Clive
 
+# Manager
 var manager : PlayerManager
-
+# Node exports
 @export var sprite : AnimatedSprite2D
+# Movement
 @export var move_speed : float = 200.0
 var move_direction : Vector2 = Vector2.ZERO
 var initial_scale : Vector2 = Vector2.ZERO
-
-var move_inputs : Dictionary ={
-	"ui_up" : false,
-	"ui_down" : false,
-	"ui_left" : false,
-	"ui_right" : false
-}
-var roll_input : bool = false
-var attack_input : bool = false
+# Input
+var input_flags : int = 0
 
 func _ready() -> void:
 	manager = PlayerManager.new()
@@ -29,7 +24,7 @@ func _process(_delta: float) -> void:
 		sprite.sprite_frames.set_animation_speed("idle", 4.0)
 
 func _physics_process(delta) -> void:
-	manager.physics_update(delta, move_direction, roll_input, attack_input)
+	manager.physics_update(delta, input_flags)
 	
 	if manager.is_allow_movement():
 		velocity = move_direction * move_speed
@@ -53,30 +48,42 @@ func flip_h(negative : bool = false) -> void:
 		rotation_degrees = 0.0
 
 func _input(event : InputEvent) -> void:
-	var direction : bool = false
-	
 	## Main input reader
-	for each in move_inputs.keys():
-		if event.is_action(each):
-			move_inputs[each] = event.is_pressed()
-			direction = true
-	if event.is_action_pressed("ui_dodge"):
-		roll_input = true
-	elif event.is_action_released("ui_dodge"):
-		roll_input = false
-	if event.is_action_pressed("ui_select"):
-		attack_input = true
-	elif event.is_action_released("ui_select"):
-		attack_input = false
+	if event.is_action_pressed("move_left"):		_set_flag(PlayerManager.InputFlags.MOVE_LEFT, true)
+	if event.is_action_released("move_left"):		_set_flag(PlayerManager.InputFlags.MOVE_LEFT, false)
+	if event.is_action_pressed("move_right"):		_set_flag(PlayerManager.InputFlags.MOVE_RIGHT, true)
+	if event.is_action_released("move_right"):		_set_flag(PlayerManager.InputFlags.MOVE_RIGHT, false)
+	if event.is_action_pressed("move_up"):			_set_flag(PlayerManager.InputFlags.MOVE_UP, true)
+	if event.is_action_released("move_up"):			_set_flag(PlayerManager.InputFlags.MOVE_UP, false)
+	if event.is_action_pressed("move_down"):		_set_flag(PlayerManager.InputFlags.MOVE_DOWN, true)
+	if event.is_action_released("move_down"):		_set_flag(PlayerManager.InputFlags.MOVE_DOWN, false)
+	if event.is_action_pressed("move_dodge"):		_set_flag(PlayerManager.InputFlags.DODGE, true)
+	if event.is_action_released("move_dodge"):		_set_flag(PlayerManager.InputFlags.DODGE, false)
+	if event.is_action_pressed("move_primary"):		_set_flag(PlayerManager.InputFlags.PRIMARY, true)
+	if event.is_action_released("move_primary"):	_set_flag(PlayerManager.InputFlags.PRIMARY, false)
+	if event.is_action_pressed("move_secondary"):	_set_flag(PlayerManager.InputFlags.SECONDARY, true)
+	if event.is_action_released("move_secondary"):	_set_flag(PlayerManager.InputFlags.SECONDARY, false)
 	
-	## Updates direction only if corresponding keys are pressed 
-	if direction:
-		_update_move_dir()
-		
+	## Updates
+	_update_move_dir()
+
+func _notification(what: int) -> void:
+	# Resets movement flags to 0 if window loses focus.
+	if what == NOTIFICATION_WM_WINDOW_FOCUS_OUT : input_flags = 0
+	_update_move_dir()
+
+# Changes move direction according to input_flags
 func _update_move_dir() -> void:
-	var x : int = int(move_inputs["ui_right"]) - int(move_inputs["ui_left"])
-	var y : int = int(move_inputs["ui_down"]) - int(move_inputs["ui_up"])
+	var x : int = int((input_flags & PlayerManager.InputFlags.MOVE_RIGHT) != 0) \
+		   - int((input_flags & PlayerManager.InputFlags.MOVE_LEFT) != 0)
+	var y : int = int((input_flags & PlayerManager.InputFlags.MOVE_DOWN) != 0) \
+		   - int((input_flags & PlayerManager.InputFlags.MOVE_UP) != 0)
 	move_direction = Vector2(x,y)
 	
 	if move_direction != Vector2.ZERO:
 		move_direction = move_direction.normalized()
+
+# Sets flag on or off
+func _set_flag(flag : int, enabled : bool) -> void:
+	if enabled : input_flags |= flag
+	else : input_flags &= ~flag

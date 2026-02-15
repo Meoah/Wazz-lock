@@ -11,7 +11,16 @@ var attacking_state : PlayerAttackingState
 var hurt_state : PlayerHurtState
 var dead_state : PlayerDeadState
 
-# Status Flags
+# Flags
+enum InputFlags{
+	MOVE_UP		= 1 << 0,
+	MOVE_DOWN	= 1 << 1,
+	MOVE_LEFT	= 1 << 2,
+	MOVE_RIGHT	= 1 << 3,
+	DODGE		= 1 << 4,
+	PRIMARY		= 1 << 5,
+	SECONDARY	= 1 << 6
+}
 enum STATUS_FLAG{
 	INVULN = 1
 }
@@ -46,19 +55,24 @@ func get_current_state() -> State:
 func is_allow_movement() -> bool:
 	return state_machine.current_state.allows_movement()
 
-func physics_update(delta : float, move_direction : Vector2, req_roll : bool, req_attack : bool) -> void:
+func physics_update(delta : float, input_flags : int) -> void:
+	# Movement flags
+	var movement_flags : int = InputFlags.MOVE_UP | InputFlags.MOVE_DOWN | InputFlags.MOVE_LEFT | InputFlags.MOVE_RIGHT
+	
 	## TODO Interrupts (hurt/dead)
 	
 	## Transitions by priority (roll > attack > movement)
-	if req_roll:
+	if input_flags & InputFlags.DODGE :
 		state_machine.transition_to(rolling_state)
-	elif req_attack:
+		print(input_flags)
+	elif input_flags & InputFlags.PRIMARY:
 		state_machine.transition_to(attacking_state)
 	else:
-		if move_direction != Vector2.ZERO:
+		if input_flags & movement_flags != 0:
 			state_machine.transition_to(walking_state)
 		else:
 			state_machine.transition_to(idle_state)
 			
 	## Runs current state behavior
-	state_machine.current_state.physics_update(delta, move_direction)
+	# TODO is this required?
+	state_machine.current_state.physics_update(delta, input_flags)

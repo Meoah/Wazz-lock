@@ -19,5 +19,5 @@ func exit(next_state : State) -> void:
 func allows_movement() -> bool:
 	return true
 
-func physics_update(_delta : float, _move_direction : Vector2) -> void:
+func physics_update(_delta : float, _move_direction : int) -> void:
 	pass
