@@ -1,7 +1,7 @@
-[gd_scene load_steps=14 format=3 uid="uid://cepaf77ic4q03"]
+[gd_scene load_steps=33 format=3 uid="uid://cepaf77ic4q03"]
 
 [ext_resource type="Script" uid="uid://d4ibmcipy3vnl" path="res://scripts/player/player_clive.gd" id="1_iwdwx"]
-[ext_resource type="Texture2D" uid="uid://c5yf27ql1ronm" path="res://assets/textures/actors/clive/spritesheets/Clive_SpriteSheet_Idle.png" id="2_fi64q"]
+[ext_resource type="Texture2D" uid="uid://c0m7qwyx0gww8" path="res://assets/textures/actors/clive/spritesheets/Clive_Spritesheet_01.png" id="2_fi64q"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_ntpy2"]
 atlas = ExtResource("2_fi64q")
@@ -35,6 +35,30 @@ region = Rect2(6144, 0, 1024, 1024)
 atlas = ExtResource("2_fi64q")
 region = Rect2(7168, 0, 1024, 1024)
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_fi64q"]
+atlas = ExtResource("2_fi64q")
+region = Rect2(0, 3072, 1024, 1024)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_op51h"]
+atlas = ExtResource("2_fi64q")
+region = Rect2(1024, 3072, 1024, 1024)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wur2a"]
+atlas = ExtResource("2_fi64q")
+region = Rect2(2048, 3072, 1024, 1024)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qwd0l"]
+atlas = ExtResource("2_fi64q")
+region = Rect2(3072, 3072, 1024, 1024)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_eq1ym"]
+atlas = ExtResource("2_fi64q")
+region = Rect2(4096, 3072, 1024, 1024)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lmkq3"]
+atlas = ExtResource("2_fi64q")
+region = Rect2(5120, 3072, 1024, 1024)
+
 [sub_resource type="SpriteFrames" id="SpriteFrames_6dulk"]
 animations = [{
 "frames": [{
@@ -65,6 +89,93 @@ animations = [{
 "loop": true,
 "name": &"idle",
 "speed": 4.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fi64q")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_op51h")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wur2a")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qwd0l")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_eq1ym")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lmkq3")
+}],
+"loop": true,
+"name": &"rolling",
+"speed": 5.0
+}]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6dulk"]
+atlas = ExtResource("2_fi64q")
+region = Rect2(0, 1024, 1024, 1024)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ych0b"]
+atlas = ExtResource("2_fi64q")
+region = Rect2(1024, 1024, 1024, 1024)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_a8cwv"]
+atlas = ExtResource("2_fi64q")
+region = Rect2(2048, 1024, 1024, 1024)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_54sbd"]
+atlas = ExtResource("2_fi64q")
+region = Rect2(3072, 1024, 1024, 1024)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_matfd"]
+atlas = ExtResource("2_fi64q")
+region = Rect2(4096, 1024, 1024, 1024)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_aid0d"]
+atlas = ExtResource("2_fi64q")
+region = Rect2(5120, 1024, 1024, 1024)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_sv0t7"]
+atlas = ExtResource("2_fi64q")
+region = Rect2(6144, 1024, 1024, 1024)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6m4a3"]
+atlas = ExtResource("2_fi64q")
+region = Rect2(7168, 1024, 1024, 1024)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_op51h"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6dulk")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ych0b")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_a8cwv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_54sbd")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_matfd")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_aid0d")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_sv0t7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6m4a3")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 4.0
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_iwdwx"]
@@ -74,14 +185,211 @@ size = Vector2(200.00005, 460.00018)
 radius = 80.00001
 height = 400.00006
 
-[node name="Clive" type="CharacterBody2D" node_paths=PackedStringArray("sprite")]
+[sub_resource type="Animation" id="Animation_ntpy2"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("BodyRoot/Body:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [&"idle"]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("BodyRoot/Hands:animation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [&"idle"]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("BodyRoot/Body:frame")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("BodyRoot/Hands:frame")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("BodyRoot/Hands:visible")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("HurtBox:visible")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="Animation" id="Animation_fi64q"]
+resource_name = "default"
+length = 2.0000033
+loop_mode = 1
+step = 0.25
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("BodyRoot/Body:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [&"idle"]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("BodyRoot/Hands:animation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [&"idle"]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("BodyRoot/Body:frame")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3, 4, 5, 6, 7]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("BodyRoot/Hands:frame")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3, 4, 5, 6, 7]
+}
+
+[sub_resource type="Animation" id="Animation_nkls8"]
+resource_name = "rolling"
+length = 0.37500626
+step = 0.0625
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("BodyRoot/Body:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [&"rolling"]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("BodyRoot/Hands:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("BodyRoot/Body:frame")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.0625, 0.125, 0.1875, 0.25, 0.3125),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3, 4, 5]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("HurtBox:visible")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_ntpy2"]
+_data = {
+&"RESET": SubResource("Animation_ntpy2"),
+&"default": SubResource("Animation_fi64q"),
+&"rolling": SubResource("Animation_nkls8")
+}
+
+[node name="Clive" type="CharacterBody2D" node_paths=PackedStringArray("animation_player", "body_root")]
 scale = Vector2(0.25, 0.25)
 script = ExtResource("1_iwdwx")
-sprite = NodePath("AnimatedSprite2D")
+animation_player = NodePath("AnimationPlayer")
+body_root = NodePath("BodyRoot")
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+[node name="BodyRoot" type="Node2D" parent="."]
+
+[node name="Body" type="AnimatedSprite2D" parent="BodyRoot"]
 scale = Vector2(0.99999994, 0.99999994)
 sprite_frames = SubResource("SpriteFrames_6dulk")
+animation = &"idle"
+autoplay = "idle"
+
+[node name="Hands" type="AnimatedSprite2D" parent="BodyRoot"]
+sprite_frames = SubResource("SpriteFrames_op51h")
 animation = &"idle"
 autoplay = "idle"
 
@@ -95,3 +403,11 @@ position = Vector2(20, 80)
 scale = Vector2(0.99999994, 0.99999994)
 shape = SubResource("CapsuleShape2D_oxjxs")
 debug_color = Color(0.63062656, 0.5243399, 0.216681, 0.41960785)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_ntpy2")
+}
+autoplay = "default"
+
+[connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]

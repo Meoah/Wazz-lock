@@ -27,15 +27,37 @@ enum STATUS_FLAG{
 
 func _init() -> void:
 	_setup_state_machine()
+	SignalBus.connect("rolling_complete", request_idle)
 
 func _setup_state_machine() -> void:
 	var transitions : Dictionary = {
-		PlayerIdleState.STATE_NAME : [PlayerWalkingState.STATE_NAME, PlayerRollingState.STATE_NAME, PlayerAttackingState.STATE_NAME, PlayerHurtState.STATE_NAME, PlayerDeadState.STATE_NAME],
-		PlayerWalkingState.STATE_NAME : [PlayerIdleState.STATE_NAME, PlayerRollingState.STATE_NAME, PlayerAttackingState.STATE_NAME, PlayerHurtState.STATE_NAME, PlayerDeadState.STATE_NAME],
-		PlayerRollingState.STATE_NAME : [PlayerIdleState.STATE_NAME, PlayerWalkingState.STATE_NAME,  PlayerHurtState.STATE_NAME, PlayerDeadState.STATE_NAME],
-		PlayerAttackingState.STATE_NAME : [PlayerIdleState.STATE_NAME, PlayerWalkingState.STATE_NAME,  PlayerHurtState.STATE_NAME, PlayerDeadState.STATE_NAME],
-		PlayerHurtState.STATE_NAME : [PlayerIdleState.STATE_NAME, PlayerDeadState.STATE_NAME],
-		PlayerDeadState.STATE_NAME : [PlayerIdleState.STATE_NAME]
+		PlayerIdleState.STATE_NAME : [
+			PlayerWalkingState.STATE_NAME,
+			PlayerRollingState.STATE_NAME,
+			PlayerAttackingState.STATE_NAME,
+			PlayerHurtState.STATE_NAME,
+			PlayerDeadState.STATE_NAME],
+		PlayerWalkingState.STATE_NAME : [
+			PlayerIdleState.STATE_NAME,
+			PlayerRollingState.STATE_NAME,
+			PlayerAttackingState.STATE_NAME,
+			PlayerHurtState.STATE_NAME,
+			PlayerDeadState.STATE_NAME],
+		PlayerRollingState.STATE_NAME : [
+			PlayerIdleState.STATE_NAME,
+			PlayerWalkingState.STATE_NAME,
+			PlayerHurtState.STATE_NAME,
+			PlayerDeadState.STATE_NAME],
+		PlayerAttackingState.STATE_NAME : [
+			PlayerIdleState.STATE_NAME,
+			PlayerWalkingState.STATE_NAME,
+			PlayerHurtState.STATE_NAME,
+			PlayerDeadState.STATE_NAME],
+		PlayerHurtState.STATE_NAME : [
+			PlayerIdleState.STATE_NAME,
+			PlayerDeadState.STATE_NAME],
+		PlayerDeadState.STATE_NAME : [
+			PlayerIdleState.STATE_NAME]
 	}
 	
 	state_machine = StateMachine.new("player_state", transitions)
@@ -64,7 +86,6 @@ func physics_update(delta : float, input_flags : int) -> void:
 	## Transitions by priority (roll > attack > movement)
 	if input_flags & InputFlags.DODGE :
 		state_machine.transition_to(rolling_state)
-		print(input_flags)
 	elif input_flags & InputFlags.PRIMARY:
 		state_machine.transition_to(attacking_state)
 	else:
@@ -76,3 +97,7 @@ func physics_update(delta : float, input_flags : int) -> void:
 	## Runs current state behavior
 	# TODO is this required?
 	state_machine.current_state.physics_update(delta, input_flags)
+
+## Requests by other systems. Returns false if invalid transition
+func request_idle() -> bool : return state_machine.transition_to(idle_state) == OK
+	

@@ -30,10 +30,17 @@ func _ready() -> void:
 
 func _setup_state_machine() -> void:
 	var transitions : Dictionary = {
-		MainMenuState.STATE_NAME : [PlayState.STATE_NAME, DebugState.STATE_NAME],
-		PlayState.STATE_NAME : [MainMenuState.STATE_NAME],
-		PauseState.STATE_NAME : [PlayState.STATE_NAME, DebugState.STATE_NAME],
-		DebugState.STATE_NAME : [PauseState.STATE_NAME, MainMenuState.STATE_NAME]
+		MainMenuState.STATE_NAME : [
+			PlayState.STATE_NAME,
+			DebugState.STATE_NAME],
+		PlayState.STATE_NAME : [
+			MainMenuState.STATE_NAME],
+		PauseState.STATE_NAME : [
+			PlayState.STATE_NAME,
+			DebugState.STATE_NAME],
+		DebugState.STATE_NAME : [
+			PauseState.STATE_NAME,
+			MainMenuState.STATE_NAME]
 	}
 	
 	_state_machine = StateMachine.new("game_state", transitions)
