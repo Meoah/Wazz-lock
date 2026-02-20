@@ -6,17 +6,36 @@ var manager : PlayerManager
 # Animation
 @export var animation_player : AnimationPlayer
 @export var body_root : Node2D
+@export var hands : AnimatedSprite2D
+@export var aim_arrow : Sprite2D
 # Movement
 const BASE_SPEED : float = 200.0
 var move_speed : float = 200.0
 var move_direction : Vector2 = Vector2.ZERO
 var initial_scale : Vector2 = Vector2.ZERO
-var is_rolling : bool = false
 # Input
 var input_flags : int = 0
-var input_lock : bool = false
+enum INPUT_FLAG{
+	MOVE_UP		= 1 << 0,
+	MOVE_DOWN	= 1 << 1,
+	MOVE_LEFT	= 1 << 2,
+	MOVE_RIGHT	= 1 << 3,
+	DODGE		= 1 << 4,
+	PRIMARY		= 1 << 5,
+	SECONDARY	= 1 << 6
+}
 # Flash
 var flash_tween : Tween
+# Cooldowns
+var roll_cooldown : float = 0.0
+var attack_cooldown : float = 0.0
+# Status Flags
+var status_flags : int = 0
+enum STATUS_FLAG{
+	INVULN		= 1 << 0,
+	ROLLING		= 1 << 1,
+	ATTACKING	= 1 << 2
+}
 
 func _ready() -> void:
 	manager = PlayerManager.new()
@@ -24,30 +43,65 @@ func _ready() -> void:
 	
 	# Connects signals
 	SignalBus.connect("signal_player_rolling", _attempt_roll)
+	SignalBus.connect("signal_player_attacking", _attempt_attack)
 	
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
+	_update_timers(delta)
+	# TODO _update_status()
+	_update_aim()
+	_update_state()
+	
 	# Handles which animation to play depending on state.
 	if manager.get_current_state() is PlayerWalkingState: _play_walking()
 	if manager.get_current_state() is PlayerIdleState: _play_idle()
 
-func _physics_process(delta) -> void:
-	# Sends data to manager for state transitions.
-	if !is_rolling:
-		manager.physics_update(delta, input_flags)
+
+func _physics_process(_delta : float) -> void:
+	_movement_handler()
 	
-	# Movement handler
-	var adjusted_move_speed = move_speed
-	if manager.get_current_state() is PlayerRollingState:
-		adjusted_move_speed *= 2.0
-		velocity = move_direction * adjusted_move_speed
-	if manager.is_allow_movement():
-		velocity = move_direction * adjusted_move_speed
-		if move_direction.x < 0:
-			_flip_h(true)
-		elif move_direction.x > 0:
-			_flip_h(false)
-		
-	move_and_slide()
+
+func _input(event : InputEvent) -> void:
+	## Main input reader
+	if event.is_action_pressed("move_left"):		_set_input_flag(INPUT_FLAG.MOVE_LEFT, true)
+	if event.is_action_released("move_left"):		_set_input_flag(INPUT_FLAG.MOVE_LEFT, false)
+	if event.is_action_pressed("move_right"):		_set_input_flag(INPUT_FLAG.MOVE_RIGHT, true)
+	if event.is_action_released("move_right"):		_set_input_flag(INPUT_FLAG.MOVE_RIGHT, false)
+	if event.is_action_pressed("move_up"):			_set_input_flag(INPUT_FLAG.MOVE_UP, true)
+	if event.is_action_released("move_up"):			_set_input_flag(INPUT_FLAG.MOVE_UP, false)
+	if event.is_action_pressed("move_down"):		_set_input_flag(INPUT_FLAG.MOVE_DOWN, true)
+	if event.is_action_released("move_down"):		_set_input_flag(INPUT_FLAG.MOVE_DOWN, false)
+	if event.is_action_pressed("move_dodge"):		_set_input_flag(INPUT_FLAG.DODGE, true)
+	if event.is_action_released("move_dodge"):		_set_input_flag(INPUT_FLAG.DODGE, false)
+	if event.is_action_pressed("move_primary"):		_set_input_flag(INPUT_FLAG.PRIMARY, true)
+	if event.is_action_released("move_primary"):	_set_input_flag(INPUT_FLAG.PRIMARY, false)
+	if event.is_action_pressed("move_secondary"):	_set_input_flag(INPUT_FLAG.SECONDARY, true)
+	if event.is_action_released("move_secondary"):	_set_input_flag(INPUT_FLAG.SECONDARY, false)
+	
+	## Updates
+	_update_move_direction()
+
+func _notification(what: int) -> void:
+	# Resets movement flags to 0 if window loses focus.
+	if what == NOTIFICATION_WM_WINDOW_FOCUS_OUT : input_flags = 0
+	_update_move_direction()
+
+# Handles all timers.
+func _update_timers(delta : float) -> void:
+	roll_cooldown -= delta
+	attack_cooldown -= delta
+
+func _update_state() -> void:
+	# Movement flags
+	var movement_flags : int = INPUT_FLAG.MOVE_UP | INPUT_FLAG.MOVE_DOWN | INPUT_FLAG.MOVE_LEFT | INPUT_FLAG.MOVE_RIGHT
+	
+	## TODO Interrupts (hurt/dead)
+	
+	## Transitions by priority (roll > attack > movement)
+	#TODO Primary/secondary attack
+	if input_flags & INPUT_FLAG.DODGE && roll_cooldown < 0 : manager.request_rolling()
+	elif input_flags & INPUT_FLAG.PRIMARY && attack_cooldown < 0 : manager.request_attacking()
+	elif input_flags & movement_flags != 0 : manager.request_walking()
+	else : manager.request_idle()
 
 # Flips the entire node visuaully on the h axis. It has to be like this
 #	as negatives are converted back to positive each update tick.
@@ -59,49 +113,49 @@ func _flip_h(negative : bool = false) -> void:
 		scale.y = initial_scale.y
 		rotation_degrees = 0.0
 
-func _input(event : InputEvent) -> void:
-	## Main input reader
-	if event.is_action_pressed("move_left"):		_set_flag(PlayerManager.InputFlags.MOVE_LEFT, true)
-	if event.is_action_released("move_left"):		_set_flag(PlayerManager.InputFlags.MOVE_LEFT, false)
-	if event.is_action_pressed("move_right"):		_set_flag(PlayerManager.InputFlags.MOVE_RIGHT, true)
-	if event.is_action_released("move_right"):		_set_flag(PlayerManager.InputFlags.MOVE_RIGHT, false)
-	if event.is_action_pressed("move_up"):			_set_flag(PlayerManager.InputFlags.MOVE_UP, true)
-	if event.is_action_released("move_up"):			_set_flag(PlayerManager.InputFlags.MOVE_UP, false)
-	if event.is_action_pressed("move_down"):		_set_flag(PlayerManager.InputFlags.MOVE_DOWN, true)
-	if event.is_action_released("move_down"):		_set_flag(PlayerManager.InputFlags.MOVE_DOWN, false)
-	if event.is_action_pressed("move_dodge"):		_set_flag(PlayerManager.InputFlags.DODGE, true)
-	if event.is_action_released("move_dodge"):		_set_flag(PlayerManager.InputFlags.DODGE, false)
-	if event.is_action_pressed("move_primary"):		_set_flag(PlayerManager.InputFlags.PRIMARY, true)
-	if event.is_action_released("move_primary"):	_set_flag(PlayerManager.InputFlags.PRIMARY, false)
-	if event.is_action_pressed("move_secondary"):	_set_flag(PlayerManager.InputFlags.SECONDARY, true)
-	if event.is_action_released("move_secondary"):	_set_flag(PlayerManager.InputFlags.SECONDARY, false)
-	
-	## Updates
-	_update_move_dir()
-
-func _notification(what: int) -> void:
-	# Resets movement flags to 0 if window loses focus.
-	if what == NOTIFICATION_WM_WINDOW_FOCUS_OUT : input_flags = 0
-	_update_move_dir()
-
 # Changes move direction according to input_flags
-func _update_move_dir() -> void:
-	# Don't read input if input_lock is true.
-	if input_lock : return
+func _update_move_direction() -> void:
+	# Don't read input if rolling.
+	if status_flags & STATUS_FLAG.ROLLING : return
 	
-	var x : int = int((input_flags & PlayerManager.InputFlags.MOVE_RIGHT) != 0) \
-		   - int((input_flags & PlayerManager.InputFlags.MOVE_LEFT) != 0)
-	var y : int = int((input_flags & PlayerManager.InputFlags.MOVE_DOWN) != 0) \
-		   - int((input_flags & PlayerManager.InputFlags.MOVE_UP) != 0)
+	var x : int = int((input_flags & INPUT_FLAG.MOVE_RIGHT) != 0) \
+		   - int((input_flags & INPUT_FLAG.MOVE_LEFT) != 0)
+	var y : int = int((input_flags & INPUT_FLAG.MOVE_DOWN) != 0) \
+		   - int((input_flags & INPUT_FLAG.MOVE_UP) != 0)
 	move_direction = Vector2(x,y)
 	
 	if move_direction != Vector2.ZERO:
 		move_direction = move_direction.normalized()
 
-# Sets flag on or off
-func _set_flag(flag : int, enabled : bool) -> void:
+# Checks if movement is allowed.
+func _movement_handler() -> void:
+	# If there are movement adjustments, do them here.
+	var adjusted_move_speed = move_speed
+	
+	# Rolling state, disallows movement adjustment when rolling.
+	if manager.get_current_state() is PlayerRollingState:
+		adjusted_move_speed *= 2.0
+		velocity = move_direction * adjusted_move_speed
+	
+	# If state allows movement, do so.
+	if manager.is_allow_movement():
+		velocity = move_direction * adjusted_move_speed
+		# Flips horizontally if player faces left.
+		# TODO mouse aiming may alter this logic.
+		if move_direction.x < 0 : _flip_h(true)
+		elif move_direction.x > 0 : _flip_h(false)
+	
+	move_and_slide()
+
+# Sets input flag on or off
+func _set_input_flag(flag : int, enabled : bool) -> void:
 	if enabled : input_flags |= flag
 	else : input_flags &= ~flag
+	
+# Sets status flag on or off
+func _set_status_flag(flag : int, enabled : bool) -> void:
+	if enabled : status_flags |= flag
+	else : status_flags &= ~flag
 
 # Plays default animation with a scaling speed depending on adjusted speed.
 func _play_walking() -> void:
@@ -120,29 +174,30 @@ func _play_idle() -> void:
 const ROLL_HOLD_FRAMES : int = 15 # How long the preroll is in frames before rolling.
 const ROLL_FLASH_COLOR : Color = Color(0x41bbf3ff)
 const ROLL_FLASH_FADE_IN : float = 0.3
-const ROLL_FLASH_FADE_OUT : float = 0.08
+const ROLL_FLASH_FADE_OUT : float = 0.3
 # Attempts to start the roll.
 func _attempt_roll() -> void:
-	if is_rolling : return
-	input_lock = true
-	is_rolling = true
+	if status_flags & STATUS_FLAG.ROLLING : return
+	_set_status_flag(STATUS_FLAG.ROLLING, true)
 	_roll()
 
 # Actual roll logic. Played once.
 # TODO Might need to consider animation cancel handling.
 func _roll() -> void:
-	# Saves current animation and freezes it.
-	#var previous_animation := animation_player.current_animation
-	#var previous_position := animation_player.current_animation_position
+	# Freezes current animation and triggers flash.
 	animation_player.pause()
-	await _preroll_glow()
+	await _preroll_flash()
+	
+	# Play actual rolling animation.
 	animation_player.speed_scale = 1.0
 	animation_player.play("rolling")
+	
+	# Cleanup
 	await animation_player.animation_finished
 	_postroll()
 
 # Freeze frames and activates the flash.
-func _preroll_glow() -> void:
+func _preroll_flash() -> void:
 	# Resets the flash if it's currently in use.
 	body_root.modulate = Color(1.0, 1.0, 1.0, 1.0)
 	
@@ -159,13 +214,11 @@ func _preroll_glow() -> void:
 
 # Tweens the glow back to 0 and sets state back to idle.
 func _postroll() -> void:
-	# Signal that the roll is done and finishes the roll.
-	SignalBus.rolling_complete.emit()
-	await get_tree().process_frame
-	is_rolling = false
-	input_lock = false
+	# Cooldown and flag.
+	roll_cooldown = 0.5
+	_set_status_flag(STATUS_FLAG.ROLLING, false)
 	
-	# Resets tween, then plays the flash tween.
+	# Resets tween, then replays the flash tween to reset back to normal colors.
 	_kill_flash_tween()
 	flash_tween = create_tween()
 	flash_tween.tween_property(body_root, "modulate", Color(1.0, 1.0, 1.0, 1.0), ROLL_FLASH_FADE_OUT)\
@@ -178,7 +231,56 @@ func _kill_flash_tween():
 		flash_tween.kill()
 	flash_tween = null
 
+## Attacking Procedure
+# Finds appropriate attack.
+func _attempt_attack() -> void:
+	# TODO actually have different attacks. For now he just punch
+	_set_status_flag(STATUS_FLAG.ATTACKING, true)
+	
+	var adjusted_attack_speed = 1.0
+	_use_aim()
+	animation_player.speed_scale = adjusted_attack_speed
+	_punch()
+	
+	await animation_player.animation_finished
+	_use_aim(true)
+	_set_status_flag(STATUS_FLAG.ATTACKING, false)
+
+# Do a punch.
+func _punch() -> void:
+	animation_player.play("attacking")
+	_adjust_attack_cooldown(1.0)
+
+# Handles cooldowns.
+func _adjust_attack_cooldown(base : float) -> void :
+	# TODO allow adjustments
+	attack_cooldown = base
+
+## Aiming Procedure
+# Uses the current arrow rotation for where the hands should aim at.
+func _use_aim(reset : bool = false) -> void:
+	if reset : hands.rotation = 0.0
+	else : hands.rotation = aim_arrow.rotation - PI / 2.0
+
+# Finds appropriate aiming type.
+func _update_aim() -> void:
+	# TODO other aim options
+	match SystemData.aim_mode:
+		SystemData.AIMING_MODE.DEFAULT : _keyboard_aim(false)
+
+# Uses the last directional input to determine aim.
+func _keyboard_aim(_assist : bool = false) -> void:
+	if move_direction == Vector2.ZERO : return
+	var target : float = move_direction.angle() + PI / 2.0
+	if scale.y != initial_scale.y : target *= -1.0
+	aim_arrow.rotation = target
+	
+	# TODO add aim assist
+	# if assist : _aim_assist()
+
+# Forces a reset every time an animation is finished.
 func _on_animation_player_animation_finished(anim_name: StringName) -> void:
 	if anim_name != "RESET":
-		animation_player.play(&"RESET")
+		manager.request_reset()
+		animation_player.play("RESET")
 		animation_player.seek(0.0, true)

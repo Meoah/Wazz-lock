@@ -14,4 +14,4 @@ signal signal_player_dead
 @warning_ignore("unused_signal")
 signal signal_player_hurt
 @warning_ignore("unused_signal")
-signal rolling_complete
+signal signal_player_reset

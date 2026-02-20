@@ -1,7 +1,7 @@
 extends PlayerState
-class_name PlayerAttackingState
+class_name PlayerResetState
 
-const STATE_NAME : String = "PLAYER_ATTACKING_STATE"
+const STATE_NAME : String = "PLAYER_RESET_STATE"
 
 func _init(parent : StateMachine) -> void:
 	state_name = STATE_NAME
@@ -9,10 +9,7 @@ func _init(parent : StateMachine) -> void:
 
 func enter(previous_state: State, data: Dictionary = {}) -> void:
 	super.enter(previous_state, data)
-	SignalBus.signal_player_attacking.emit()
+	SignalBus.signal_player_reset.emit()
 
 func exit(next_state : State) -> void:
 	super.exit(next_state)
-
-func allows_movement() -> bool:
-	return true
