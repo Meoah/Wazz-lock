@@ -8,8 +8,8 @@ var manager : PlayerManager
 @export var body_root : Node2D
 @export var hands : AnimatedSprite2D
 @export var aim_arrow : Sprite2D
-@export var collision_box : CollisionShape2D
-@export var hurt_box : Area2D
+@export var hit_box : HitBox
+@export var hurt_box : HurtBox
 @export var health_bar : ProgressBar
 # Movement
 const BASE_SPEED : float = 200.0
@@ -45,16 +45,15 @@ func _ready() -> void:
 	manager = PlayerManager.new()
 	
 	# Connects signals
-	#SignalBus.connect("state_player_hurt", _player_hurt)
+	SignalBus.connect("state_player_hurt", _player_hurt)
 	SignalBus.connect("state_player_dead", _player_dead)
 	SignalBus.connect("state_player_rolling", _attempt_roll)
 	SignalBus.connect("state_player_attacking", _attempt_attack)
 	
 func _process(delta: float) -> void:
-	if manager.get_current_state() is PlayerDeadState : return
-	
 	_update_timers(delta)
 	_update_status()
+	if manager.get_current_state() is PlayerDeadState : return
 	_update_aim()
 	_update_state()
 	
@@ -64,6 +63,7 @@ func _process(delta: float) -> void:
 
 
 func _physics_process(_delta : float) -> void:
+	if manager.get_current_state() is PlayerDeadState : return
 	_movement_handler()
 
 func _input(event : InputEvent) -> void:
@@ -99,8 +99,10 @@ func _update_timers(delta : float) -> void:
 
 # Handles most statuses.
 func _update_status() -> void:
-	if invuln_cooldown > 0 : _set_status_flag(STATUS_FLAG.INVULN, true)
-	if invuln_cooldown <= 0 : _set_status_flag(STATUS_FLAG.INVULN, false)
+	if invuln_cooldown > 0 : 
+		_set_status_flag(STATUS_FLAG.INVULN, true)
+	if invuln_cooldown <= 0 :
+		_set_status_flag(STATUS_FLAG.INVULN, false)
 	
 	# Status handlers.
 	_health_handler()
@@ -120,7 +122,7 @@ var was_invuln : bool = false
 # Determines effects while invuln.
 func _invuln_handler() -> void:
 	# Only run the handler if it detects a change in invuln status.
-	var invuln_now := (status_flags & STATUS_FLAG.INVULN) != 0
+	var invuln_now : bool = (status_flags & STATUS_FLAG.INVULN) != 0
 	if invuln_now == was_invuln : return
 	was_invuln = invuln_now
 	
@@ -129,7 +131,7 @@ func _invuln_handler() -> void:
 
 # Starts the invuln flash.
 func _start_invuln_flash() -> void:
-	# Resets
+	# Resets.
 	_stop_invuln_flash()
 	
 	# Starts the loop of alpha flashing.
@@ -346,6 +348,12 @@ func _keyboard_aim(_assist : bool = false) -> void:
 	# TODO add aim assist
 	# if assist : _aim_assist()
 
+func _player_hurt() -> void:
+	animation_player.speed_scale = 1.0
+	animation_player.play("hurt")
+	invuln_cooldown = 0.5
+
+# Die.
 func _player_dead() -> void:
 	manager.request_dead()
 	animation_player.speed_scale = 1.0

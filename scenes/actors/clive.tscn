@@ -1,8 +1,10 @@
-[gd_scene load_steps=61 format=3 uid="uid://cepaf77ic4q03"]
+[gd_scene load_steps=69 format=3 uid="uid://cepaf77ic4q03"]
 
-[ext_resource type="Script" uid="uid://d4ibmcipy3vnl" path="res://scripts/player/player_clive.gd" id="1_iwdwx"]
+[ext_resource type="Script" uid="uid://d4ibmcipy3vnl" path="res://scripts/actors/player/player_clive.gd" id="1_iwdwx"]
 [ext_resource type="Texture2D" uid="uid://c0m7qwyx0gww8" path="res://assets/textures/actors/clive/spritesheets/Clive_Spritesheet_01.png" id="2_fi64q"]
+[ext_resource type="Script" uid="uid://cvj6l5ujm0x8x" path="res://scripts/systems/hit_box.gd" id="3_ibqeh"]
 [ext_resource type="Texture2D" uid="uid://ckeymueeg50gj" path="res://assets/textures/actors/clive/Arrow_Clive.svg" id="3_ntpy2"]
+[ext_resource type="Script" uid="uid://c2dmqut00g845" path="res://scripts/systems/hurt_box.gd" id="4_ktvhp"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_t5ilq"]
 atlas = ExtResource("2_fi64q")
@@ -67,6 +69,26 @@ region = Rect2(6144, 6144, 1024, 1024)
 [sub_resource type="AtlasTexture" id="AtlasTexture_158a3"]
 atlas = ExtResource("2_fi64q")
 region = Rect2(7168, 6144, 1024, 1024)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ibqeh"]
+atlas = ExtResource("2_fi64q")
+region = Rect2(0, 4096, 1024, 1024)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ktvhp"]
+atlas = ExtResource("2_fi64q")
+region = Rect2(1024, 4096, 1024, 1024)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pjq7m"]
+atlas = ExtResource("2_fi64q")
+region = Rect2(2048, 4096, 1024, 1024)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_o7y33"]
+atlas = ExtResource("2_fi64q")
+region = Rect2(3072, 4096, 1024, 1024)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ts6xf"]
+atlas = ExtResource("2_fi64q")
+region = Rect2(4096, 4096, 1024, 1024)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_ntpy2"]
 atlas = ExtResource("2_fi64q")
@@ -177,6 +199,26 @@ animations = [{
 }],
 "loop": false,
 "name": &"dead",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ibqeh")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ktvhp")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pjq7m")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_o7y33")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ts6xf")
+}],
+"loop": true,
+"name": &"hurt",
 "speed": 5.0
 }, {
 "frames": [{
@@ -431,7 +473,7 @@ tracks/4/keys = {
 tracks/5/type = "value"
 tracks/5/imported = false
 tracks/5/enabled = true
-tracks/5/path = NodePath("HurtBox/Box1:visible")
+tracks/5/path = NodePath("BodyRoot/Hands/Hitbox/Box1:disabled")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
@@ -443,55 +485,55 @@ tracks/5/keys = {
 tracks/6/type = "value"
 tracks/6/imported = false
 tracks/6/enabled = true
-tracks/6/path = NodePath("BodyRoot/Hands/Hitbox/Box1:disabled")
+tracks/6/path = NodePath("BodyRoot/Hands/Hitbox/Box1:shape:size")
 tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [true]
+"update": 0,
+"values": [Vector2(20, 20)]
 }
 tracks/7/type = "value"
 tracks/7/imported = false
 tracks/7/enabled = true
-tracks/7/path = NodePath("BodyRoot/Hands/Hitbox/Box1:shape:size")
+tracks/7/path = NodePath("BodyRoot/Hands/Hitbox/Box1:position")
 tracks/7/interp = 1
 tracks/7/loop_wrap = true
 tracks/7/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector2(20, 20)]
+"values": [Vector2(0, 0)]
 }
 tracks/8/type = "value"
 tracks/8/imported = false
 tracks/8/enabled = true
-tracks/8/path = NodePath("BodyRoot/Hands/Hitbox/Box1:position")
+tracks/8/path = NodePath("BodyRoot/Hands/Hitbox:visible")
 tracks/8/interp = 1
 tracks/8/loop_wrap = true
 tracks/8/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(0, 0)]
+"update": 1,
+"values": [false]
 }
 tracks/9/type = "value"
 tracks/9/imported = false
 tracks/9/enabled = true
-tracks/9/path = NodePath("BodyRoot/Hands/Hitbox:visible")
+tracks/9/path = NodePath("AimArrow:visible")
 tracks/9/interp = 1
 tracks/9/loop_wrap = true
 tracks/9/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [false]
+"values": [true]
 }
 tracks/10/type = "value"
 tracks/10/imported = false
 tracks/10/enabled = true
-tracks/10/path = NodePath("AimArrow:visible")
+tracks/10/path = NodePath("HurtBox:visible")
 tracks/10/interp = 1
 tracks/10/loop_wrap = true
 tracks/10/keys = {
@@ -575,6 +617,58 @@ tracks/5/keys = {
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
 "values": [true, false]
+}
+
+[sub_resource type="Animation" id="Animation_mpwfl"]
+resource_name = "dead"
+length = 1.0666701
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("BodyRoot/Body:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [&"dead"]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("BodyRoot/Body:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.06666667, 0.13333334, 0.20000002, 0.26666668, 0.33333334, 0.40000004, 0.4666667, 0.53333336, 0.6, 0.6666667, 0.73333335, 0.8000001, 0.86666673, 0.9333334, 1),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("BodyRoot/Hands:visible")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("AimArrow:visible")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
 }
 
 [sub_resource type="Animation" id="Animation_fi64q"]
@@ -672,7 +766,7 @@ tracks/2/keys = {
 tracks/3/type = "value"
 tracks/3/imported = false
 tracks/3/enabled = true
-tracks/3/path = NodePath("HurtBox/Box1:visible")
+tracks/3/path = NodePath("HurtBox:visible")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
@@ -682,9 +776,9 @@ tracks/3/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_mpwfl"]
-resource_name = "dead"
-length = 1.0666701
+[sub_resource type="Animation" id="Animation_mkp5j"]
+resource_name = "hurt"
+length = 0.33333668
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -695,39 +789,51 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [&"dead"]
+"values": [&"hurt"]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("BodyRoot/Body:frame")
+tracks/1/path = NodePath("BodyRoot/Hands:animation")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.06666667, 0.13333334, 0.20000002, 0.26666668, 0.33333334, 0.40000004, 0.4666667, 0.53333336, 0.6, 0.6666667, 0.73333335, 0.8000001, 0.86666673, 0.9333334, 1),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+"values": [&"idle"]
 }
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("BodyRoot/Hands:visible")
+tracks/2/path = NodePath("BodyRoot/Body:frame")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
+"times": PackedFloat32Array(0, 0.06666667, 0.13333334, 0.2, 0.26666668),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
 "update": 1,
-"values": [false]
+"values": [1, 0, 2, 3, 4]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
 tracks/3/enabled = true
-tracks/3/path = NodePath("AimArrow:visible")
+tracks/3/path = NodePath("BodyRoot/Hands:frame")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.13333336, 0.16666669, 0.20000002, 0.23333335, 0.26666668, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3, 4, 5, 6, 7]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("HurtBox:visible")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
@@ -740,10 +846,11 @@ _data = {
 &"attacking": SubResource("Animation_gx6xm"),
 &"dead": SubResource("Animation_mpwfl"),
 &"default": SubResource("Animation_fi64q"),
+&"hurt": SubResource("Animation_mkp5j"),
 &"rolling": SubResource("Animation_nkls8")
 }
 
-[node name="Clive" type="CharacterBody2D" node_paths=PackedStringArray("animation_player", "body_root", "hands", "aim_arrow", "collision_box", "hurt_box", "health_bar")]
+[node name="Clive" type="CharacterBody2D" node_paths=PackedStringArray("animation_player", "body_root", "hands", "aim_arrow", "hit_box", "hurt_box", "health_bar")]
 scale = Vector2(0.25, 0.25)
 collision_layer = 16
 collision_mask = 12291
@@ -752,7 +859,7 @@ animation_player = NodePath("AnimationPlayer")
 body_root = NodePath("BodyRoot")
 hands = NodePath("BodyRoot/Hands")
 aim_arrow = NodePath("AimArrow")
-collision_box = NodePath("CollisionBox")
+hit_box = NodePath("BodyRoot/Hands/Hitbox")
 hurt_box = NodePath("HurtBox")
 health_bar = NodePath("HealthBar")
 
@@ -774,6 +881,7 @@ visible = false
 position = Vector2(0.22, 0)
 collision_layer = 64
 collision_mask = 16904
+script = ExtResource("3_ibqeh")
 
 [node name="Box1" type="CollisionShape2D" parent="BodyRoot/Hands/Hitbox"]
 shape = SubResource("RectangleShape2D_t5ilq")
@@ -784,16 +892,18 @@ debug_color = Color(1, 0, 0, 0.23529412)
 position = Vector2(3.33786e-06, 89.999985)
 scale = Vector2(0.9999994, 0.9999994)
 shape = SubResource("RectangleShape2D_iwdwx")
+debug_color = Color(0, 0.6, 0.7019608, 0.41960785)
 
 [node name="HurtBox" type="Area2D" parent="."]
 collision_layer = 32
 collision_mask = 1028
+script = ExtResource("4_ktvhp")
 
 [node name="Box1" type="CollisionShape2D" parent="HurtBox"]
 position = Vector2(0, 90)
 scale = Vector2(0.99999994, 0.99999994)
 shape = SubResource("CapsuleShape2D_oxjxs")
-debug_color = Color(0.63062656, 0.5243399, 0.216681, 0.41960785)
+debug_color = Color(0.6313726, 0.5254902, 0.21568628, 0.41960785)
 
 [node name="AimArrow" type="Sprite2D" parent="."]
 modulate = Color(1, 1, 1, 0.23529412)
