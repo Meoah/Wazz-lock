@@ -7,6 +7,8 @@ var parent : CharacterBody2D
 func _ready() -> void:
 	parent = find_character_body_parent()
 
+func _process(_delta: float) -> void:
+	pass
 # Recursively crawl up parent tree to locate a CharacterBody2D.
 func find_character_body_parent(start : Node = self) -> CharacterBody2D:
 	while start:
@@ -17,6 +19,7 @@ func find_character_body_parent(start : Node = self) -> CharacterBody2D:
 
 func take_damage(source_position : Vector2, damage : float) -> void:
 	if parent is Clive:
+		if parent.status_flags & parent.STATUS_FLAG.INVULN : return
 		SystemData.player_current_health -= damage
 		parent.manager.request_hurt()
 	if parent is BaseEnemy:

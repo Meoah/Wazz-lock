@@ -101,8 +101,12 @@ func _update_timers(delta : float) -> void:
 func _update_status() -> void:
 	if invuln_cooldown > 0 : 
 		_set_status_flag(STATUS_FLAG.INVULN, true)
+		hurt_box.monitorable = false
+		hurt_box.monitoring = false
 	if invuln_cooldown <= 0 :
 		_set_status_flag(STATUS_FLAG.INVULN, false)
+		hurt_box.monitorable = true
+		hurt_box.monitoring = true
 	
 	# Status handlers.
 	_health_handler()
@@ -351,7 +355,7 @@ func _keyboard_aim(_assist : bool = false) -> void:
 func _player_hurt() -> void:
 	animation_player.speed_scale = 1.0
 	animation_player.play("hurt")
-	invuln_cooldown = 0.5
+	invuln_cooldown = 1
 
 # Die.
 func _player_dead() -> void:

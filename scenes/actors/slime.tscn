@@ -147,7 +147,7 @@ base_max_health = 80.0
 sprite_frames = SubResource("SpriteFrames_6ctp5")
 animation = &"idle"
 autoplay = "idle"
-frame_progress = 0.07824779
+frame_progress = 0.7339145
 
 [node name="HurtBox" type="Area2D" parent="."]
 collision_layer = 512
