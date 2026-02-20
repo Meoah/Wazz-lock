@@ -19,4 +19,5 @@ func find_character_body_parent(start : Node = self) -> CharacterBody2D:
 	return null
 
 func _on_area_entered(area : HurtBox) -> void:
-	area.take_damage(global_position, base_damage)
+	var adjusted_damage = base_damage * randf_range(0.8, 1.2)
+	area.take_damage(global_position, adjusted_damage)

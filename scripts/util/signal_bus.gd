@@ -18,4 +18,4 @@ signal state_player_reset
 
 ## HUD Signals
 @warning_ignore("unused_signal")
-signal floating_text(message : String, position : Vector2)
+signal floating_text(message : String, source_position : Vector2)

@@ -45,10 +45,10 @@ func _ready() -> void:
 	manager = PlayerManager.new()
 	
 	# Connects signals
-	SignalBus.connect("state_player_hurt", _player_hurt)
-	SignalBus.connect("state_player_dead", _player_dead)
-	SignalBus.connect("state_player_rolling", _attempt_roll)
-	SignalBus.connect("state_player_attacking", _attempt_attack)
+	SignalBus.state_player_hurt.connect(_player_hurt)
+	SignalBus.state_player_dead.connect(_player_dead)
+	SignalBus.state_player_rolling.connect(_attempt_roll)
+	SignalBus.state_player_attacking.connect(_attempt_attack)
 	
 func _process(delta: float) -> void:
 	_update_timers(delta)

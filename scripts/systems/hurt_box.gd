@@ -25,9 +25,10 @@ func take_damage(source_position : Vector2, damage : float) -> void:
 	if parent is BaseEnemy:
 		parent.current_health -= damage
 		parent.damaged_timer = 0.5
+	SignalBus.floating_text.emit("%.1f" % -damage, global_position)
 	_knockback(source_position, damage)
 	
 func _knockback(source_position : Vector2, damage : float) -> void:
 	var direction : Vector2 = Vector2(global_position - source_position).normalized()
 	# TODO knockback and poise stats
-	parent.velocity += direction * damage * 300
+	parent.velocity += direction * damage * 100

@@ -1,8 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://1gbo7h5cshjx"]
+[gd_scene load_steps=8 format=3 uid="uid://1gbo7h5cshjx"]
 
 [ext_resource type="Script" uid="uid://bm8sxloaxtp0g" path="res://scripts/misc/debug.gd" id="1_64ukp"]
+[ext_resource type="PackedScene" uid="uid://c10em4b36gxf4" path="res://scenes/ui/hud/floating_text.tscn" id="2_1xjnm"]
 [ext_resource type="PackedScene" uid="uid://cepaf77ic4q03" path="res://scenes/actors/clive.tscn" id="2_bcyn4"]
 [ext_resource type="PackedScene" uid="uid://ccfpuofuxrw58" path="res://scenes/actors/slime.tscn" id="3_bcyn4"]
+[ext_resource type="PackedScene" uid="uid://dllmwyqxu8cl7" path="res://scenes/ui/hud/root_hud.tscn" id="4_rbb28"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_64ukp"]
 size = Vector2(5, 1080)
@@ -12,6 +14,7 @@ size = Vector2(1920, 5)
 
 [node name="Debug" type="Node2D"]
 script = ExtResource("1_64ukp")
+floating_text_scene = ExtResource("2_1xjnm")
 
 [node name="BoundingBox" type="StaticBody2D" parent="."]
 collision_mask = 0
@@ -41,3 +44,5 @@ target = NodePath("../Clive")
 
 [node name="Clive" parent="." instance=ExtResource("2_bcyn4")]
 position = Vector2(441, 510)
+
+[node name="RootHUD" parent="." instance=ExtResource("4_rbb28")]

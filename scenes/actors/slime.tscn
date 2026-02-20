@@ -140,14 +140,14 @@ collision_layer = 256
 collision_mask = 4115
 script = ExtResource("1_2txaw")
 health_bar = NodePath("HealthBar")
-base_damage = 1.0
+base_damage = 5.0
 base_max_health = 80.0
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_6ctp5")
 animation = &"idle"
 autoplay = "idle"
-frame_progress = 0.7339145
+frame_progress = 0.035266194
 
 [node name="HurtBox" type="Area2D" parent="."]
 collision_layer = 512
@@ -164,6 +164,7 @@ debug_color = Color(0.6313726, 0.5254902, 0.21568628, 0.41960785)
 collision_layer = 1024
 collision_mask = 32
 script = ExtResource("4_jskh2")
+base_damage = 5.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="EnemyHitBox"]
 shape = SubResource("RectangleShape2D_dhje3")

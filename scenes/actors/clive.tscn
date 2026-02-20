@@ -882,6 +882,7 @@ position = Vector2(0.22, 0)
 collision_layer = 64
 collision_mask = 16904
 script = ExtResource("3_ibqeh")
+base_damage = 5.0
 
 [node name="Box1" type="CollisionShape2D" parent="BodyRoot/Hands/Hitbox"]
 shape = SubResource("RectangleShape2D_t5ilq")
