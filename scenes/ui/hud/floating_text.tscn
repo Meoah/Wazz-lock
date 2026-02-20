@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://c10em4b36gxf4"]
+
+[ext_resource type="Script" uid="uid://bln2ia7pimpy4" path="res://scripts/ui/hud/floating_text.gd" id="1_6c26b"]
+
+[node name="FloatingText" type="RichTextLabel"]
+offset_right = 246.0
+offset_bottom = 23.0
+script = ExtResource("1_6c26b")

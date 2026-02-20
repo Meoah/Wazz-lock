@@ -2,7 +2,7 @@ extends State
 class_name DebugState
 
 const STATE_NAME : String = "DEBUG_STATE"
-const DEBUG_SCENE : PackedScene = preload("res://scenes/screens/debug.tscn")
+const DEBUG_SCENE : PackedScene = preload("res://scenes/rooms/debug/debug.tscn")
 
 signal signal_debug
 

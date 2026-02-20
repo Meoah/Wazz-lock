@@ -1,7 +1,7 @@
 extends PlayerState
-class_name PlayerRollingState
+class_name PlayerResetState
 
-const STATE_NAME : String = "PLAYER_ROLLING_STATE"
+const STATE_NAME : String = "PLAYER_RESET_STATE"
 
 func _init(parent : StateMachine) -> void:
 	state_name = STATE_NAME
@@ -9,7 +9,7 @@ func _init(parent : StateMachine) -> void:
 
 func enter(previous_state: State, data: Dictionary = {}) -> void:
 	super.enter(previous_state, data)
-	SignalBus.state_player_rolling.emit()
+	SignalBus.state_player_reset.emit()
 
 func exit(next_state : State) -> void:
 	super.exit(next_state)
