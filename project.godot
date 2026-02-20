@@ -123,6 +123,7 @@ move_secondary={
 2d_physics/layer_1="enviornment_static"
 2d_physics/layer_2="enviornment_moveable"
 2d_physics/layer_3="enviornment_harmful"
+2d_physics/layer_4="enviornment_destructable"
 2d_physics/layer_5="player_collision"
 2d_physics/layer_6="player_hurt_box"
 2d_physics/layer_7="player_hit_box"
@@ -131,6 +132,7 @@ move_secondary={
 2d_physics/layer_11="enemy_hit_box"
 2d_physics/layer_13="prop_collision"
 2d_physics/layer_14="prop_collectable"
+2d_physics/layer_15="prop_destructable"
 
 [rendering]
 
