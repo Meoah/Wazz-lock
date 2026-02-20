@@ -8,11 +8,13 @@ var manager : PlayerManager
 @export var body_root : Node2D
 @export var hands : AnimatedSprite2D
 @export var aim_arrow : Sprite2D
+@export var collision_box : CollisionShape2D
+@export var hurt_box : Area2D
+@export var health_bar : ProgressBar
 # Movement
 const BASE_SPEED : float = 200.0
 var move_speed : float = 200.0
 var move_direction : Vector2 = Vector2.ZERO
-var initial_scale : Vector2 = Vector2.ZERO
 # Input
 var input_flags : int = 0
 enum INPUT_FLAG{
@@ -24,11 +26,12 @@ enum INPUT_FLAG{
 	PRIMARY		= 1 << 5,
 	SECONDARY	= 1 << 6
 }
-# Flash
+# Tweens
 var flash_tween : Tween
 # Cooldowns
 var roll_cooldown : float = 0.0
 var attack_cooldown : float = 0.0
+var invuln_cooldown : float = 0.0
 # Status Flags
 var status_flags : int = 0
 enum STATUS_FLAG{
@@ -39,7 +42,6 @@ enum STATUS_FLAG{
 
 func _ready() -> void:
 	manager = PlayerManager.new()
-	initial_scale = scale # Required for _flip_h()
 	
 	# Connects signals
 	SignalBus.connect("signal_player_rolling", _attempt_roll)
@@ -47,7 +49,7 @@ func _ready() -> void:
 	
 func _process(delta: float) -> void:
 	_update_timers(delta)
-	# TODO _update_status()
+	_update_status()
 	_update_aim()
 	_update_state()
 	
@@ -89,7 +91,17 @@ func _notification(what: int) -> void:
 func _update_timers(delta : float) -> void:
 	roll_cooldown -= delta
 	attack_cooldown -= delta
+	invuln_cooldown -= delta
 
+# Handles most statuses.
+func _update_status() -> void:
+	if invuln_cooldown > 0 : _set_status_flag(STATUS_FLAG.INVULN, true)
+	if invuln_cooldown <= 0 : _set_status_flag(STATUS_FLAG.INVULN, false)
+	
+	# Check status
+	
+
+# Main state handler
 func _update_state() -> void:
 	# Movement flags
 	var movement_flags : int = INPUT_FLAG.MOVE_UP | INPUT_FLAG.MOVE_DOWN | INPUT_FLAG.MOVE_LEFT | INPUT_FLAG.MOVE_RIGHT
@@ -107,11 +119,11 @@ func _update_state() -> void:
 #	as negatives are converted back to positive each update tick.
 func _flip_h(negative : bool = false) -> void:
 	if negative:
-		scale.y = -1 * initial_scale.y
-		rotation_degrees = 180.0
+		body_root.scale.y = -1.0
+		body_root.rotation_degrees = 180.0
 	else:
-		scale.y = initial_scale.y
-		rotation_degrees = 0.0
+		body_root.scale.y = 1.0
+		body_root.rotation_degrees = 0.0
 
 # Changes move direction according to input_flags
 func _update_move_direction() -> void:
@@ -173,8 +185,6 @@ func _play_idle() -> void:
 ## Rolling Procedure
 const ROLL_HOLD_FRAMES : int = 15 # How long the preroll is in frames before rolling.
 const ROLL_FLASH_COLOR : Color = Color(0x41bbf3ff)
-const ROLL_FLASH_FADE_IN : float = 0.3
-const ROLL_FLASH_FADE_OUT : float = 0.3
 # Attempts to start the roll.
 func _attempt_roll() -> void:
 	if status_flags & STATUS_FLAG.ROLLING : return
@@ -202,11 +212,7 @@ func _preroll_flash() -> void:
 	body_root.modulate = Color(1.0, 1.0, 1.0, 1.0)
 	
 	# Resets tween, then plays the flash tween.
-	_kill_flash_tween()
-	flash_tween = create_tween()
-	flash_tween.tween_property(body_root, "modulate", ROLL_FLASH_COLOR, ROLL_FLASH_FADE_IN)\
-		.set_trans(Tween.TRANS_SINE)\
-		.set_ease(Tween.EASE_OUT)
+	_flash(ROLL_FLASH_COLOR, 0.3)
 	
 	# Wait for ROLL_HOLD_FRAMES amount of frames.
 	for frame in ROLL_HOLD_FRAMES:
@@ -215,13 +221,17 @@ func _preroll_flash() -> void:
 # Tweens the glow back to 0 and sets state back to idle.
 func _postroll() -> void:
 	# Cooldown and flag.
-	roll_cooldown = 0.5
+	roll_cooldown = 0.56
 	_set_status_flag(STATUS_FLAG.ROLLING, false)
 	
 	# Resets tween, then replays the flash tween to reset back to normal colors.
+	_flash(Color(1.0, 1.0, 1.0, 1.0), 0.3)
+
+# Flash handler.
+func _flash(target_color : Color, time : float) -> void:
 	_kill_flash_tween()
 	flash_tween = create_tween()
-	flash_tween.tween_property(body_root, "modulate", Color(1.0, 1.0, 1.0, 1.0), ROLL_FLASH_FADE_OUT)\
+	flash_tween.tween_property(body_root, "modulate", target_color, time)\
 		.set_trans(Tween.TRANS_SINE)\
 		.set_ease(Tween.EASE_OUT)
 
@@ -260,6 +270,7 @@ func _adjust_attack_cooldown(base : float) -> void :
 # Uses the current arrow rotation for where the hands should aim at.
 func _use_aim(reset : bool = false) -> void:
 	if reset : hands.rotation = 0.0
+	elif body_root.scale.y < 0 : hands.rotation = -aim_arrow.rotation - PI / 2.0
 	else : hands.rotation = aim_arrow.rotation - PI / 2.0
 
 # Finds appropriate aiming type.
@@ -272,7 +283,6 @@ func _update_aim() -> void:
 func _keyboard_aim(_assist : bool = false) -> void:
 	if move_direction == Vector2.ZERO : return
 	var target : float = move_direction.angle() + PI / 2.0
-	if scale.y != initial_scale.y : target *= -1.0
 	aim_arrow.rotation = target
 	
 	# TODO add aim assist

@@ -243,11 +243,11 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_t5ilq"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_iwdwx"]
-size = Vector2(200.00005, 460.00018)
+size = Vector2(240.00014, 476.00024)
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_oxjxs"]
-radius = 80.00001
-height = 400.00006
+radius = 100.0
+height = 436.0
 
 [sub_resource type="Animation" id="Animation_ntpy2"]
 length = 0.001
@@ -421,7 +421,7 @@ tracks/3/keys = {
 "times": PackedFloat32Array(0.13333334, 0.20000002, 0.33333334),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [Vector2(144, 64), Vector2(188, 344), Vector2(152, 144)]
+"values": [Vector2(144, 64), Vector2(591, 184), Vector2(152, 144)]
 }
 tracks/4/type = "value"
 tracks/4/imported = false
@@ -561,7 +561,7 @@ _data = {
 &"rolling": SubResource("Animation_nkls8")
 }
 
-[node name="Clive" type="CharacterBody2D" node_paths=PackedStringArray("animation_player", "body_root", "hands", "aim_arrow")]
+[node name="Clive" type="CharacterBody2D" node_paths=PackedStringArray("animation_player", "body_root", "hands", "aim_arrow", "collision_box", "hurt_box", "health_bar")]
 scale = Vector2(0.25, 0.25)
 collision_layer = 16
 collision_mask = 12291
@@ -570,6 +570,9 @@ animation_player = NodePath("AnimationPlayer")
 body_root = NodePath("BodyRoot")
 hands = NodePath("BodyRoot/Hands")
 aim_arrow = NodePath("AimArrow")
+collision_box = NodePath("CollisionBox")
+hurt_box = NodePath("HurtBox")
+health_bar = NodePath("HealthBar")
 
 [node name="BodyRoot" type="Node2D" parent="."]
 
@@ -596,7 +599,7 @@ disabled = true
 debug_color = Color(1, 0, 0, 0.23529412)
 
 [node name="CollisionBox" type="CollisionShape2D" parent="."]
-position = Vector2(19.999975, 89.999954)
+position = Vector2(3.33786e-06, 89.999985)
 scale = Vector2(0.9999994, 0.9999994)
 shape = SubResource("RectangleShape2D_iwdwx")
 
@@ -605,7 +608,7 @@ collision_layer = 32
 collision_mask = 1028
 
 [node name="Box1" type="CollisionShape2D" parent="HurtBox"]
-position = Vector2(20, 80)
+position = Vector2(0, 90)
 scale = Vector2(0.99999994, 0.99999994)
 shape = SubResource("CapsuleShape2D_oxjxs")
 debug_color = Color(0.63062656, 0.5243399, 0.216681, 0.41960785)
@@ -621,5 +624,15 @@ libraries = {
 &"": SubResource("AnimationLibrary_ntpy2")
 }
 autoplay = "default"
+
+[node name="HealthBar" type="ProgressBar" parent="."]
+modulate = Color(0, 1, 0, 1)
+layout_direction = 1
+offset_left = -250.0
+offset_top = -400.0
+offset_right = 250.0
+offset_bottom = -350.0
+value = 75.0
+show_percentage = false
 
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]
