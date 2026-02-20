@@ -28,6 +28,7 @@ enum INPUT_FLAG{
 }
 # Tweens
 var flash_tween : Tween
+var invuln_tween : Tween
 # Cooldowns
 var roll_cooldown : float = 0.0
 var attack_cooldown : float = 0.0
@@ -44,10 +45,14 @@ func _ready() -> void:
 	manager = PlayerManager.new()
 	
 	# Connects signals
-	SignalBus.connect("signal_player_rolling", _attempt_roll)
-	SignalBus.connect("signal_player_attacking", _attempt_attack)
+	#SignalBus.connect("state_player_hurt", _player_hurt)
+	SignalBus.connect("state_player_dead", _player_dead)
+	SignalBus.connect("state_player_rolling", _attempt_roll)
+	SignalBus.connect("state_player_attacking", _attempt_attack)
 	
 func _process(delta: float) -> void:
+	if manager.get_current_state() is PlayerDeadState : return
+	
 	_update_timers(delta)
 	_update_status()
 	_update_aim()
@@ -60,7 +65,6 @@ func _process(delta: float) -> void:
 
 func _physics_process(_delta : float) -> void:
 	_movement_handler()
-	
 
 func _input(event : InputEvent) -> void:
 	## Main input reader
@@ -98,15 +102,65 @@ func _update_status() -> void:
 	if invuln_cooldown > 0 : _set_status_flag(STATUS_FLAG.INVULN, true)
 	if invuln_cooldown <= 0 : _set_status_flag(STATUS_FLAG.INVULN, false)
 	
-	# Check status
+	# Status handlers.
+	_health_handler()
+	_invuln_handler()
+
+# Handles health. Triggers death if health < 0.
+func _health_handler() -> void:
+	health_bar.max_value = SystemData.player_max_health
+	health_bar.value = SystemData.player_current_health
 	
+	if SystemData.player_current_health < 0.0 : manager.request_dead()
+
+## Invuln Procedure
+const INVULN_FLASH_MIN_ALPHA : float = 0.25
+const INVULN_FLASH_HALF_PERIOD : float = 0.06
+var was_invuln : bool = false
+# Determines effects while invuln.
+func _invuln_handler() -> void:
+	# Only run the handler if it detects a change in invuln status.
+	var invuln_now := (status_flags & STATUS_FLAG.INVULN) != 0
+	if invuln_now == was_invuln : return
+	was_invuln = invuln_now
+	
+	if invuln_now : _start_invuln_flash()
+	else : _stop_invuln_flash()
+
+# Starts the invuln flash.
+func _start_invuln_flash() -> void:
+	# Resets
+	_stop_invuln_flash()
+	
+	# Starts the loop of alpha flashing.
+	invuln_tween = create_tween()
+	invuln_tween.set_loops()
+	invuln_tween.tween_property(body_root, "modulate:a", INVULN_FLASH_MIN_ALPHA, INVULN_FLASH_HALF_PERIOD)\
+		.set_trans(Tween.TRANS_SINE)\
+		.set_ease(Tween.EASE_IN_OUT)
+	invuln_tween.tween_property(body_root, "modulate:a", 1.0, INVULN_FLASH_HALF_PERIOD)\
+		.set_trans(Tween.TRANS_SINE)\
+		.set_ease(Tween.EASE_IN_OUT)
+
+# Stops the flashing and resets.
+func _stop_invuln_flash() -> void:
+	_kill_invuln_tween()
+	body_root.modulate.a = 1.0
+
+# Kills the invuln_tween.
+func _kill_invuln_tween() -> void:
+	if invuln_tween and invuln_tween.is_running():
+		invuln_tween.kill()
+	invuln_tween = null
 
 # Main state handler
 func _update_state() -> void:
 	# Movement flags
 	var movement_flags : int = INPUT_FLAG.MOVE_UP | INPUT_FLAG.MOVE_DOWN | INPUT_FLAG.MOVE_LEFT | INPUT_FLAG.MOVE_RIGHT
 	
-	## TODO Interrupts (hurt/dead)
+	## Interrupts
+	if manager.get_current_state() is PlayerDeadState : return
+	if manager.get_current_state() is PlayerHurtState : return
 	
 	## Transitions by priority (roll > attack > movement)
 	#TODO Primary/secondary attack
@@ -184,7 +238,7 @@ func _play_idle() -> void:
 
 ## Rolling Procedure
 const ROLL_HOLD_FRAMES : int = 15 # How long the preroll is in frames before rolling.
-const ROLL_FLASH_COLOR : Color = Color(0x41bbf3ff)
+const ROLL_FLASH_COLOR : Color = Color(0.255, 0.733, 0.953)
 # Attempts to start the roll.
 func _attempt_roll() -> void:
 	if status_flags & STATUS_FLAG.ROLLING : return
@@ -209,10 +263,10 @@ func _roll() -> void:
 # Freeze frames and activates the flash.
 func _preroll_flash() -> void:
 	# Resets the flash if it's currently in use.
-	body_root.modulate = Color(1.0, 1.0, 1.0, 1.0)
+	body_root.modulate = Color(1.0, 1.0, 1.0)
 	
 	# Resets tween, then plays the flash tween.
-	_flash(ROLL_FLASH_COLOR, 0.3)
+	_flash_color(ROLL_FLASH_COLOR, 0.3)
 	
 	# Wait for ROLL_HOLD_FRAMES amount of frames.
 	for frame in ROLL_HOLD_FRAMES:
@@ -225,12 +279,16 @@ func _postroll() -> void:
 	_set_status_flag(STATUS_FLAG.ROLLING, false)
 	
 	# Resets tween, then replays the flash tween to reset back to normal colors.
-	_flash(Color(1.0, 1.0, 1.0, 1.0), 0.3)
+	_flash_color(Color(1.0, 1.0, 1.0), 0.3)
 
 # Flash handler.
-func _flash(target_color : Color, time : float) -> void:
+func _flash_color(target_color : Color, time : float) -> void:
+	# Reset
 	_kill_flash_tween()
 	flash_tween = create_tween()
+	
+	# Preserves current alpha, then flash the target color.
+	target_color.a = body_root.modulate.a
 	flash_tween.tween_property(body_root, "modulate", target_color, time)\
 		.set_trans(Tween.TRANS_SINE)\
 		.set_ease(Tween.EASE_OUT)
@@ -288,9 +346,14 @@ func _keyboard_aim(_assist : bool = false) -> void:
 	# TODO add aim assist
 	# if assist : _aim_assist()
 
-# Forces a reset every time an animation is finished.
-func _on_animation_player_animation_finished(anim_name: StringName) -> void:
-	if anim_name != "RESET":
+func _player_dead() -> void:
+	manager.request_dead()
+	animation_player.speed_scale = 1.0
+	animation_player.play("dead")
+
+# Forces a reset every time an animation is finished unless dead.
+func _on_animation_player_animation_finished(anim_name : StringName) -> void:
+	if (anim_name != "RESET") && (anim_name != "dead"):
 		manager.request_reset()
 		animation_player.play("RESET")
 		animation_player.seek(0.0, true)

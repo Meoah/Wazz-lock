@@ -10,5 +10,10 @@ enum AIMING_MODE{
 	CONTROLLER			= 5,
 	CONTROLLER_ASSIST	= 6
 }
-# Player Data
+# Settings Data
 var aim_mode : int = 0
+# Player Data
+var player_max_health : float
+var player_max_mana : float
+var player_current_health : float
+var player_current_mana : float

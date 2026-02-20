@@ -9,7 +9,7 @@ func _init(parent : StateMachine) -> void:
 
 func enter(previous_state: State, data: Dictionary = {}) -> void:
 	super.enter(previous_state, data)
-	SignalBus.signal_player_dead.emit()
+	SignalBus.state_player_dead.emit()
 
 func exit(next_state : State) -> void:
 	super.exit(next_state)

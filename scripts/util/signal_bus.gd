@@ -2,16 +2,20 @@ extends Node
 
 ## Player Signals
 @warning_ignore("unused_signal")
-signal signal_player_idle
+signal state_player_idle
 @warning_ignore("unused_signal")
-signal signal_player_walking
+signal state_player_walking
 @warning_ignore("unused_signal")
-signal signal_player_rolling
+signal state_player_rolling
 @warning_ignore("unused_signal")
-signal signal_player_attacking
+signal state_player_attacking
 @warning_ignore("unused_signal")
-signal signal_player_dead
+signal state_player_dead
 @warning_ignore("unused_signal")
-signal signal_player_hurt
+signal state_player_hurt
 @warning_ignore("unused_signal")
-signal signal_player_reset
+signal state_player_reset
+
+## HUD Signals
+@warning_ignore("unused_signal")
+signal floating_text(message : String, position : Vector2)
