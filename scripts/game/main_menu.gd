@@ -9,7 +9,6 @@ func _ready() -> void:
 	if OS.has_feature("web"):
 		button_quit.visible = false
 		
-	#TODO audio
 	#TODO save file
 
 func _on_play_pressed():
