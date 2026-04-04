@@ -4,6 +4,8 @@ class_name HurtBox
 # TODO this whole things sucks, fix it to be universal.
 var parent : CharacterBody2D
 
+signal damaged
+
 func _ready() -> void:
 	parent = find_character_body_parent()
 
@@ -20,13 +22,14 @@ func find_character_body_parent(start : Node = self) -> CharacterBody2D:
 func take_damage(source_position : Vector2, damage : float) -> void:
 	if parent is Clive:
 		if parent.status_flags & parent.STATUS_FLAG.INVULN : return
-		SystemData.player_current_health -= damage
+		parent.status.current_health -= damage
 		parent.manager.request_hurt()
 	if parent is BaseEnemy:
-		parent.current_health -= damage
+		parent.status.current_health -= damage
 		parent.damaged_timer = 0.5
 	SignalBus.floating_text.emit("%.1f" % -damage, global_position)
 	_knockback(source_position, damage)
+	damaged.emit()
 	
 func _knockback(source_position : Vector2, damage : float) -> void:
 	var direction : Vector2 = Vector2(global_position - source_position).normalized()

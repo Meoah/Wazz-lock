@@ -1,9 +1,18 @@
-[gd_scene load_steps=25 format=3 uid="uid://ccfpuofuxrw58"]
+[gd_scene load_steps=29 format=3 uid="uid://ccfpuofuxrw58"]
 
 [ext_resource type="Texture2D" uid="uid://bhgceoulf4mer" path="res://assets/textures/actors/enemies/slime/Slime_Forest_Spritesheet.png" id="1_1ma3d"]
 [ext_resource type="Script" uid="uid://cq70pbj5lpkap" path="res://scripts/actors/enemies/slime.gd" id="1_2txaw"]
+[ext_resource type="AudioStream" uid="uid://bqmahajqmcyiv" path="res://assets/audio/slime_hit.ogg" id="2_jskh2"]
 [ext_resource type="Script" uid="uid://c2dmqut00g845" path="res://scripts/systems/hurt_box.gd" id="3_dhje3"]
+[ext_resource type="AudioStream" uid="uid://cxmbyf5i8fqk0" path="res://assets/audio/slime_death.ogg" id="3_nh0x5"]
 [ext_resource type="Script" uid="uid://cvj6l5ujm0x8x" path="res://scripts/systems/hit_box.gd" id="4_jskh2"]
+[ext_resource type="PackedScene" uid="uid://7r8xbtlsdroq" path="res://scenes/components/status_component.tscn" id="4_tpkli"]
+
+[sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_nh0x5"]
+random_pitch = 1.5
+random_volume_offset_db = 1.0
+streams_count = 1
+stream_0/stream = ExtResource("2_jskh2")
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_2txaw"]
 atlas = ExtResource("1_1ma3d")
@@ -134,14 +143,18 @@ size = Vector2(900, 700)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jskh2"]
 size = Vector2(600, 400)
 
-[node name="Slime" type="CharacterBody2D" node_paths=PackedStringArray("health_bar")]
+[node name="Slime" type="CharacterBody2D" node_paths=PackedStringArray("hurt_box", "health_bar", "status")]
 scale = Vector2(0.1, 0.1)
 collision_layer = 256
 collision_mask = 4115
 script = ExtResource("1_2txaw")
+damage_sfx = SubResource("AudioStreamRandomizer_nh0x5")
+death_sfx = ExtResource("3_nh0x5")
+hurt_box = NodePath("HurtBox")
 health_bar = NodePath("HealthBar")
-base_damage = 5.0
-base_max_health = 80.0
+status = NodePath("Status")
+
+[node name="Status" parent="." instance=ExtResource("4_tpkli")]
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_6ctp5")

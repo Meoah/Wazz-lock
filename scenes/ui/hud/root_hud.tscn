@@ -1,14 +1,563 @@
-[gd_scene load_steps=3 format=3 uid="uid://dllmwyqxu8cl7"]
+[gd_scene load_steps=30 format=3 uid="uid://dllmwyqxu8cl7"]
 
 [ext_resource type="Script" uid="uid://cil7hs5t70vqq" path="res://scripts/ui/hud/root_hud.gd" id="1_qvnt6"]
-[ext_resource type="PackedScene" uid="uid://c10em4b36gxf4" path="res://scenes/ui/hud/floating_text.tscn" id="2_50mfl"]
+[ext_resource type="Script" uid="uid://clgos0y204p5t" path="res://scripts/ui/hud/floating_text_manager.gd" id="2_50mfl"]
+[ext_resource type="PackedScene" uid="uid://c10em4b36gxf4" path="res://scenes/ui/hud/floating_text.tscn" id="3_8sqsm"]
+[ext_resource type="Script" uid="uid://brk6suq4nufvj" path="res://scripts/ui/hud/game_hud.gd" id="4_468kv"]
+[ext_resource type="Script" uid="uid://b6yhotfl86tff" path="res://scripts/ui/hud/status_bar.gd" id="4_r1gym"]
+[ext_resource type="Texture2D" uid="uid://d4m4qtmlehje3" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/progress_transparent_small.png" id="5_1fano"]
+[ext_resource type="Texture2D" uid="uid://dqjsgdvu4ucda" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/progress_red_small.png" id="6_snols"]
+[ext_resource type="Script" uid="uid://mn5c5dbrbo5q" path="res://scripts/ui/hud/status_bar_label.gd" id="8_klb5v"]
+[ext_resource type="Texture2D" uid="uid://cxbt0keofhp3r" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/progress_blue_small.png" id="8_snols"]
+[ext_resource type="Texture2D" uid="uid://c1vkg448fex15" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/sword.png" id="9_82c43"]
+[ext_resource type="Texture2D" uid="uid://ctxwp3io3liq3" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/shield.png" id="10_eq3f6"]
+[ext_resource type="Script" uid="uid://8wmc7eaon5mt" path="res://scripts/ui/hud/stat_value.gd" id="10_klb5v"]
+[ext_resource type="Texture2D" uid="uid://o53t8mkno1hv" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/pouch.png" id="10_r2e01"]
+[ext_resource type="Texture2D" uid="uid://coa85xq5s748w" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/tokens.png" id="12_6rrl3"]
+[ext_resource type="Texture2D" uid="uid://b32kgs8pv8mk8" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/exploding.png" id="12_ncs24"]
+[ext_resource type="Texture2D" uid="uid://cabcualj1gtri" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/structure_wall.png" id="12_r2e01"]
+[ext_resource type="Texture2D" uid="uid://8s5qb5fk0kcn" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/hourglass.png" id="17_bsa2x"]
+[ext_resource type="Texture2D" uid="uid://6bdqqiv8tlhv" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/skull.png" id="18_l06hf"]
+[ext_resource type="Texture2D" uid="uid://bqprnalsbvh7m" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/minimap_ring_brown.png" id="19_fgvxg"]
+[ext_resource type="PackedScene" uid="uid://bn4hjjqbutbau" path="res://scenes/ui/hud/minimap.tscn" id="20_d7g6y"]
+[ext_resource type="Shader" uid="uid://cejexcrn24214" path="res://shaders/circle_mask.gdshader" id="20_eqcq6"]
+[ext_resource type="Texture2D" uid="uid://d3cc5rm3wcmx2" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/flask_full.png" id="21_eqcq6"]
+[ext_resource type="Texture2D" uid="uid://bdp0prty0sxis" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/minimap_compass_future_n.png" id="22_mkc83"]
+[ext_resource type="Texture2D" uid="uid://c8wlomx33kjk4" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/minimap_compass_future_e.png" id="23_dctk5"]
+[ext_resource type="Texture2D" uid="uid://dffvpbxi6u7ca" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/minimap_compass_future_s.png" id="24_jey0l"]
+[ext_resource type="Texture2D" uid="uid://cghsu3ndpgbdo" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/minimap_compass_future_w.png" id="25_gaun4"]
 
-[node name="RootHUD" type="Control"]
+[sub_resource type="Theme" id="Theme_klb5v"]
+RichTextLabel/constants/outline_size = 4
+RichTextLabel/font_sizes/normal_font_size = 20
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_ccasb"]
+viewport_path = NodePath("GameHUD/Minimap/ViewportMask/SubViewport")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_h3g4y"]
+resource_local_to_scene = true
+shader = ExtResource("20_eqcq6")
+shader_parameter/viewport_tex = SubResource("ViewportTexture_ccasb")
+shader_parameter/center = Vector2(0.5, 0.5)
+shader_parameter/radius = 0.5
+shader_parameter/edge_softness = 0.002
+
+[node name="RootHUD" type="CanvasLayer" node_paths=PackedStringArray("game_hud")]
+script = ExtResource("1_qvnt6")
+game_hud = NodePath("GameHUD")
+
+[node name="FloatingTextManager" type="Node" parent="."]
+script = ExtResource("2_50mfl")
+floating_text_scene = ExtResource("3_8sqsm")
+
+[node name="GameHUD" type="Control" parent="." node_paths=PackedStringArray("status_bars", "stat_values")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_qvnt6")
-floating_text_scene = ExtResource("2_50mfl")
+mouse_filter = 2
+theme = SubResource("Theme_klb5v")
+script = ExtResource("4_468kv")
+status_bars = [NodePath("StatusBars/Health"), NodePath("StatusBars/Mana"), NodePath("BossHealthBar/BossHealth")]
+stat_values = [NodePath("Status/Damage/DamageValue"), NodePath("Status/Defense/DefenseValue"), NodePath("Status/Knockback/KnockbackValue"), NodePath("Status/Poise/PoiseValue"), NodePath("Currency/Money/MoneyValue"), NodePath("Currency/Meta/MetaValue"), NodePath("Timer/Timer/TimerLabel"), NodePath("Potion/Potion/PotionValue")]
+
+[node name="StatusBars" type="VBoxContainer" parent="GameHUD"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.0234375
+anchor_top = 0.041666668
+anchor_right = 0.21875
+anchor_bottom = 0.13055556
+mouse_filter = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="Health" type="TextureProgressBar" parent="GameHUD/StatusBars" node_paths=PackedStringArray("_status_bar_label")]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+value = 50.0
+nine_patch_stretch = true
+stretch_margin_left = 8
+stretch_margin_top = 8
+stretch_margin_right = 8
+stretch_margin_bottom = 8
+texture_under = ExtResource("5_1fano")
+texture_progress = ExtResource("6_snols")
+script = ExtResource("4_r1gym")
+bar_type = "Player Health"
+_status_bar_label = NodePath("MarginContainer/HealthLabel")
+
+[node name="MarginContainer" type="MarginContainer" parent="GameHUD/StatusBars/Health"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 4
+
+[node name="HealthLabel" type="HBoxContainer" parent="GameHUD/StatusBars/Health/MarginContainer" node_paths=PackedStringArray("_value_label", "_regen_label")]
+layout_mode = 2
+script = ExtResource("8_klb5v")
+bar_type = "Health"
+_value_label = NodePath("Value")
+_regen_label = NodePath("Regen")
+
+[node name="Value" type="RichTextLabel" parent="GameHUD/StatusBars/Health/MarginContainer/HealthLabel"]
+layout_mode = 2
+size_flags_horizontal = 2
+mouse_filter = 2
+bbcode_enabled = true
+text = "100/100
+"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="Regen" type="RichTextLabel" parent="GameHUD/StatusBars/Health/MarginContainer/HealthLabel"]
+layout_mode = 2
+size_flags_horizontal = 8
+mouse_filter = 2
+bbcode_enabled = true
+text = "+0/s"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+vertical_alignment = 1
+
+[node name="Mana" type="TextureProgressBar" parent="GameHUD/StatusBars" node_paths=PackedStringArray("_status_bar_label")]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+value = 50.0
+nine_patch_stretch = true
+stretch_margin_left = 8
+stretch_margin_top = 8
+stretch_margin_right = 8
+stretch_margin_bottom = 8
+texture_under = ExtResource("5_1fano")
+texture_progress = ExtResource("8_snols")
+script = ExtResource("4_r1gym")
+bar_type = "Player Mana"
+_status_bar_label = NodePath("MarginContainer/ManaLabel")
+
+[node name="MarginContainer" type="MarginContainer" parent="GameHUD/StatusBars/Mana"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 4
+
+[node name="ManaLabel" type="HBoxContainer" parent="GameHUD/StatusBars/Mana/MarginContainer" node_paths=PackedStringArray("_value_label", "_regen_label")]
+layout_mode = 2
+script = ExtResource("8_klb5v")
+bar_type = "Mana"
+_value_label = NodePath("Value")
+_regen_label = NodePath("Regen")
+
+[node name="Value" type="RichTextLabel" parent="GameHUD/StatusBars/Mana/MarginContainer/ManaLabel"]
+layout_mode = 2
+size_flags_horizontal = 2
+mouse_filter = 2
+bbcode_enabled = true
+text = "100/100
+"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="Regen" type="RichTextLabel" parent="GameHUD/StatusBars/Mana/MarginContainer/ManaLabel"]
+layout_mode = 2
+size_flags_horizontal = 8
+mouse_filter = 2
+bbcode_enabled = true
+text = "+0/s"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+vertical_alignment = 1
+
+[node name="Currency" type="VBoxContainer" parent="GameHUD"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.02734375
+anchor_top = 0.14444445
+anchor_right = 0.2171875
+anchor_bottom = 0.27222222
+offset_left = -5.0
+offset_top = 0.9999924
+offset_right = 2.0
+offset_bottom = -11.0
+grow_horizontal = 2
+mouse_filter = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="Money" type="HBoxContainer" parent="GameHUD/Currency"]
+layout_mode = 2
+
+[node name="MoneyIcon" type="TextureRect" parent="GameHUD/Currency/Money"]
+self_modulate = Color(0.7710743, 0.6335866, 0.44420683, 1)
+layout_mode = 2
+size_flags_horizontal = 0
+texture = ExtResource("10_r2e01")
+expand_mode = 2
+
+[node name="MoneyValue" type="RichTextLabel" parent="GameHUD/Currency/Money"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_filter = 2
+bbcode_enabled = true
+text = "555"
+fit_content = true
+autowrap_mode = 0
+script = ExtResource("10_klb5v")
+stat_type = "Money"
+
+[node name="Meta" type="HBoxContainer" parent="GameHUD/Currency"]
+layout_mode = 2
+
+[node name="MetaIcon" type="TextureRect" parent="GameHUD/Currency/Meta"]
+self_modulate = Color(0.16941616, 0.5786958, 0.518918, 1)
+layout_mode = 2
+size_flags_horizontal = 0
+texture = ExtResource("12_6rrl3")
+expand_mode = 2
+
+[node name="MetaValue" type="RichTextLabel" parent="GameHUD/Currency/Meta"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_filter = 2
+bbcode_enabled = true
+text = "555"
+fit_content = true
+autowrap_mode = 0
+script = ExtResource("10_klb5v")
+stat_type = "Meta"
+
+[node name="Status" type="VBoxContainer" parent="GameHUD"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.0234375
+anchor_top = 0.2777778
+anchor_right = 0.140625
+anchor_bottom = 0.6944444
+offset_top = -1.5258789e-05
+offset_bottom = 3.0517578e-05
+mouse_filter = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="Damage" type="HBoxContainer" parent="GameHUD/Status"]
+layout_mode = 2
+
+[node name="DamageIcon" type="TextureRect" parent="GameHUD/Status/Damage"]
+self_modulate = Color(0.76486015, 0.48134786, 0.23095521, 1)
+layout_mode = 2
+size_flags_horizontal = 0
+texture = ExtResource("9_82c43")
+expand_mode = 2
+
+[node name="DamageValue" type="RichTextLabel" parent="GameHUD/Status/Damage"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_filter = 2
+bbcode_enabled = true
+text = "555"
+fit_content = true
+autowrap_mode = 0
+script = ExtResource("10_klb5v")
+stat_type = "Damage"
+
+[node name="Defense" type="HBoxContainer" parent="GameHUD/Status"]
+layout_mode = 2
+
+[node name="DefenseIcon" type="TextureRect" parent="GameHUD/Status/Defense"]
+self_modulate = Color(0.556953, 0.556953, 0.556953, 1)
+layout_mode = 2
+size_flags_horizontal = 0
+texture = ExtResource("10_eq3f6")
+expand_mode = 2
+
+[node name="DefenseValue" type="RichTextLabel" parent="GameHUD/Status/Defense"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_filter = 2
+bbcode_enabled = true
+text = "555"
+fit_content = true
+autowrap_mode = 0
+script = ExtResource("10_klb5v")
+stat_type = "Defense"
+
+[node name="Knockback" type="HBoxContainer" parent="GameHUD/Status"]
+layout_mode = 2
+
+[node name="KnockbackIcon" type="TextureRect" parent="GameHUD/Status/Knockback"]
+self_modulate = Color(0.8737027, 0.35502607, 0.2833309, 1)
+layout_mode = 2
+size_flags_horizontal = 0
+texture = ExtResource("12_ncs24")
+expand_mode = 2
+
+[node name="KnockbackValue" type="RichTextLabel" parent="GameHUD/Status/Knockback"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_filter = 2
+bbcode_enabled = true
+text = "555"
+fit_content = true
+autowrap_mode = 0
+script = ExtResource("10_klb5v")
+stat_type = "Knockback"
+
+[node name="Poise" type="HBoxContainer" parent="GameHUD/Status"]
+layout_mode = 2
+
+[node name="PoiseIcon" type="TextureRect" parent="GameHUD/Status/Poise"]
+self_modulate = Color(0.21280932, 0.78232473, 0.7808152, 1)
+layout_mode = 2
+size_flags_horizontal = 0
+texture = ExtResource("12_r2e01")
+expand_mode = 2
+
+[node name="PoiseValue" type="RichTextLabel" parent="GameHUD/Status/Poise"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_filter = 2
+bbcode_enabled = true
+text = "555"
+fit_content = true
+autowrap_mode = 0
+script = ExtResource("10_klb5v")
+stat_type = "Poise"
+
+[node name="Timer" type="MarginContainer" parent="GameHUD"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -74.5
+offset_right = 74.5
+offset_bottom = 58.0
+grow_horizontal = 2
+theme_override_constants/margin_top = 30
+
+[node name="Timer" type="HBoxContainer" parent="GameHUD/Timer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 1
+
+[node name="TimerIcon" type="TextureRect" parent="GameHUD/Timer/Timer"]
+self_modulate = Color(0.8217887, 0.82178867, 0.82178867, 1)
+layout_mode = 2
+size_flags_horizontal = 0
+texture = ExtResource("17_bsa2x")
+expand_mode = 3
+
+[node name="TimerLabel" type="RichTextLabel" parent="GameHUD/Timer/Timer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+mouse_filter = 2
+bbcode_enabled = true
+text = "00:00:00:000"
+fit_content = true
+autowrap_mode = 0
+horizontal_alignment = 2
+vertical_alignment = 1
+script = ExtResource("10_klb5v")
+stat_type = "Timer"
+
+[node name="BossHealthBar" type="HBoxContainer" parent="GameHUD"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.3046875
+anchor_top = 0.090277776
+anchor_right = 0.6953125
+anchor_bottom = 0.13472222
+offset_top = -1.0
+offset_bottom = -1.0
+size_flags_vertical = 3
+metadata/_edit_use_anchors_ = true
+
+[node name="BossIcon" type="TextureRect" parent="GameHUD/BossHealthBar"]
+self_modulate = Color(0.6872149, 0.68721503, 0.6872149, 1)
+layout_mode = 2
+size_flags_horizontal = 8
+texture = ExtResource("18_l06hf")
+expand_mode = 2
+
+[node name="BossHealth" type="TextureProgressBar" parent="GameHUD/BossHealthBar" node_paths=PackedStringArray("_enemy_name")]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+mouse_filter = 2
+value = 50.0
+nine_patch_stretch = true
+stretch_margin_left = 8
+stretch_margin_top = 8
+stretch_margin_right = 8
+stretch_margin_bottom = 8
+texture_under = ExtResource("5_1fano")
+texture_progress = ExtResource("6_snols")
+script = ExtResource("4_r1gym")
+bar_type = "Boss Health"
+_enemy_name = NodePath("BossName")
+
+[node name="BossName" type="RichTextLabel" parent="GameHUD/BossHealthBar/BossHealth"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+text = "Boss Name"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Minimap" type="MarginContainer" parent="GameHUD"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -296.0
+offset_bottom = 296.0
+grow_horizontal = 0
+theme_override_constants/margin_top = 30
+theme_override_constants/margin_right = 30
+
+[node name="ViewportMask" type="ColorRect" parent="GameHUD/Minimap"]
+material = SubResource("ShaderMaterial_h3g4y")
+layout_mode = 2
+
+[node name="SubViewport" type="SubViewport" parent="GameHUD/Minimap/ViewportMask"]
+transparent_bg = true
+
+[node name="Minimap" parent="GameHUD/Minimap/ViewportMask/SubViewport" instance=ExtResource("20_d7g6y")]
+
+[node name="MinimapGraphics" type="Control" parent="GameHUD/Minimap"]
+layout_mode = 2
+
+[node name="Ring" type="TextureRect" parent="GameHUD/Minimap/MinimapGraphics"]
+custom_minimum_size = Vector2(256, 256)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("19_fgvxg")
+
+[node name="North" type="TextureRect" parent="GameHUD/Minimap/MinimapGraphics"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -10.0
+offset_right = 10.0
+offset_bottom = 22.0
+grow_horizontal = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+texture = ExtResource("22_mkc83")
+
+[node name="East" type="TextureRect" parent="GameHUD/Minimap/MinimapGraphics"]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.0
+offset_bottom = 11.0
+grow_horizontal = 0
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+texture = ExtResource("23_dctk5")
+
+[node name="South" type="TextureRect" parent="GameHUD/Minimap/MinimapGraphics"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -10.0
+offset_top = -22.0
+offset_right = 10.0
+grow_horizontal = 2
+grow_vertical = 0
+size_flags_horizontal = 4
+size_flags_vertical = 0
+texture = ExtResource("24_jey0l")
+
+[node name="West" type="TextureRect" parent="GameHUD/Minimap/MinimapGraphics"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_top = -11.0
+offset_right = 20.0
+offset_bottom = 11.0
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+texture = ExtResource("25_gaun4")
+
+[node name="Potion" type="MarginContainer" parent="GameHUD"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -40.0
+offset_top = -40.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_constants/margin_right = 30
+theme_override_constants/margin_bottom = 30
+
+[node name="Potion" type="HBoxContainer" parent="GameHUD/Potion"]
+layout_mode = 2
+
+[node name="PotionIcon" type="TextureRect" parent="GameHUD/Potion/Potion"]
+self_modulate = Color(0.9081081, 0.3795361, 0.41230142, 1)
+layout_mode = 2
+size_flags_horizontal = 0
+texture = ExtResource("21_eqcq6")
+expand_mode = 2
+
+[node name="PotionValue" type="RichTextLabel" parent="GameHUD/Potion/Potion"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_filter = 2
+bbcode_enabled = true
+text = "555"
+fit_content = true
+autowrap_mode = 0
+script = ExtResource("10_klb5v")
+stat_type = "Potion"

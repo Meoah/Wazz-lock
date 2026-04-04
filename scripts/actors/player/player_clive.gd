@@ -2,19 +2,28 @@ extends CharacterBody2D
 class_name Clive
 
 # Manager
-var manager : PlayerManager
-# Animation
-@export var animation_player : AnimationPlayer
-@export var body_root : Node2D
-@export var hands : AnimatedSprite2D
-@export var aim_arrow : Sprite2D
-@export var hit_box : HitBox
-@export var hurt_box : HurtBox
-@export var health_bar : ProgressBar
+var manager: PlayerManager
+
+@export_category("Audio")
+@export var punch_sfx: AudioStream
+@export var death_sfx: AudioStream
+
+@export_category("Children Nodes")
+@export var status: Status
+@export var inventory: Inventory
+@export var animation_player: AnimationPlayer
+@export var body_root: Node2D
+@export var hands: AnimatedSprite2D
+@export var aim_arrow: Sprite2D
+@export var hit_box: HitBox
+@export var hurt_box: HurtBox
+@export var health_bar: ProgressBar
+
 # Movement
-const BASE_SPEED : float = 200.0
-var move_speed : float = 200.0
-var move_direction : Vector2 = Vector2.ZERO
+const BASE_SPEED: float = 200.0
+var move_speed: float = 200.0
+var move_direction: Vector2 = Vector2.ZERO
+
 # Input
 var input_flags : int = 0
 enum INPUT_FLAG{
@@ -24,15 +33,19 @@ enum INPUT_FLAG{
 	MOVE_RIGHT	= 1 << 3,
 	DODGE		= 1 << 4,
 	PRIMARY		= 1 << 5,
-	SECONDARY	= 1 << 6
+	SECONDARY	= 1 << 6,
+	POTION		= 1 << 7
 }
+
 # Tweens
 var flash_tween : Tween
 var invuln_tween : Tween
+
 # Cooldowns
 var roll_cooldown : float = 0.0
 var attack_cooldown : float = 0.0
 var invuln_cooldown : float = 0.0
+
 # Status Flags
 var status_flags : int = 0
 enum STATUS_FLAG{
@@ -44,11 +57,17 @@ enum STATUS_FLAG{
 func _ready() -> void:
 	manager = PlayerManager.new()
 	
+	# Status
+	status.setup()
+	status.request_active()
+	
 	# Connects signals
 	SignalBus.state_player_hurt.connect(_player_hurt)
 	SignalBus.state_player_dead.connect(_player_dead)
 	SignalBus.state_player_rolling.connect(_attempt_roll)
 	SignalBus.state_player_attacking.connect(_attempt_attack)
+	
+	SignalBus.player_ready.emit(self)
 	
 func _process(delta: float) -> void:
 	_update_timers(delta)
@@ -57,10 +76,26 @@ func _process(delta: float) -> void:
 	_update_aim()
 	_update_state()
 	
+	# TODO get rid of this
+	potion_cooldown -= delta
+	if input_flags & INPUT_FLAG.POTION:
+		_use_potion()
+	if potion_cooldown < -3.0:
+		status.health_regen = 0
+	
 	# Handles which animation to play depending on state.
 	if manager.get_current_state() is PlayerWalkingState: _play_walking()
 	if manager.get_current_state() is PlayerIdleState: _play_idle()
 
+# TODO get rid of this
+var potion_cooldown: float = 0.0
+func _use_potion() -> void:
+	if potion_cooldown > 0.0: return
+	if inventory.request_use_item(inventory.HEALTH_POTION):
+		SignalBus.floating_text.emit("+10", position)
+		status.current_health += 10.0
+		status.health_regen = 2.5
+		potion_cooldown = 1.0
 
 func _physics_process(_delta : float) -> void:
 	if manager.get_current_state() is PlayerDeadState : return
@@ -82,6 +117,8 @@ func _input(event : InputEvent) -> void:
 	if event.is_action_released("move_primary"):	_set_input_flag(INPUT_FLAG.PRIMARY, false)
 	if event.is_action_pressed("move_secondary"):	_set_input_flag(INPUT_FLAG.SECONDARY, true)
 	if event.is_action_released("move_secondary"):	_set_input_flag(INPUT_FLAG.SECONDARY, false)
+	if event.is_action_pressed("use_potion"):		_set_input_flag(INPUT_FLAG.POTION, true)
+	if event.is_action_released("use_potion"):		_set_input_flag(INPUT_FLAG.POTION, false)
 	
 	## Updates
 	_update_move_direction()
@@ -114,10 +151,10 @@ func _update_status() -> void:
 
 # Handles health. Triggers death if health < 0.
 func _health_handler() -> void:
-	health_bar.max_value = SystemData.player_max_health
-	health_bar.value = SystemData.player_current_health
+	health_bar.max_value = status.max_health
+	health_bar.value = status.current_health
 	
-	if SystemData.player_current_health < 0.0 : manager.request_dead()
+	if status.current_health < 0.0 : manager.request_dead()
 
 ## Invuln Procedure
 const INVULN_FLASH_MIN_ALPHA : float = 0.25
@@ -323,6 +360,7 @@ func _attempt_attack() -> void:
 # Do a punch.
 func _punch() -> void:
 	animation_player.play("attacking")
+	AudioManager.play_sfx(punch_sfx)
 	_adjust_attack_cooldown(1.0)
 
 # Handles cooldowns.
@@ -333,15 +371,19 @@ func _adjust_attack_cooldown(base : float) -> void :
 ## Aiming Procedure
 # Uses the current arrow rotation for where the hands should aim at.
 func _use_aim(reset : bool = false) -> void:
-	if reset : hands.rotation = 0.0
-	elif body_root.scale.y < 0 : hands.rotation = -aim_arrow.rotation - PI / 2.0
-	else : hands.rotation = aim_arrow.rotation - PI / 2.0
+	if reset:
+		hands.rotation = 0.0
+	elif body_root.scale.y < 0:
+		hands.rotation = -aim_arrow.rotation - PI / 2.0
+	else:
+		hands.rotation = aim_arrow.rotation - PI / 2.0
 
 # Finds appropriate aiming type.
 func _update_aim() -> void:
 	# TODO other aim options
 	match SystemData.aim_mode:
 		SystemData.AIMING_MODE.DEFAULT : _keyboard_aim(false)
+		SystemData.AIMING_MODE.MOUSE : _mouse_aim(false)
 
 # Uses the last directional input to determine aim.
 func _keyboard_aim(_assist : bool = false) -> void:
@@ -352,6 +394,10 @@ func _keyboard_aim(_assist : bool = false) -> void:
 	# TODO add aim assist
 	# if assist : _aim_assist()
 
+func _mouse_aim(_assist : bool = false) -> void:
+	aim_arrow.look_at(get_global_mouse_position())
+	aim_arrow.rotation_degrees += 90
+
 func _player_hurt() -> void:
 	animation_player.speed_scale = 1.0
 	animation_player.play("hurt")
@@ -360,6 +406,7 @@ func _player_hurt() -> void:
 # Die.
 func _player_dead() -> void:
 	manager.request_dead()
+	AudioManager.play_sfx(death_sfx)
 	animation_player.speed_scale = 1.0
 	animation_player.play("dead")
 

@@ -1,21 +1,35 @@
-[gd_scene load_steps=5 format=3 uid="uid://cpv5i74img1v3"]
+[gd_scene load_steps=11 format=3 uid="uid://cpv5i74img1v3"]
 
 [ext_resource type="Script" uid="uid://dbaxi2jjyn2im" path="res://scripts/managers/game_manager.gd" id="1_hwd4i"]
+[ext_resource type="PackedScene" uid="uid://d1l0qt8blrdqy" path="res://scenes/root_scenes/main_menu.tscn" id="2_eaq8r"]
 [ext_resource type="Script" uid="uid://dlyqy2ujtb70s" path="res://scripts/ui/pop_ups/popup_queue.gd" id="2_glms7"]
-[ext_resource type="PackedScene" uid="uid://1gbo7h5cshjx" path="res://scenes/rooms/debug/debug.tscn" id="2_oo155"]
+[ext_resource type="PackedScene" uid="uid://bixe33bv0wwac" path="res://scenes/root_scenes/dungeon_root.tscn" id="3_q8mjp"]
+[ext_resource type="PackedScene" uid="uid://bs5ksgyl8xicy" path="res://scenes/rooms/debug/debug.tscn" id="3_ternb"]
 [ext_resource type="PackedScene" uid="uid://bo6oudf3dtprg" path="res://scenes/ui/pop_ups/blocker.tscn" id="3_udu3i"]
+[ext_resource type="PackedScene" uid="uid://dllmwyqxu8cl7" path="res://scenes/ui/hud/root_hud.tscn" id="5_jdad8"]
+[ext_resource type="PackedScene" uid="uid://b62nwhb2eckl1" path="res://scenes/ui/tooltip_layer.tscn" id="7_q8mjp"]
 
-[node name="GameManager" type="Control" node_paths=PackedStringArray("_scene_root", "_popup_queue")]
+[sub_resource type="Theme" id="Theme_k4jhu"]
+
+[sub_resource type="Theme" id="Theme_jdad8"]
+
+[node name="GameManager" type="Control" node_paths=PackedStringArray("scene_root", "popup_queue", "tooltip_layer", "root_hud")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
+theme = SubResource("Theme_k4jhu")
 script = ExtResource("1_hwd4i")
-_debug_scene = ExtResource("2_oo155")
-_scene_root = NodePath("SceneRoot")
-_popup_queue = NodePath("PopupQueue")
+scene_root = NodePath("SceneRoot")
+popup_queue = NodePath("CanvasLayer/PopupQueue")
+tooltip_layer = NodePath("CanvasLayer/TooltipLayer")
+root_hud = NodePath("RootHUD")
+main_menu_scene = ExtResource("2_eaq8r")
+dungeon_root = ExtResource("3_q8mjp")
+debug_room = ExtResource("3_ternb")
 
 [node name="SceneRoot" type="Control" parent="."]
 layout_mode = 1
@@ -26,16 +40,25 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="PopupQueue" type="Control" parent="." node_paths=PackedStringArray("_blocker")]
+[node name="RootHUD" parent="." instance=ExtResource("5_jdad8")]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+layer = 20
+
+[node name="PopupQueue" type="Control" parent="CanvasLayer" node_paths=PackedStringArray("_blocker")]
 top_level = true
-layout_mode = 1
+z_index = 1
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = SubResource("Theme_jdad8")
 script = ExtResource("2_glms7")
 _blocker = NodePath("Blocker")
 
-[node name="Blocker" parent="PopupQueue" instance=ExtResource("3_udu3i")]
+[node name="Blocker" parent="CanvasLayer/PopupQueue" instance=ExtResource("3_udu3i")]
 layout_mode = 1
+
+[node name="TooltipLayer" parent="CanvasLayer" instance=ExtResource("7_q8mjp")]
