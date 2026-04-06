@@ -8,7 +8,6 @@ extends Node
 @export_category("Root Scenes")
 @export var main_menu_scene: PackedScene
 @export var dungeon_root: PackedScene
-@export var debug_room: PackedScene
 
 ## States
 var play_state: PlayState

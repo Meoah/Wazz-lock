@@ -1,0 +1,90 @@
+[gd_scene load_steps=12 format=3 uid="uid://bq3b20odg2d4j"]
+
+[ext_resource type="Script" uid="uid://cbugcfpqrsaoa" path="res://scripts/game/run/room/exit_drain.gd" id="1_n4mvd"]
+[ext_resource type="Texture2D" uid="uid://dp8uhf8ytc1yu" path="res://assets/textures/props/FloorDrain_Tileset.png" id="2_1d33w"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_v8nyo"]
+atlas = ExtResource("2_1d33w")
+region = Rect2(8192, 0, 2048, 2048)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_eyvo2"]
+atlas = ExtResource("2_1d33w")
+region = Rect2(0, 0, 2048, 2048)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7x81x"]
+atlas = ExtResource("2_1d33w")
+region = Rect2(2048, 0, 2048, 2048)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hpr25"]
+atlas = ExtResource("2_1d33w")
+region = Rect2(4096, 0, 2048, 2048)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qpl30"]
+atlas = ExtResource("2_1d33w")
+region = Rect2(6144, 0, 2048, 2048)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ya8el"]
+atlas = ExtResource("2_1d33w")
+region = Rect2(8192, 0, 2048, 2048)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_h1fgm"]
+atlas = ExtResource("2_1d33w")
+region = Rect2(0, 0, 2048, 2048)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_qrwy5"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_v8nyo")
+}],
+"loop": false,
+"name": &"opened",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_eyvo2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7x81x")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hpr25")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qpl30")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ya8el")
+}],
+"loop": false,
+"name": &"opening",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_h1fgm")
+}],
+"loop": false,
+"name": &"unopened",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_j4tbw"]
+size = Vector2(2048, 2048)
+
+[node name="ExitDrain" type="Area2D"]
+scale = Vector2(0.075, 0.075)
+collision_layer = 32768
+collision_mask = 16
+script = ExtResource("1_n4mvd")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_qrwy5")
+animation = &"unopened"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_j4tbw")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="body_exited" from="." to="." method="_on_body_exited"]

@@ -1,10 +1,9 @@
-[gd_scene load_steps=11 format=3 uid="uid://cpv5i74img1v3"]
+[gd_scene load_steps=10 format=3 uid="uid://cpv5i74img1v3"]
 
 [ext_resource type="Script" uid="uid://dbaxi2jjyn2im" path="res://scripts/managers/game_manager.gd" id="1_hwd4i"]
 [ext_resource type="PackedScene" uid="uid://d1l0qt8blrdqy" path="res://scenes/root_scenes/main_menu.tscn" id="2_eaq8r"]
 [ext_resource type="Script" uid="uid://dlyqy2ujtb70s" path="res://scripts/ui/pop_ups/popup_queue.gd" id="2_glms7"]
-[ext_resource type="PackedScene" uid="uid://bixe33bv0wwac" path="res://scenes/root_scenes/dungeon_root.tscn" id="3_q8mjp"]
-[ext_resource type="PackedScene" uid="uid://bs5ksgyl8xicy" path="res://scenes/rooms/debug/debug.tscn" id="3_ternb"]
+[ext_resource type="PackedScene" uid="uid://bixe33bv0wwac" path="res://scenes/root_scenes/run_root.tscn" id="3_q8mjp"]
 [ext_resource type="PackedScene" uid="uid://bo6oudf3dtprg" path="res://scenes/ui/pop_ups/blocker.tscn" id="3_udu3i"]
 [ext_resource type="PackedScene" uid="uid://dllmwyqxu8cl7" path="res://scenes/ui/hud/root_hud.tscn" id="5_jdad8"]
 [ext_resource type="PackedScene" uid="uid://b62nwhb2eckl1" path="res://scenes/ui/tooltip_layer.tscn" id="7_q8mjp"]
@@ -29,7 +28,6 @@ tooltip_layer = NodePath("CanvasLayer/TooltipLayer")
 root_hud = NodePath("RootHUD")
 main_menu_scene = ExtResource("2_eaq8r")
 dungeon_root = ExtResource("3_q8mjp")
-debug_room = ExtResource("3_ternb")
 
 [node name="SceneRoot" type="Control" parent="."]
 layout_mode = 1

@@ -1,0 +1,26 @@
+[gd_scene load_steps=3 format=3 uid="uid://cgsam8pgivahn"]
+
+[ext_resource type="Script" uid="uid://bxl4xfhyvrh2p" path="res://scripts/game/run/room/exit_handler.gd" id="1_qc6hr"]
+[ext_resource type="PackedScene" uid="uid://bq3b20odg2d4j" path="res://scenes/props/exit_drain.tscn" id="2_gdbqw"]
+
+[node name="ExitHandler" type="Node2D"]
+script = ExtResource("1_qc6hr")
+
+[node name="ExitDrainNorth" parent="." instance=ExtResource("2_gdbqw")]
+position = Vector2(0, -128)
+scale = Vector2(0.063, 0.063)
+
+[node name="ExitDrainEast" parent="." instance=ExtResource("2_gdbqw")]
+position = Vector2(128, 0)
+scale = Vector2(0.063, 0.063)
+exit_direction = 1
+
+[node name="ExitDrainSouth" parent="." instance=ExtResource("2_gdbqw")]
+position = Vector2(0, 128)
+scale = Vector2(0.063, 0.063)
+exit_direction = 2
+
+[node name="ExitDrainWest" parent="." instance=ExtResource("2_gdbqw")]
+position = Vector2(-128, 0)
+scale = Vector2(0.063, 0.063)
+exit_direction = 3
