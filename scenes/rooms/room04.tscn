@@ -1,13 +1,13 @@
 [gd_scene load_steps=9 format=4 uid="uid://cqodi2d0t2rlw"]
 
-[ext_resource type="Script" uid="uid://f735godv2lc6" path="res://scripts/game/run/room/room.gd" id="1_3y4w7"]
-[ext_resource type="Script" uid="uid://cmivelq4jxjnu" path="res://scripts/game/run/room/tile_handler.gd" id="1_20sjn"]
+[ext_resource type="Script" uid="uid://f735godv2lc6" path="res://Scripts/game/run/room/room.gd" id="1_3y4w7"]
+[ext_resource type="Script" uid="uid://cmivelq4jxjnu" path="res://Scripts/game/run/room/tile_handler.gd" id="1_20sjn"]
 [ext_resource type="TileSet" uid="uid://d0ha6r7frwc6h" path="res://assets/textures/enviornment/tile_set.tres" id="2_fd0ig"]
-[ext_resource type="Script" uid="uid://c7b7iw7u6fxg3" path="res://scripts/game/run/room/enemy_handler.gd" id="3_munbw"]
-[ext_resource type="Script" uid="uid://dtumni32nsr7b" path="res://scripts/game/run/room/floor_tiles.gd" id="4_im3t2"]
-[ext_resource type="PackedScene" uid="uid://cgsam8pgivahn" path="res://scenes/props/exit_handler.tscn" id="4_ps5qb"]
-[ext_resource type="Script" uid="uid://dhvmyyaqapscr" path="res://scripts/game/run/room/wall_tiles.gd" id="5_aau7n"]
-[ext_resource type="Script" uid="uid://tqfqun2o0wua" path="res://scripts/game/run/room/water_tiles.gd" id="6_f03d1"]
+[ext_resource type="Script" uid="uid://c7b7iw7u6fxg3" path="res://Scripts/game/run/room/enemy_handler.gd" id="3_munbw"]
+[ext_resource type="Script" uid="uid://dtumni32nsr7b" path="res://Scripts/game/run/room/floor_tiles.gd" id="4_im3t2"]
+[ext_resource type="PackedScene" uid="uid://cgsam8pgivahn" path="res://Scenes/props/exit_handler.tscn" id="4_ps5qb"]
+[ext_resource type="Script" uid="uid://dhvmyyaqapscr" path="res://Scripts/game/run/room/wall_tiles.gd" id="5_aau7n"]
+[ext_resource type="Script" uid="uid://tqfqun2o0wua" path="res://Scripts/game/run/room/water_tiles.gd" id="6_f03d1"]
 
 [node name="room04" type="Node2D" node_paths=PackedStringArray("_tile_handler", "_enemy_handler", "_exit_handler")]
 script = ExtResource("1_3y4w7")
@@ -36,7 +36,7 @@ script = ExtResource("5_aau7n")
 
 [node name="Water" type="TileMapLayer" parent="TileHandler"]
 scale = Vector2(0.125, 0.125)
-tile_map_data = PackedByteArray("AAAJAAkAAwAAAAAAAAAIAAkAAwAAAAAAAAAHAAkAAwAAAAAAAAAGAAkAAwAAAAAAAAAFAAkAAwAAAAAAAAAEAAkAAwAAAAAAAAADAAkAAwAAAAAAAAACAAkAAwAAAAAAAAABAAkAAwAAAAAAAAABAAgAAwAAAAAAAAACAAgAAwAAAAAAAAADAAgAAwAAAAAAAAAEAAgAAwAAAAAAAAAFAAgAAwAAAAAAAAAGAAgAAwAAAAAAAAAHAAgAAwAAAAAAAAAIAAgAAwAAAAAAAAAJAAgAAwAAAAAAAAAcAAgAAwAAAAAAAAAbAAgAAwAAAAAAAAAaAAgAAwAAAAAAAAAZAAgAAwAAAAAAAAAYAAgAAwAAAAAAAAAXAAgAAwAAAAAAAAAWAAgAAwAAAAAAAAAVAAgAAwAAAAAAAAAUAAgAAwAAAAAAAAAUAAcAAwAAAAAAAAAVAAcAAwAAAAAAAAAWAAcAAwAAAAAAAAAXAAcAAwAAAAAAAAAYAAcAAwAAAAAAAAAZAAcAAwAAAAAAAAAaAAcAAwAAAAAAAAAbAAcAAwAAAAAAAAAcAAcAAwAAAAAAAAA=")
+tile_map_data = PackedByteArray("AAAJAAkAAwAIAAkAAAAIAAkAAwAAAAcAAAAHAAkAAwAAAAcAAAAGAAkAAwAAAAcAAAAFAAkAAwAAAAcAAAAEAAkAAwAAAAcAAAADAAkAAwAAAAcAAAACAAkAAwAAAAcAAAABAAkAAwAAAAoAAAABAAgAAwAIAAgAAAACAAgAAwAAAAUAAAADAAgAAwAAAAUAAAAEAAgAAwAAAAUAAAAFAAgAAwAAAAUAAAAGAAgAAwAAAAUAAAAHAAgAAwAAAAUAAAAIAAgAAwAAAAUAAAAJAAgAAwAAAAkAAAAcAAgAAwAIAAkAAAAbAAgAAwAAAAcAAAAaAAgAAwAAAAcAAAAZAAgAAwAAAAcAAAAYAAgAAwAAAAcAAAAXAAgAAwAAAAcAAAAWAAgAAwAAAAcAAAAVAAgAAwAAAAcAAAAUAAgAAwAAAAoAAAAUAAcAAwAIAAgAAAAVAAcAAwAAAAUAAAAWAAcAAwAAAAUAAAAXAAcAAwAAAAUAAAAYAAcAAwAAAAUAAAAZAAcAAwAAAAUAAAAaAAcAAwAAAAUAAAAbAAcAAwAAAAUAAAAcAAcAAwAAAAkAAAA=")
 tile_set = ExtResource("2_fd0ig")
 script = ExtResource("6_f03d1")
 

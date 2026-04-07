@@ -1,13 +1,13 @@
 [gd_scene load_steps=9 format=4 uid="uid://dmy24lxwnif0v"]
 
-[ext_resource type="Script" uid="uid://cmivelq4jxjnu" path="res://scripts/game/run/room/tile_handler.gd" id="1_60s0c"]
-[ext_resource type="Script" uid="uid://f735godv2lc6" path="res://scripts/game/run/room/room.gd" id="1_lhjxf"]
+[ext_resource type="Script" uid="uid://cmivelq4jxjnu" path="res://Scripts/game/run/room/tile_handler.gd" id="1_60s0c"]
+[ext_resource type="Script" uid="uid://f735godv2lc6" path="res://Scripts/game/run/room/room.gd" id="1_lhjxf"]
 [ext_resource type="TileSet" uid="uid://d0ha6r7frwc6h" path="res://assets/textures/enviornment/tile_set.tres" id="2_eol0m"]
-[ext_resource type="Script" uid="uid://dtumni32nsr7b" path="res://scripts/game/run/room/floor_tiles.gd" id="3_o3eow"]
-[ext_resource type="Script" uid="uid://dhvmyyaqapscr" path="res://scripts/game/run/room/wall_tiles.gd" id="4_q5sk3"]
-[ext_resource type="Script" uid="uid://tqfqun2o0wua" path="res://scripts/game/run/room/water_tiles.gd" id="5_43k3s"]
-[ext_resource type="Script" uid="uid://c7b7iw7u6fxg3" path="res://scripts/game/run/room/enemy_handler.gd" id="6_ceu8k"]
-[ext_resource type="PackedScene" uid="uid://cgsam8pgivahn" path="res://scenes/props/exit_handler.tscn" id="7_82am3"]
+[ext_resource type="Script" uid="uid://dtumni32nsr7b" path="res://Scripts/game/run/room/floor_tiles.gd" id="3_o3eow"]
+[ext_resource type="Script" uid="uid://dhvmyyaqapscr" path="res://Scripts/game/run/room/wall_tiles.gd" id="4_q5sk3"]
+[ext_resource type="Script" uid="uid://tqfqun2o0wua" path="res://Scripts/game/run/room/water_tiles.gd" id="5_43k3s"]
+[ext_resource type="Script" uid="uid://c7b7iw7u6fxg3" path="res://Scripts/game/run/room/enemy_handler.gd" id="6_ceu8k"]
+[ext_resource type="PackedScene" uid="uid://cgsam8pgivahn" path="res://Scenes/props/exit_handler.tscn" id="7_82am3"]
 
 [node name="room17" type="Node2D" node_paths=PackedStringArray("_tile_handler", "_enemy_handler", "_exit_handler")]
 script = ExtResource("1_lhjxf")
@@ -36,7 +36,7 @@ script = ExtResource("4_q5sk3")
 
 [node name="Water" type="TileMapLayer" parent="TileHandler"]
 scale = Vector2(0.125, 0.125)
-tile_map_data = PackedByteArray("AAAGAAsAAwAAAAAAAAAGAAwAAwAAAAAAAAAHAAsAAwAAAAAAAAAHAAwAAwAAAAAAAAAIAAsAAwAAAAAAAAAIAAwAAwAAAAAAAAAJAAsAAwAAAAAAAAAJAAwAAwAAAAAAAAAKAAsAAwAAAAAAAAAKAAwAAwAAAAAAAAAKAAoAAwAAAAAAAAALAAoAAwAAAAAAAAAMAAoAAwAAAAAAAAANAAoAAwAAAAAAAAAOAAoAAwAAAAAAAAAPAAoAAwAAAAAAAAAQAAoAAwAAAAAAAAARAAoAAwAAAAAAAAASAAoAAwAAAAAAAAATAAoAAwAAAAAAAAAUAAoAAwAAAAAAAAAVAAoAAwAAAAAAAAAWAAoAAwAAAAAAAAAXAAoAAwAAAAAAAAAXAAQAAwAAAAAAAAAXAAUAAwAAAAAAAAAXAAYAAwAAAAAAAAAXAAcAAwAAAAAAAAAXAAgAAwAAAAAAAAAXAAkAAwAAAAAAAAATAAQAAwAAAAAAAAATAAUAAwAAAAAAAAATAAYAAwAAAAAAAAAKAAYAAwAAAAAAAAALAAYAAwAAAAAAAAAMAAYAAwAAAAAAAAANAAYAAwAAAAAAAAAOAAYAAwAAAAAAAAAPAAYAAwAAAAAAAAAQAAYAAwAAAAAAAAARAAYAAwAAAAAAAAASAAYAAwAAAAAAAAAGAAQAAwAAAAAAAAAGAAUAAwAAAAAAAAAHAAQAAwAAAAAAAAAHAAUAAwAAAAAAAAAIAAQAAwAAAAAAAAAIAAUAAwAAAAAAAAAJAAQAAwAAAAAAAAAJAAUAAwAAAAAAAAAKAAQAAwAAAAAAAAAKAAUAAwAAAAAAAAAGAAYAAwAAAAAAAAAGAAcAAwAAAAAAAAAGAAgAAwAAAAAAAAAGAAkAAwAAAAAAAAAGAAoAAwAAAAAAAAA=")
+tile_map_data = PackedByteArray("AAAGAAsAAwAEAAQAAAAGAAwAAwAAAAoAAAAHAAsAAwAAAAUAAAAHAAwAAwAAAAcAAAAIAAsAAwAAAAUAAAAIAAwAAwAAAAcAAAAJAAsAAwAAAAUAAAAJAAwAAwAAAAcAAAAKAAsAAwAIAAYAAAAKAAwAAwAIAAkAAAAKAAoAAwAMAAgAAAALAAoAAwAEAAgAAAAMAAoAAwAEAAgAAAANAAoAAwAEAAgAAAAOAAoAAwAEAAgAAAAPAAoAAwAEAAgAAAAQAAoAAwAEAAgAAAARAAoAAwAEAAgAAAASAAoAAwAEAAgAAAATAAoAAwAEAAgAAAAUAAoAAwAEAAgAAAAVAAoAAwAEAAgAAAAWAAoAAwAEAAgAAAAXAAoAAwAMAAkAAAAXAAQAAwAIAAoAAAAXAAUAAwAAAAgAAAAXAAYAAwAAAAgAAAAXAAcAAwAAAAgAAAAXAAgAAwAAAAgAAAAXAAkAAwAAAAgAAAATAAQAAwAIAAoAAAATAAUAAwAAAAgAAAATAAYAAwAMAAkAAAAKAAYAAwAEAAoAAAALAAYAAwAEAAgAAAAMAAYAAwAEAAgAAAANAAYAAwAEAAgAAAAOAAYAAwAEAAgAAAAPAAYAAwAEAAgAAAAQAAYAAwAEAAgAAAARAAYAAwAEAAgAAAASAAYAAwAEAAgAAAAGAAQAAwAIAAgAAAAGAAUAAwAIAAQAAAAHAAQAAwAAAAUAAAAHAAUAAwAAAAcAAAAIAAQAAwAAAAUAAAAIAAUAAwAAAAcAAAAJAAQAAwAAAAUAAAAJAAUAAwAAAAcAAAAKAAQAAwAAAAkAAAAKAAUAAwAEAAYAAAAGAAYAAwAAAAgAAAAGAAcAAwAAAAgAAAAGAAgAAwAAAAgAAAAGAAkAAwAAAAgAAAAGAAoAAwAAAAgAAAA=")
 tile_set = ExtResource("2_eol0m")
 script = ExtResource("5_43k3s")
 
