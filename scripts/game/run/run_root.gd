@@ -28,7 +28,26 @@ func _ready() -> void:
 
 func _load_room_scene_paths() -> Array[String]:
 	var paths: Array[String] = [
-		"res://scenes/rooms/room20.tscn"
+		"res://scenes/rooms/room01.tscn",
+		"res://scenes/rooms/room02.tscn",
+		"res://scenes/rooms/room03.tscn",
+		"res://scenes/rooms/room04.tscn",
+		"res://scenes/rooms/room05.tscn",
+		"res://scenes/rooms/room06.tscn",
+		"res://scenes/rooms/room07.tscn",
+		"res://scenes/rooms/room08.tscn",
+		"res://scenes/rooms/room09.tscn",
+		"res://scenes/rooms/room10.tscn",
+		"res://scenes/rooms/room11.tscn",
+		"res://scenes/rooms/room12.tscn",
+		"res://scenes/rooms/room13.tscn",
+		"res://scenes/rooms/room14.tscn",
+		"res://scenes/rooms/room15.tscn",
+		"res://scenes/rooms/room16.tscn",
+		"res://scenes/rooms/room17.tscn",
+		"res://scenes/rooms/room18.tscn",
+		"res://scenes/rooms/room19.tscn",
+		"res://scenes/rooms/room20.tscn",
 	]
 	
 	return paths

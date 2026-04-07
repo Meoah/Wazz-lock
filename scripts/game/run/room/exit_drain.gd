@@ -3,31 +3,44 @@ class_name ExitDrain
 
 
 @export var exit_direction: RoomData.Directions
-
+@export var _drain_animated_sprite: AnimatedSprite2D
 
 var destination_room_data: RoomData = null
-var can_trigger: bool = false
+var is_can_trigger: bool = false
+var is_opened: bool = false
+
+
+func setup() -> void:
+	if is_opened: _drain_animated_sprite.play("opened")
 
 
 func set_destination(new_destination: RoomData) -> void:
 	destination_room_data = new_destination
-	can_trigger = new_destination != null
+	is_can_trigger = new_destination != null
 
 
 func disarm_until_leave() -> void:
-	can_trigger = false
+	is_can_trigger = false
+
+
+func open() -> void:
+	_drain_animated_sprite.play("opening")
+	await _drain_animated_sprite.animation_finished
+	is_opened = true
+	_drain_animated_sprite.play("opened")
 
 
 func _on_body_entered(body: Node2D) -> void:
 	if !(body is Clive) : return
-	if !can_trigger : return
+	if !is_can_trigger : return
 	if !destination_room_data: return
+	if !is_opened: return
 	
 	SignalBus.change_room.emit(destination_room_data, _get_opposite_direction())
 
 
 func _on_body_exited(body: Node2D) -> void:
-	if body is Clive and destination_room_data: can_trigger = true
+	if body is Clive and destination_room_data: is_can_trigger = true
 
 
 func _get_opposite_direction() -> RoomData.Directions:

@@ -71,19 +71,22 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_j4tbw"]
-size = Vector2(2048, 2048)
+size = Vector2(500, 500)
 
-[node name="ExitDrain" type="Area2D"]
+[node name="ExitDrain" type="Area2D" node_paths=PackedStringArray("_drain_animated_sprite")]
 scale = Vector2(0.075, 0.075)
 collision_layer = 32768
 collision_mask = 16
 script = ExtResource("1_n4mvd")
+_drain_animated_sprite = NodePath("AnimatedSprite2D")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_qrwy5")
 animation = &"unopened"
+frame_progress = 1.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 13.333336)
 shape = SubResource("RectangleShape2D_j4tbw")
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]

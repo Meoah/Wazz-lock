@@ -18,6 +18,8 @@ func setup_exits(room_data: RoomData) -> void:
 		if destination:
 			exit_drain.show()
 			exit_drain.set_destination(destination)
+			exit_drain.is_opened = room_data.cleared
+			exit_drain.setup()
 		else:
 			exit_drain.hide()
 			exit_drain.set_destination(null)
@@ -44,3 +46,16 @@ func get_spawn_position(entrance_direction: int = -1) -> Vector2:
 	var spawn_exit: ExitDrain = get_spawn_exit(entrance_direction)
 	if spawn_exit: return spawn_exit.global_position
 	return global_position
+
+
+func open_all_exits() -> void:
+	for exit_drain in exit_list:
+		exit_drain.open()
+
+
+func request_open_exit(exit_direction: RoomData.Directions) -> bool:
+	for exit_drain in exit_list:
+		if exit_drain.exit_direction == exit_direction:
+			exit_drain.open()
+			return true
+	return false
