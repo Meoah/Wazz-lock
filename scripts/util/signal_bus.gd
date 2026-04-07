@@ -1,21 +1,21 @@
 extends Node
 
-## Player Signals
-@warning_ignore("unused_signal")
+# Player Signals
 signal state_player_idle
-@warning_ignore("unused_signal")
 signal state_player_walking
-@warning_ignore("unused_signal")
 signal state_player_rolling
-@warning_ignore("unused_signal")
 signal state_player_attacking
-@warning_ignore("unused_signal")
 signal state_player_dead
-@warning_ignore("unused_signal")
 signal state_player_hurt
-@warning_ignore("unused_signal")
 signal state_player_reset
+signal player_ready(node: Clive)
 
-## HUD Signals
-@warning_ignore("unused_signal")
-signal floating_text(message : String, source_position : Vector2)
+# HUD Signals
+signal floating_text(message: String, source_position: Vector2)
+
+# Main Menu Signals
+signal main_menu_save_slot_selected(slot_number: int)
+signal button_pressed
+
+# Run Signals
+signal change_room(room_data: RoomData, entrance_direction: int)

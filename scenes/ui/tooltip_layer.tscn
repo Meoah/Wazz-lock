@@ -1,0 +1,54 @@
+[gd_scene load_steps=5 format=3 uid="uid://b62nwhb2eckl1"]
+
+[ext_resource type="Script" uid="uid://bh2ppeysk78sh" path="res://scripts/ui/tooltip.gd" id="1_gc7l6"]
+[ext_resource type="Texture2D" uid="uid://bwndnjjrninfg" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/panel_grey.png" id="2_gc7l6"]
+
+[sub_resource type="Theme" id="Theme_bd7w1"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_jdad8"]
+
+[node name="TooltipLayer" type="Control" node_paths=PackedStringArray("tooltip_panel", "tooltip_label")]
+z_index = 2
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = SubResource("Theme_bd7w1")
+script = ExtResource("1_gc7l6")
+tooltip_panel = NodePath("Tooltip")
+tooltip_label = NodePath("Tooltip/MarginContainer/Label")
+
+[node name="Tooltip" type="PanelContainer" parent="."]
+layout_mode = 1
+offset_right = 41.0
+offset_bottom = 63.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_jdad8")
+
+[node name="NinePatchRect" type="NinePatchRect" parent="Tooltip"]
+layout_mode = 2
+texture = ExtResource("2_gc7l6")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="MarginContainer" type="MarginContainer" parent="Tooltip"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="Label" type="RichTextLabel" parent="Tooltip/MarginContainer"]
+layout_mode = 2
+mouse_filter = 2
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+horizontal_alignment = 1

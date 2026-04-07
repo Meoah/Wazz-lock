@@ -1,10 +1,24 @@
-[gd_scene load_steps=69 format=3 uid="uid://cepaf77ic4q03"]
+[gd_scene load_steps=76 format=3 uid="uid://cepaf77ic4q03"]
 
 [ext_resource type="Script" uid="uid://d4ibmcipy3vnl" path="res://scripts/actors/player/player_clive.gd" id="1_iwdwx"]
 [ext_resource type="Texture2D" uid="uid://c0m7qwyx0gww8" path="res://assets/textures/actors/clive/spritesheets/Clive_Spritesheet_01.png" id="2_fi64q"]
+[ext_resource type="AudioStream" uid="uid://btvilpp0lscov" path="res://assets/audio/punch_1.ogg" id="2_o7y33"]
 [ext_resource type="Script" uid="uid://cvj6l5ujm0x8x" path="res://scripts/systems/hit_box.gd" id="3_ibqeh"]
 [ext_resource type="Texture2D" uid="uid://ckeymueeg50gj" path="res://assets/textures/actors/clive/Arrow_Clive.svg" id="3_ntpy2"]
+[ext_resource type="AudioStream" uid="uid://bm7j1r6xe5dj2" path="res://assets/audio/punch_2.ogg" id="3_ts6xf"]
 [ext_resource type="Script" uid="uid://c2dmqut00g845" path="res://scripts/systems/hurt_box.gd" id="4_ktvhp"]
+[ext_resource type="AudioStream" uid="uid://bulx4oga848kn" path="res://assets/audio/punch_3.ogg" id="4_mkp5j"]
+[ext_resource type="AudioStream" uid="uid://opl8r4t1dasm" path="res://assets/audio/clive_death.ogg" id="5_ts6xf"]
+[ext_resource type="PackedScene" uid="uid://7r8xbtlsdroq" path="res://scenes/components/status_component.tscn" id="6_rugy7"]
+[ext_resource type="PackedScene" uid="uid://dpqg42i4qfxbi" path="res://scenes/components/inventory_component.tscn" id="7_rugy7"]
+
+[sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_rugy7"]
+playback_mode = 1
+random_pitch = 1.2
+streams_count = 3
+stream_0/stream = ExtResource("2_o7y33")
+stream_1/stream = ExtResource("3_ts6xf")
+stream_2/stream = ExtResource("4_mkp5j")
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_t5ilq"]
 atlas = ExtResource("2_fi64q")
@@ -542,6 +556,18 @@ tracks/10/keys = {
 "update": 1,
 "values": [true]
 }
+tracks/11/type = "value"
+tracks/11/imported = false
+tracks/11/enabled = true
+tracks/11/path = NodePath("BodyRoot/Hands:position")
+tracks/11/interp = 1
+tracks/11/loop_wrap = true
+tracks/11/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
 
 [sub_resource type="Animation" id="Animation_gx6xm"]
 resource_name = "attacking"
@@ -592,7 +618,7 @@ tracks/3/keys = {
 "times": PackedFloat32Array(0.13333334, 0.20000002, 0.33333334),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [Vector2(144, 64), Vector2(591, 184), Vector2(152, 144)]
+"values": [Vector2(144, 64), Vector2(591, 500), Vector2(152, 144)]
 }
 tracks/4/type = "value"
 tracks/4/imported = false
@@ -617,6 +643,18 @@ tracks/5/keys = {
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
 "values": [true, false]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("BodyRoot/Hands:position")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [Vector2(200, 100)]
 }
 
 [sub_resource type="Animation" id="Animation_mpwfl"]
@@ -724,58 +762,6 @@ tracks/3/keys = {
 "values": [0, 1, 2, 3, 4, 5, 6, 7]
 }
 
-[sub_resource type="Animation" id="Animation_nkls8"]
-resource_name = "rolling"
-length = 0.40000334
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("BodyRoot/Body:animation")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [&"rolling"]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("BodyRoot/Hands:visible")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [false]
-}
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("BodyRoot/Body:frame")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0, 0.06666667, 0.13333334, 0.2, 0.26666668, 0.33333334),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
-"update": 1,
-"values": [0, 1, 2, 3, 4, 5]
-}
-tracks/3/type = "value"
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/path = NodePath("HurtBox:visible")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [false]
-}
-
 [sub_resource type="Animation" id="Animation_mkp5j"]
 resource_name = "hurt"
 length = 0.33333668
@@ -840,6 +826,58 @@ tracks/4/keys = {
 "values": [false]
 }
 
+[sub_resource type="Animation" id="Animation_nkls8"]
+resource_name = "rolling"
+length = 0.40000334
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("BodyRoot/Body:animation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [&"rolling"]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("BodyRoot/Hands:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("BodyRoot/Body:frame")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.06666667, 0.13333334, 0.2, 0.26666668, 0.33333334),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3, 4, 5]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("HurtBox:visible")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_ntpy2"]
 _data = {
 &"RESET": SubResource("Animation_ntpy2"),
@@ -850,11 +888,15 @@ _data = {
 &"rolling": SubResource("Animation_nkls8")
 }
 
-[node name="Clive" type="CharacterBody2D" node_paths=PackedStringArray("animation_player", "body_root", "hands", "aim_arrow", "hit_box", "hurt_box", "health_bar")]
+[node name="Clive" type="CharacterBody2D" node_paths=PackedStringArray("status", "inventory", "animation_player", "body_root", "hands", "aim_arrow", "hit_box", "hurt_box", "health_bar") groups=["player"]]
 scale = Vector2(0.25, 0.25)
 collision_layer = 16
 collision_mask = 12547
 script = ExtResource("1_iwdwx")
+punch_sfx = SubResource("AudioStreamRandomizer_rugy7")
+death_sfx = ExtResource("5_ts6xf")
+status = NodePath("Status")
+inventory = NodePath("Inventory")
 animation_player = NodePath("AnimationPlayer")
 body_root = NodePath("BodyRoot")
 hands = NodePath("BodyRoot/Hands")
@@ -863,9 +905,16 @@ hit_box = NodePath("BodyRoot/Hands/Hitbox")
 hurt_box = NodePath("HurtBox")
 health_bar = NodePath("HealthBar")
 
+[node name="Status" parent="." instance=ExtResource("6_rugy7")]
+actor_name = "Clive"
+
+[node name="Inventory" parent="." instance=ExtResource("7_rugy7")]
+
 [node name="BodyRoot" type="Node2D" parent="."]
 
 [node name="Body" type="AnimatedSprite2D" parent="BodyRoot"]
+y_sort_enabled = true
+position = Vector2(0, -3.9999988)
 scale = Vector2(0.99999994, 0.99999994)
 sprite_frames = SubResource("SpriteFrames_6dulk")
 animation = &"idle"
@@ -927,5 +976,6 @@ offset_right = 250.0
 offset_bottom = -350.0
 value = 75.0
 show_percentage = false
+metadata/_edit_use_anchors_ = true
 
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]

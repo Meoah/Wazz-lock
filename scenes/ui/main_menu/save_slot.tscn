@@ -1,0 +1,186 @@
+[gd_scene load_steps=17 format=3 uid="uid://c5d81avm06wq6"]
+
+[ext_resource type="Texture2D" uid="uid://bakvtes34qef5" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/panel_brown_corners_b.png" id="1_2r04i"]
+[ext_resource type="Texture2D" uid="uid://bbv2qsiavk038" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/banner_classic_curtain.png" id="1_jgro5"]
+[ext_resource type="Script" uid="uid://8tawfnwb1v7j" path="res://scripts/ui/main_menu/save_slot.gd" id="2_7jev8"]
+[ext_resource type="Texture2D" uid="uid://c5yf27ql1ronm" path="res://assets/textures/actors/clive/spritesheets/Clive_SpriteSheet_Idle.png" id="3_7jev8"]
+[ext_resource type="Texture2D" uid="uid://42ei7qig066p" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/panel_brown_damaged.png" id="3_ao746"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_e21yp"]
+texture = ExtResource("1_2r04i")
+texture_margin_left = 16.0
+texture_margin_top = 16.0
+texture_margin_right = 16.0
+texture_margin_bottom = 16.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_rtx5h"]
+texture = ExtResource("3_ao746")
+texture_margin_left = 16.0
+texture_margin_top = 16.0
+texture_margin_right = 16.0
+texture_margin_bottom = 16.0
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qsepa"]
+atlas = ExtResource("3_7jev8")
+region = Rect2(0, 0, 1024, 1024)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7d3ci"]
+atlas = ExtResource("3_7jev8")
+region = Rect2(1024, 0, 1024, 1024)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wkybw"]
+atlas = ExtResource("3_7jev8")
+region = Rect2(2048, 0, 1024, 1024)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nmwvd"]
+atlas = ExtResource("3_7jev8")
+region = Rect2(3072, 0, 1024, 1024)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5dia5"]
+atlas = ExtResource("3_7jev8")
+region = Rect2(4096, 0, 1024, 1024)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_u745r"]
+atlas = ExtResource("3_7jev8")
+region = Rect2(5120, 0, 1024, 1024)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8kfg0"]
+atlas = ExtResource("3_7jev8")
+region = Rect2(6144, 0, 1024, 1024)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_huipp"]
+atlas = ExtResource("3_7jev8")
+region = Rect2(7168, 0, 1024, 1024)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_q53jw"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qsepa")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7d3ci")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wkybw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nmwvd")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5dia5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_u745r")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8kfg0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_huipp")
+}],
+"loop": true,
+"name": &"default",
+"speed": 8.0
+}]
+
+[node name="SaveSlot" type="Control" node_paths=PackedStringArray("_animated_sprite_clive", "_label_slot_number")]
+modulate = Color(0.5, 0.5, 0.5, 1)
+custom_minimum_size = Vector2(390, 553)
+layout_mode = 3
+anchors_preset = 0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("2_7jev8")
+_animated_sprite_clive = NodePath("PanelContainer/MarginContainer/VBoxContainer/MarginContainer/PanelContainer/AnimatedSprite2D")
+_label_slot_number = NodePath("TextureRect/SlotNumber")
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_e21yp")
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+mouse_filter = 2
+theme_override_constants/margin_top = 40
+
+[node name="PanelContainer" type="PanelContainer" parent="PanelContainer/MarginContainer/VBoxContainer/MarginContainer"]
+custom_minimum_size = Vector2(256, 256)
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_rtx5h")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="PanelContainer/MarginContainer/VBoxContainer/MarginContainer/PanelContainer"]
+scale = Vector2(0.25, 0.25)
+sprite_frames = SubResource("SpriteFrames_q53jw")
+autoplay = "default"
+frame_progress = 0.6565193
+speed_scale = 0.1
+centered = false
+
+[node name="SaveData" type="Control" parent="PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="RichTextLabel" type="RichTextLabel" parent="PanelContainer/MarginContainer/VBoxContainer/SaveData"]
+modulate = Color(0, 0, 0, 1)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+bbcode_enabled = true
+text = "Save Data Info"
+scroll_active = false
+horizontal_alignment = 1
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -128.0
+offset_top = -20.0
+offset_right = 128.0
+offset_bottom = 44.0
+grow_horizontal = 2
+mouse_filter = 2
+texture = ExtResource("1_jgro5")
+
+[node name="SlotNumber" type="Label" parent="TextureRect"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "SLOT #"
+horizontal_alignment = 1

@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://7r8xbtlsdroq"]
+
+[ext_resource type="Script" uid="uid://dkotjjoh5ryyy" path="res://scripts/actors/player/player_status.gd" id="1_61gah"]
+
+[node name="Status" type="Node"]
+script = ExtResource("1_61gah")
+type = 0
