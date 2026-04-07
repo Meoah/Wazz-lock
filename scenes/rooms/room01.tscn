@@ -1,12 +1,12 @@
 [gd_scene load_steps=8 format=4 uid="uid://cci38o3gv1ckh"]
 
-[ext_resource type="Script" uid="uid://f735godv2lc6" path="res://scripts/game/run/room/room.gd" id="1_pgrfd"]
-[ext_resource type="Script" uid="uid://cmivelq4jxjnu" path="res://scripts/game/run/room/tile_handler.gd" id="2_pwinf"]
+[ext_resource type="Script" uid="uid://f735godv2lc6" path="res://Scripts/game/run/room/room.gd" id="1_pgrfd"]
+[ext_resource type="Script" uid="uid://cmivelq4jxjnu" path="res://Scripts/game/run/room/tile_handler.gd" id="2_pwinf"]
 [ext_resource type="TileSet" uid="uid://d0ha6r7frwc6h" path="res://assets/textures/enviornment/tile_set.tres" id="3_b475j"]
-[ext_resource type="Script" uid="uid://dtumni32nsr7b" path="res://scripts/game/run/room/floor_tiles.gd" id="4_561gn"]
-[ext_resource type="Script" uid="uid://dhvmyyaqapscr" path="res://scripts/game/run/room/wall_tiles.gd" id="5_g8xvh"]
-[ext_resource type="Script" uid="uid://c7b7iw7u6fxg3" path="res://scripts/game/run/room/enemy_handler.gd" id="6_0hles"]
-[ext_resource type="PackedScene" uid="uid://cgsam8pgivahn" path="res://scenes/props/exit_handler.tscn" id="7_lct0p"]
+[ext_resource type="Script" uid="uid://dtumni32nsr7b" path="res://Scripts/game/run/room/floor_tiles.gd" id="4_561gn"]
+[ext_resource type="Script" uid="uid://dhvmyyaqapscr" path="res://Scripts/game/run/room/wall_tiles.gd" id="5_g8xvh"]
+[ext_resource type="Script" uid="uid://c7b7iw7u6fxg3" path="res://Scripts/game/run/room/enemy_handler.gd" id="6_0hles"]
+[ext_resource type="PackedScene" uid="uid://cgsam8pgivahn" path="res://Scenes/props/exit_handler.tscn" id="7_lct0p"]
 
 [node name="room01" type="Node2D" node_paths=PackedStringArray("_tile_handler", "_enemy_handler", "_exit_handler")]
 script = ExtResource("1_pgrfd")
