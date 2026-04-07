@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=4 uid="uid://cci38o3gv1ckh"]
+[gd_scene load_steps=9 format=4 uid="uid://cci38o3gv1ckh"]
 
 [ext_resource type="Script" uid="uid://f735godv2lc6" path="res://Scripts/game/run/room/room.gd" id="1_pgrfd"]
 [ext_resource type="Script" uid="uid://cmivelq4jxjnu" path="res://Scripts/game/run/room/tile_handler.gd" id="2_pwinf"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://dtumni32nsr7b" path="res://Scripts/game/run/room/floor_tiles.gd" id="4_561gn"]
 [ext_resource type="Script" uid="uid://dhvmyyaqapscr" path="res://Scripts/game/run/room/wall_tiles.gd" id="5_g8xvh"]
 [ext_resource type="Script" uid="uid://c7b7iw7u6fxg3" path="res://Scripts/game/run/room/enemy_handler.gd" id="6_0hles"]
+[ext_resource type="PackedScene" uid="uid://covcxrd0mfk4b" path="res://Scenes/actors/enemies/_enemy_spawner.tscn" id="7_5go5g"]
 [ext_resource type="PackedScene" uid="uid://cgsam8pgivahn" path="res://Scenes/props/exit_handler.tscn" id="7_lct0p"]
 
 [node name="room01" type="Node2D" node_paths=PackedStringArray("_tile_handler", "_enemy_handler", "_exit_handler")]
@@ -34,6 +35,24 @@ script = ExtResource("5_g8xvh")
 
 [node name="EnemyHandler" type="Node2D" parent="."]
 script = ExtResource("6_0hles")
+
+[node name="EnemySpawner" parent="EnemyHandler" instance=ExtResource("7_5go5g")]
+position = Vector2(1056, 159)
+
+[node name="EnemySpawner2" parent="EnemyHandler" instance=ExtResource("7_5go5g")]
+position = Vector2(607, 95)
+
+[node name="EnemySpawner3" parent="EnemyHandler" instance=ExtResource("7_5go5g")]
+position = Vector2(159, 159)
+
+[node name="EnemySpawner4" parent="EnemyHandler" instance=ExtResource("7_5go5g")]
+position = Vector2(288, 223)
+
+[node name="EnemySpawner5" parent="EnemyHandler" instance=ExtResource("7_5go5g")]
+position = Vector2(480, 290)
+
+[node name="EnemySpawner6" parent="EnemyHandler" instance=ExtResource("7_5go5g")]
+position = Vector2(799, 225)
 
 [node name="ExitHandler" parent="." instance=ExtResource("7_lct0p")]
 
