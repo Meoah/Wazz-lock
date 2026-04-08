@@ -1,13 +1,14 @@
-[gd_scene load_steps=9 format=4 uid="uid://3n7ogm38flmn"]
+[gd_scene load_steps=10 format=4 uid="uid://3n7ogm38flmn"]
 
-[ext_resource type="Script" uid="uid://cmivelq4jxjnu" path="res://Scripts/game/run/room/tile_handler.gd" id="1_qg2o2"]
-[ext_resource type="Script" uid="uid://f735godv2lc6" path="res://Scripts/game/run/room/room.gd" id="1_sqtj8"]
+[ext_resource type="Script" uid="uid://cmivelq4jxjnu" path="res://scripts/game/run/room/tile_handler.gd" id="1_qg2o2"]
+[ext_resource type="Script" uid="uid://f735godv2lc6" path="res://scripts/game/run/room/room.gd" id="1_sqtj8"]
 [ext_resource type="TileSet" uid="uid://d0ha6r7frwc6h" path="res://assets/textures/enviornment/tile_set.tres" id="2_u6sg5"]
-[ext_resource type="Script" uid="uid://dtumni32nsr7b" path="res://Scripts/game/run/room/floor_tiles.gd" id="3_u6sg5"]
-[ext_resource type="Script" uid="uid://c7b7iw7u6fxg3" path="res://Scripts/game/run/room/enemy_handler.gd" id="3_yiu4e"]
+[ext_resource type="Script" uid="uid://dtumni32nsr7b" path="res://scripts/game/run/room/floor_tiles.gd" id="3_u6sg5"]
+[ext_resource type="Script" uid="uid://c7b7iw7u6fxg3" path="res://scripts/game/run/room/enemy_handler.gd" id="3_yiu4e"]
 [ext_resource type="PackedScene" uid="uid://cgsam8pgivahn" path="res://Scenes/props/exit_handler.tscn" id="4_ko6oa"]
-[ext_resource type="Script" uid="uid://dhvmyyaqapscr" path="res://Scripts/game/run/room/wall_tiles.gd" id="4_sqtj8"]
-[ext_resource type="Script" uid="uid://tqfqun2o0wua" path="res://Scripts/game/run/room/water_tiles.gd" id="5_0lvl3"]
+[ext_resource type="Script" uid="uid://dhvmyyaqapscr" path="res://scripts/game/run/room/wall_tiles.gd" id="4_sqtj8"]
+[ext_resource type="Script" uid="uid://tqfqun2o0wua" path="res://scripts/game/run/room/water_tiles.gd" id="5_0lvl3"]
+[ext_resource type="PackedScene" uid="uid://covcxrd0mfk4b" path="res://Scenes/actors/enemies/_enemy_spawner.tscn" id="8_j27q0"]
 
 [node name="room13" type="Node2D" node_paths=PackedStringArray("_tile_handler", "_enemy_handler", "_exit_handler")]
 script = ExtResource("1_sqtj8")
@@ -42,6 +43,120 @@ script = ExtResource("5_0lvl3")
 
 [node name="EnemyHandler" type="Node2D" parent="."]
 script = ExtResource("3_yiu4e")
+
+[node name="Slime" parent="EnemyHandler" instance=ExtResource("8_j27q0")]
+position = Vector2(1378, 100)
+
+[node name="Slime2" parent="EnemyHandler" instance=ExtResource("8_j27q0")]
+position = Vector2(1380, 355)
+
+[node name="Slime3" parent="EnemyHandler" instance=ExtResource("8_j27q0")]
+position = Vector2(1758, 352)
+
+[node name="Slime4" parent="EnemyHandler" instance=ExtResource("8_j27q0")]
+position = Vector2(1569, 286)
+
+[node name="Slime5" parent="EnemyHandler" instance=ExtResource("8_j27q0")]
+position = Vector2(1185, 410)
+
+[node name="Slime6" parent="EnemyHandler" instance=ExtResource("8_j27q0")]
+position = Vector2(1759, 667)
+
+[node name="Slime7" parent="EnemyHandler" instance=ExtResource("8_j27q0")]
+position = Vector2(1823, 858)
+
+[node name="Slime8" parent="EnemyHandler" instance=ExtResource("8_j27q0")]
+position = Vector2(1632, 984)
+
+[node name="Slime9" parent="EnemyHandler" instance=ExtResource("8_j27q0")]
+position = Vector2(1568, 799)
+
+[node name="Slime10" parent="EnemyHandler" instance=ExtResource("8_j27q0")]
+position = Vector2(1312, 862)
+
+[node name="Slime11" parent="EnemyHandler" instance=ExtResource("8_j27q0")]
+position = Vector2(990, 802)
+
+[node name="Slime12" parent="EnemyHandler" instance=ExtResource("8_j27q0")]
+position = Vector2(865, 678)
+
+[node name="Slime13" parent="EnemyHandler" instance=ExtResource("8_j27q0")]
+position = Vector2(799, 929)
+
+[node name="Slime14" parent="EnemyHandler" instance=ExtResource("8_j27q0")]
+position = Vector2(225, 989)
+
+[node name="Slime15" parent="EnemyHandler" instance=ExtResource("8_j27q0")]
+position = Vector2(670, 804)
+
+[node name="Slime16" parent="EnemyHandler" instance=ExtResource("8_j27q0")]
+position = Vector2(355, 799)
+
+[node name="Slime17" parent="EnemyHandler" instance=ExtResource("8_j27q0")]
+position = Vector2(862, 351)
+
+[node name="Slime18" parent="EnemyHandler" instance=ExtResource("8_j27q0")]
+position = Vector2(672, 224)
+
+[node name="Slime19" parent="EnemyHandler" instance=ExtResource("8_j27q0")]
+position = Vector2(219, 220)
+
+[node name="Slime20" parent="EnemyHandler" instance=ExtResource("8_j27q0")]
+position = Vector2(481, 159)
+
+[node name="Slime21" parent="EnemyHandler" instance=ExtResource("8_j27q0")]
+position = Vector2(349, 288)
+
+[node name="Slime22" parent="EnemyHandler" instance=ExtResource("8_j27q0")]
+position = Vector2(160, 858)
+
+[node name="Slime_Boss" parent="EnemyHandler" instance=ExtResource("8_j27q0")]
+position = Vector2(543, 408)
+enemy_type = 2
+
+[node name="Slime_Boss2" parent="EnemyHandler" instance=ExtResource("8_j27q0")]
+position = Vector2(1245, 286)
+enemy_type = 2
+
+[node name="Slime_Boss3" parent="EnemyHandler" instance=ExtResource("8_j27q0")]
+position = Vector2(157, 669)
+enemy_type = 2
+
+[node name="Slime_Boss4" parent="EnemyHandler" instance=ExtResource("8_j27q0")]
+position = Vector2(546, 735)
+enemy_type = 2
+
+[node name="Slime_Boss5" parent="EnemyHandler" instance=ExtResource("8_j27q0")]
+position = Vector2(1376, 678)
+enemy_type = 2
+
+[node name="Slime_Boss6" parent="EnemyHandler" instance=ExtResource("8_j27q0")]
+position = Vector2(1699, 220)
+enemy_type = 2
+
+[node name="Bubble" parent="EnemyHandler" instance=ExtResource("8_j27q0")]
+position = Vector2(166, 160)
+enemy_type = 1
+
+[node name="Bubble2" parent="EnemyHandler" instance=ExtResource("8_j27q0")]
+position = Vector2(156, 929)
+enemy_type = 1
+
+[node name="Bubble3" parent="EnemyHandler" instance=ExtResource("8_j27q0")]
+position = Vector2(1761, 930)
+enemy_type = 1
+
+[node name="Bubble4" parent="EnemyHandler" instance=ExtResource("8_j27q0")]
+position = Vector2(1763, 154)
+enemy_type = 1
+
+[node name="Bubble5" parent="EnemyHandler" instance=ExtResource("8_j27q0")]
+position = Vector2(612, 676)
+enemy_type = 1
+
+[node name="Bubble6" parent="EnemyHandler" instance=ExtResource("8_j27q0")]
+position = Vector2(1310, 413)
+enemy_type = 1
 
 [node name="ExitHandler" parent="." instance=ExtResource("4_ko6oa")]
 

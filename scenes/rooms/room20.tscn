@@ -1,12 +1,13 @@
-[gd_scene load_steps=9 format=4 uid="uid://cnsn6gio361ua"]
+[gd_scene load_steps=10 format=4 uid="uid://cnsn6gio361ua"]
 
 [ext_resource type="TileSet" uid="uid://d0ha6r7frwc6h" path="res://assets/textures/enviornment/tile_set.tres" id="1_qjmxw"]
-[ext_resource type="Script" uid="uid://f735godv2lc6" path="res://Scripts/game/run/room/room.gd" id="1_xklb4"]
-[ext_resource type="Script" uid="uid://cmivelq4jxjnu" path="res://Scripts/game/run/room/tile_handler.gd" id="2_7x81x"]
-[ext_resource type="Script" uid="uid://c7b7iw7u6fxg3" path="res://Scripts/game/run/room/enemy_handler.gd" id="4_hpr25"]
-[ext_resource type="Script" uid="uid://dtumni32nsr7b" path="res://Scripts/game/run/room/floor_tiles.gd" id="4_ya8el"]
-[ext_resource type="Script" uid="uid://dhvmyyaqapscr" path="res://Scripts/game/run/room/wall_tiles.gd" id="5_h1fgm"]
-[ext_resource type="Script" uid="uid://tqfqun2o0wua" path="res://Scripts/game/run/room/water_tiles.gd" id="6_qrwy5"]
+[ext_resource type="Script" uid="uid://f735godv2lc6" path="res://scripts/game/run/room/room.gd" id="1_xklb4"]
+[ext_resource type="Script" uid="uid://cmivelq4jxjnu" path="res://scripts/game/run/room/tile_handler.gd" id="2_7x81x"]
+[ext_resource type="Script" uid="uid://c7b7iw7u6fxg3" path="res://scripts/game/run/room/enemy_handler.gd" id="4_hpr25"]
+[ext_resource type="Script" uid="uid://dtumni32nsr7b" path="res://scripts/game/run/room/floor_tiles.gd" id="4_ya8el"]
+[ext_resource type="Script" uid="uid://dhvmyyaqapscr" path="res://scripts/game/run/room/wall_tiles.gd" id="5_h1fgm"]
+[ext_resource type="Script" uid="uid://tqfqun2o0wua" path="res://scripts/game/run/room/water_tiles.gd" id="6_qrwy5"]
+[ext_resource type="PackedScene" uid="uid://covcxrd0mfk4b" path="res://Scenes/actors/enemies/_enemy_spawner.tscn" id="8_8nmvp"]
 [ext_resource type="PackedScene" uid="uid://cgsam8pgivahn" path="res://Scenes/props/exit_handler.tscn" id="9_qpl30"]
 
 [node name="room20" type="Node2D" node_paths=PackedStringArray("_tile_handler", "_enemy_handler", "_exit_handler")]
@@ -43,6 +44,48 @@ script = ExtResource("6_qrwy5")
 
 [node name="EnemyHandler" type="Node2D" parent="."]
 script = ExtResource("4_hpr25")
+
+[node name="Bubble" parent="EnemyHandler" instance=ExtResource("8_8nmvp")]
+position = Vector2(161, 159)
+enemy_type = 1
+
+[node name="Bubble2" parent="EnemyHandler" instance=ExtResource("8_8nmvp")]
+position = Vector2(161, 928)
+enemy_type = 1
+
+[node name="Bubble3" parent="EnemyHandler" instance=ExtResource("8_8nmvp")]
+position = Vector2(1757, 924)
+enemy_type = 1
+
+[node name="Bubble4" parent="EnemyHandler" instance=ExtResource("8_8nmvp")]
+position = Vector2(1756, 163)
+enemy_type = 1
+
+[node name="Bubble5" parent="EnemyHandler" instance=ExtResource("8_8nmvp")]
+position = Vector2(802, 606)
+enemy_type = 1
+
+[node name="Bubble6" parent="EnemyHandler" instance=ExtResource("8_8nmvp")]
+position = Vector2(1119, 545)
+enemy_type = 1
+
+[node name="Slime" parent="EnemyHandler" instance=ExtResource("8_8nmvp")]
+position = Vector2(1692, 226)
+
+[node name="Slime2" parent="EnemyHandler" instance=ExtResource("8_8nmvp")]
+position = Vector2(226, 864)
+
+[node name="Slime_Boss" parent="EnemyHandler" instance=ExtResource("8_8nmvp")]
+position = Vector2(225, 225)
+enemy_type = 2
+
+[node name="Slime_Boss2" parent="EnemyHandler" instance=ExtResource("8_8nmvp")]
+position = Vector2(1694, 862)
+enemy_type = 2
+
+[node name="Slime_Boss3" parent="EnemyHandler" instance=ExtResource("8_8nmvp")]
+position = Vector2(960, 574)
+enemy_type = 2
 
 [node name="ExitHandler" parent="." instance=ExtResource("9_qpl30")]
 
