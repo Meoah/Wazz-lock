@@ -1,15 +1,17 @@
-extends PlayerState
-class_name PlayerHurtState
+extends StateComponent
+class_name PlayerHurtStateComponent
 
-const STATE_NAME : String = "PLAYER_HURT_STATE"
+func enter(_previous_state: StateComponent, _data: Dictionary = {}) -> void:
+	if parent is Clive:
+		parent.begin_hurt()
+		
+		await parent.hurt_finished
+		if machine.current_state != self: return
+		
+		if parent.has_move_input(): machine.transition_to(&"walk")
+		else: machine.transition_to(&"idle")
 
-func _init(parent : StateMachine) -> void:
-	state_name = STATE_NAME
-	super._init(parent)
 
-func enter(previous_state: State, data: Dictionary = {}) -> void:
-	super.enter(previous_state, data)
-	SignalBus.state_player_hurt.emit()
-
-func exit(next_state : State) -> void:
-	super.exit(next_state)
+func physics_update(_delta: float) -> void:
+	if parent is Clive:
+		parent.movement.request_stop()

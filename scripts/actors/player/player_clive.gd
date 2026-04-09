@@ -1,418 +1,393 @@
 extends CharacterBody2D
 class_name Clive
 
-# Manager
-var manager: PlayerManager
+signal roll_startup_finished
+signal roll_finished
+signal hurt_finished
+signal death_finished
+
+@export_category("Components")
+@export var state_machine: StateMachineComponent
+@export var movement: MovementComponent
+@export var attack: PlayerAttackComponent
+@export var combat_receiver: CombatReceiverComponent
+@export var status: StatusComponent
+@export var inventory: InventoryComponent
+@export var aim: AimComponent
+@export var hit_box: HitBoxComponent
+@export var hurt_box: HurtBoxComponent
 
 @export_category("Audio")
 @export var punch_sfx: AudioStream
 @export var death_sfx: AudioStream
 
 @export_category("Children Nodes")
-@export var status: Status
-@export var inventory: Inventory
 @export var animation_player: AnimationPlayer
 @export var body_root: Node2D
 @export var hands: AnimatedSprite2D
-@export var aim_arrow: Sprite2D
-@export var hit_box: HitBox
-@export var hurt_box: HurtBox
 @export var health_bar: ProgressBar
 
-# Movement
-const BASE_SPEED: float = 200.0
-var move_speed: float = 200.0
+const INVULN_FLASH_MIN_ALPHA := 0.25
+const INVULN_FLASH_HALF_PERIOD := 0.06
+const ROLL_HOLD_FRAMES := 15
+const ROLL_FLASH_COLOR := Color(0.255, 0.733, 0.953)
+
 var move_direction: Vector2 = Vector2.ZERO
 
-# Input
-var input_flags : int = 0
-enum INPUT_FLAG{
+var input_flags: int = 0
+enum INPUT_FLAG {
 	MOVE_UP		= 1 << 0,
 	MOVE_DOWN	= 1 << 1,
 	MOVE_LEFT	= 1 << 2,
-	MOVE_RIGHT	= 1 << 3,
-	DODGE		= 1 << 4,
-	PRIMARY		= 1 << 5,
-	SECONDARY	= 1 << 6,
-	POTION		= 1 << 7
+	MOVE_RIGHT	= 1 << 3
 }
 
-# Tweens
-var flash_tween : Tween
-var invuln_tween : Tween
+var roll_requested: bool = false
+var potion_requested: bool = false
+var dodge_held: bool = false
+var primary_attack_held: bool = false
+var secondary_attack_held: bool = false
 
-# Cooldowns
-var roll_cooldown : float = 0.0
-var attack_cooldown : float = 0.0
-var invuln_cooldown : float = 0.0
+var flash_tween: Tween
+var invuln_tween: Tween
 
-# Status Flags
-var status_flags : int = 0
-enum STATUS_FLAG{
+var roll_cooldown: float = 0.0
+var invuln_cooldown: float = 0.0
+var potion_cooldown: float = 0.0
+
+var status_flags: int = 0
+enum STATUS_FLAG {
 	INVULN		= 1 << 0,
 	ROLLING		= 1 << 1,
-	ATTACKING	= 1 << 2
+	ATTACKING	= 1 << 2,
+	DEAD		= 1 << 3
 }
 
+var was_invuln: bool = false
+var action_token: int = 0
+
+
 func _ready() -> void:
-	manager = PlayerManager.new()
+	_validate_components()
 	
-	# Status
 	status.setup()
 	status.request_active()
+	status.dead.connect(_on_status_dead)
+
+	movement.setup(self)
+	movement.set_movement_enabled(true)
+	movement.request_stop()
+	movement.clear_impulses()
 	
-	# Connects signals
-	SignalBus.state_player_hurt.connect(_player_hurt)
-	SignalBus.state_player_dead.connect(_player_dead)
-	SignalBus.state_player_rolling.connect(_attempt_roll)
-	SignalBus.state_player_attacking.connect(_attempt_attack)
+	if hit_box: hit_box.end_activation()
+	
+	state_machine.setup(self)
 	
 	SignalBus.player_ready.emit(self)
-	
+
+
 func _process(delta: float) -> void:
 	_update_timers(delta)
 	_update_status()
-	if manager.get_current_state() is PlayerDeadState : return
-	_update_aim()
-	_update_state()
+	_handle_potion()
 	
-	# TODO get rid of this
-	potion_cooldown -= delta
-	if input_flags & INPUT_FLAG.POTION:
-		_use_potion()
-	if potion_cooldown < -3.0:
-		status.health_regen = 0
-	
-	# Handles which animation to play depending on state.
-	if manager.get_current_state() is PlayerWalkingState: _play_walking()
-	if manager.get_current_state() is PlayerIdleState: _play_idle()
+	if status.current_health <= 0.0 and not is_dead(): _on_status_dead()
 
-# TODO get rid of this
-var potion_cooldown: float = 0.0
-func _use_potion() -> void:
+
+func _physics_process(delta: float) -> void:
+	movement.physics_step(delta)
+
+
+func _input(event: InputEvent) -> void:
+	if event.is_action_pressed("move_left"): _set_input_flag(INPUT_FLAG.MOVE_LEFT, true)
+	if event.is_action_released("move_left"): _set_input_flag(INPUT_FLAG.MOVE_LEFT, false)
+	
+	if event.is_action_pressed("move_right"): _set_input_flag(INPUT_FLAG.MOVE_RIGHT, true)
+	if event.is_action_released("move_right"): _set_input_flag(INPUT_FLAG.MOVE_RIGHT, false)
+	
+	if event.is_action_pressed("move_up"): _set_input_flag(INPUT_FLAG.MOVE_UP, true)
+	if event.is_action_released("move_up"): _set_input_flag(INPUT_FLAG.MOVE_UP, false)
+	
+	if event.is_action_pressed("move_down"): _set_input_flag(INPUT_FLAG.MOVE_DOWN, true)
+	if event.is_action_released("move_down"): _set_input_flag(INPUT_FLAG.MOVE_DOWN, false)
+	
+	if event.is_action_pressed("move_dodge"):
+		roll_requested = true
+		dodge_held = true
+	
+	if event.is_action_released("move_dodge"):
+		dodge_held = false
+	
+	if event.is_action_pressed("move_primary"):
+		primary_attack_held = true
+		if attack: attack.on_attack_button_pressed(PlayerAttackComponent.AttackInputType.PRIMARY)
+
+	if event.is_action_released("move_primary"):
+		primary_attack_held = false
+		if attack: attack.on_attack_button_released(PlayerAttackComponent.AttackInputType.PRIMARY)
+
+	if event.is_action_pressed("move_secondary"):
+		secondary_attack_held = true
+		if attack: attack.on_attack_button_pressed(PlayerAttackComponent.AttackInputType.SECONDARY)
+
+	if event.is_action_released("move_secondary"):
+		secondary_attack_held = false
+		if attack: attack.on_attack_button_released(PlayerAttackComponent.AttackInputType.SECONDARY)
+	
+	_update_move_direction()
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_WINDOW_FOCUS_OUT:
+		input_flags = 0
+		roll_requested = false
+		primary_attack_held = false
+		secondary_attack_held = false
+		potion_requested = false
+		dodge_held = false
+	_update_move_direction()
+
+
+func get_status_component() -> StatusComponent: return status
+func is_dead() -> bool: return (status_flags & STATUS_FLAG.DEAD) != 0
+func is_invulnerable() -> bool: return (status_flags & STATUS_FLAG.INVULN) != 0
+func is_attacking() -> bool: return (status_flags & STATUS_FLAG.ATTACKING) != 0
+
+func has_move_input() -> bool: return move_direction != Vector2.ZERO
+func get_move_direction() -> Vector2: return move_direction
+func is_dodge_held() -> bool: return dodge_held
+
+
+func is_attack_button_held(input_type: int) -> bool:
+	match input_type:
+		PlayerAttackComponent.AttackInputType.PRIMARY: return primary_attack_held
+		PlayerAttackComponent.AttackInputType.SECONDARY: return secondary_attack_held
+	return false
+
+func _validate_components() -> void:
+	if state_machine == null: push_error("Clive missing StateMachineComponent")
+	if movement == null: push_error("Clive missing MovementComponent")
+	if combat_receiver == null: push_error("Clive missing CombatReceiverComponent")
+	if status == null: push_error("Clive missing StatusComponent")
+	if inventory == null: push_error("Clive missing InventoryComponent")
+	if hurt_box == null: push_error("Clive missing HurtBoxComponent")
+	if hit_box == null: push_error("Clive missing HitBoxComponent")
+	if animation_player == null: push_error("Clive missing AnimationPlayer")
+	if body_root == null: push_error("Clive missing BodyRoot")
+	if aim == null: push_error("Clive missing AimComponent")
+
+
+func _update_timers(delta: float) -> void:
+	roll_cooldown -= delta
+	invuln_cooldown -= delta
+	potion_cooldown -= delta
+
+
+func _update_status() -> void:
+	health_bar.max_value = status.max_health
+	health_bar.value = status.current_health
+	
+	var invuln_now: bool = invuln_cooldown > 0.0
+	_set_status_flag(STATUS_FLAG.INVULN, invuln_now)
+	
+	hurt_box.monitorable = not invuln_now
+	hurt_box.monitoring = not invuln_now
+	
+	_invuln_handler()
+
+
+func _handle_potion() -> void:
+	if !potion_requested: return
+	
+	potion_requested = false
+	
 	if potion_cooldown > 0.0: return
+	
 	if inventory.request_use_item(inventory.HEALTH_POTION):
 		SignalBus.floating_text.emit("+10", position)
 		status.current_health += 10.0
 		status.health_regen = 2.5
 		potion_cooldown = 1.0
 
-func _physics_process(_delta : float) -> void:
-	if manager.get_current_state() is PlayerDeadState : return
-	_movement_handler()
 
-func _input(event : InputEvent) -> void:
-	## Main input reader
-	if event.is_action_pressed("move_left"):		_set_input_flag(INPUT_FLAG.MOVE_LEFT, true)
-	if event.is_action_released("move_left"):		_set_input_flag(INPUT_FLAG.MOVE_LEFT, false)
-	if event.is_action_pressed("move_right"):		_set_input_flag(INPUT_FLAG.MOVE_RIGHT, true)
-	if event.is_action_released("move_right"):		_set_input_flag(INPUT_FLAG.MOVE_RIGHT, false)
-	if event.is_action_pressed("move_up"):			_set_input_flag(INPUT_FLAG.MOVE_UP, true)
-	if event.is_action_released("move_up"):			_set_input_flag(INPUT_FLAG.MOVE_UP, false)
-	if event.is_action_pressed("move_down"):		_set_input_flag(INPUT_FLAG.MOVE_DOWN, true)
-	if event.is_action_released("move_down"):		_set_input_flag(INPUT_FLAG.MOVE_DOWN, false)
-	if event.is_action_pressed("move_dodge"):		_set_input_flag(INPUT_FLAG.DODGE, true)
-	if event.is_action_released("move_dodge"):		_set_input_flag(INPUT_FLAG.DODGE, false)
-	if event.is_action_pressed("move_primary"):		_set_input_flag(INPUT_FLAG.PRIMARY, true)
-	if event.is_action_released("move_primary"):	_set_input_flag(INPUT_FLAG.PRIMARY, false)
-	if event.is_action_pressed("move_secondary"):	_set_input_flag(INPUT_FLAG.SECONDARY, true)
-	if event.is_action_released("move_secondary"):	_set_input_flag(INPUT_FLAG.SECONDARY, false)
-	if event.is_action_pressed("use_potion"):		_set_input_flag(INPUT_FLAG.POTION, true)
-	if event.is_action_released("use_potion"):		_set_input_flag(INPUT_FLAG.POTION, false)
+func _set_input_flag(flag: int, enabled: bool) -> void:
+	if enabled: input_flags |= flag
+	else: input_flags &= ~flag
+
+
+func _set_status_flag(flag: int, enabled: bool) -> void:
+	if enabled: status_flags |= flag
+	else: status_flags &= ~flag
+
+
+func on_hit_received(_hit_data: HitData) -> void:
+	roll_requested = false
+
+
+func on_hurt_received(_hit_data: HitData) -> void:
+	roll_requested = false
 	
-	## Updates
-	_update_move_direction()
+	if hit_box: hit_box.end_activation()
 
-func _notification(what: int) -> void:
-	# Resets movement flags to 0 if window loses focus.
-	if what == NOTIFICATION_WM_WINDOW_FOCUS_OUT : input_flags = 0
-	_update_move_direction()
 
-# Handles all timers.
-func _update_timers(delta : float) -> void:
-	roll_cooldown -= delta
-	attack_cooldown -= delta
-	invuln_cooldown -= delta
+func on_death_received(_hit_data: HitData) -> void:
+	input_flags = 0
+	roll_requested = false
+	potion_requested = false
 
-# Handles most statuses.
-func _update_status() -> void:
-	if invuln_cooldown > 0 : 
-		_set_status_flag(STATUS_FLAG.INVULN, true)
-		hurt_box.monitorable = false
-		hurt_box.monitoring = false
-	if invuln_cooldown <= 0 :
-		_set_status_flag(STATUS_FLAG.INVULN, false)
-		hurt_box.monitorable = true
-		hurt_box.monitoring = true
-	
-	# Status handlers.
-	_health_handler()
-	_invuln_handler()
+	if hit_box:
+		hit_box.end_activation()
 
-# Handles health. Triggers death if health < 0.
-func _health_handler() -> void:
-	health_bar.max_value = status.max_health
-	health_bar.value = status.current_health
-	
-	if status.current_health < 0.0 : manager.request_dead()
+	if movement:
+		movement.request_stop()
+		movement.clear_impulses()
+		movement.set_movement_enabled(false)
 
-## Invuln Procedure
-const INVULN_FLASH_MIN_ALPHA : float = 0.25
-const INVULN_FLASH_HALF_PERIOD : float = 0.06
-var was_invuln : bool = false
-# Determines effects while invuln.
-func _invuln_handler() -> void:
-	# Only run the handler if it detects a change in invuln status.
-	var invuln_now : bool = (status_flags & STATUS_FLAG.INVULN) != 0
-	if invuln_now == was_invuln : return
-	was_invuln = invuln_now
-	
-	if invuln_now : _start_invuln_flash()
-	else : _stop_invuln_flash()
 
-# Starts the invuln flash.
-func _start_invuln_flash() -> void:
-	# Resets.
-	_stop_invuln_flash()
-	
-	# Starts the loop of alpha flashing.
-	invuln_tween = create_tween()
-	invuln_tween.set_loops()
-	invuln_tween.tween_property(body_root, "modulate:a", INVULN_FLASH_MIN_ALPHA, INVULN_FLASH_HALF_PERIOD)\
-		.set_trans(Tween.TRANS_SINE)\
-		.set_ease(Tween.EASE_IN_OUT)
-	invuln_tween.tween_property(body_root, "modulate:a", 1.0, INVULN_FLASH_HALF_PERIOD)\
-		.set_trans(Tween.TRANS_SINE)\
-		.set_ease(Tween.EASE_IN_OUT)
-
-# Stops the flashing and resets.
-func _stop_invuln_flash() -> void:
-	_kill_invuln_tween()
-	body_root.modulate.a = 1.0
-
-# Kills the invuln_tween.
-func _kill_invuln_tween() -> void:
-	if invuln_tween and invuln_tween.is_running():
-		invuln_tween.kill()
-	invuln_tween = null
-
-# Main state handler
-func _update_state() -> void:
-	# Movement flags
-	var movement_flags : int = INPUT_FLAG.MOVE_UP | INPUT_FLAG.MOVE_DOWN | INPUT_FLAG.MOVE_LEFT | INPUT_FLAG.MOVE_RIGHT
-	
-	## Interrupts
-	if manager.get_current_state() is PlayerDeadState : return
-	if manager.get_current_state() is PlayerHurtState : return
-	
-	## Transitions by priority (roll > attack > movement)
-	#TODO Primary/secondary attack
-	if input_flags & INPUT_FLAG.DODGE && roll_cooldown < 0 : manager.request_rolling()
-	elif input_flags & INPUT_FLAG.PRIMARY && attack_cooldown < 0 : manager.request_attacking()
-	elif input_flags & movement_flags != 0 : manager.request_walking()
-	else : manager.request_idle()
-
-# Flips the entire node visuaully on the h axis. It has to be like this
-#	as negatives are converted back to positive each update tick.
-func _flip_h(negative : bool = false) -> void:
-	if negative:
-		body_root.scale.y = -1.0
-		body_root.rotation_degrees = 180.0
-	else:
-		body_root.scale.y = 1.0
-		body_root.rotation_degrees = 0.0
-
-# Changes move direction according to input_flags
 func _update_move_direction() -> void:
-	# Don't read input if rolling.
-	if status_flags & STATUS_FLAG.ROLLING : return
+	var x: float = int((input_flags & INPUT_FLAG.MOVE_RIGHT) != 0) - int((input_flags & INPUT_FLAG.MOVE_LEFT) != 0)
+	var y: float = int((input_flags & INPUT_FLAG.MOVE_DOWN) != 0) - int((input_flags & INPUT_FLAG.MOVE_UP) != 0)
 	
-	var x : int = int((input_flags & INPUT_FLAG.MOVE_RIGHT) != 0) \
-		   - int((input_flags & INPUT_FLAG.MOVE_LEFT) != 0)
-	var y : int = int((input_flags & INPUT_FLAG.MOVE_DOWN) != 0) \
-		   - int((input_flags & INPUT_FLAG.MOVE_UP) != 0)
-	move_direction = Vector2(x,y)
-	
-	if move_direction != Vector2.ZERO:
-		move_direction = move_direction.normalized()
+	move_direction = Vector2(x, y)
+	if move_direction != Vector2.ZERO: move_direction = move_direction.normalized()
 
-# Checks if movement is allowed.
-func _movement_handler() -> void:
-	# If there are movement adjustments, do them here.
-	var adjusted_move_speed = move_speed
-	
-	# Rolling state, disallows movement adjustment when rolling.
-	if manager.get_current_state() is PlayerRollingState:
-		adjusted_move_speed *= 2.0
-		velocity = move_direction * adjusted_move_speed
-	
-	# If state allows movement, do so.
-	if manager.is_allow_movement():
-		velocity = move_direction * adjusted_move_speed
-		# Flips horizontally if player faces left.
-		# TODO mouse aiming may alter this logic.
-		if move_direction.x < 0 : _flip_h(true)
-		elif move_direction.x > 0 : _flip_h(false)
-	
-	move_and_slide()
 
-# Sets input flag on or off
-func _set_input_flag(flag : int, enabled : bool) -> void:
-	if enabled : input_flags |= flag
-	else : input_flags &= ~flag
+func consume_roll_request(entry_cost: float = 20.0) -> bool:
+	if not roll_requested: return false
+	roll_requested = false
 	
-# Sets status flag on or off
-func _set_status_flag(flag : int, enabled : bool) -> void:
-	if enabled : status_flags |= flag
-	else : status_flags &= ~flag
+	if roll_cooldown > 0.0 or is_dead(): return false
+	if not status.request_mana(entry_cost): return false
+	
+	return true
 
-# Plays default animation with a scaling speed depending on adjusted speed.
-func _play_walking() -> void:
-	var speed_ratio = velocity.length() / BASE_SPEED
-	if animation_player.current_animation != "default":
-		animation_player.play("default")
-	animation_player.speed_scale = lerp(1.0, 4.0, speed_ratio)
 
-# Plays default animation at normal speed.
-func _play_idle() -> void:
-	if animation_player.current_animation != "default":
-		animation_player.play("default")
+func play_idle() -> void:
+	if animation_player.current_animation != "idle": animation_player.play("idle")
 	animation_player.speed_scale = 1.0
 
-## Rolling Procedure
-const ROLL_HOLD_FRAMES : int = 15 # How long the preroll is in frames before rolling.
-const ROLL_FLASH_COLOR : Color = Color(0.255, 0.733, 0.953)
-# Attempts to start the roll.
-func _attempt_roll() -> void:
-	if status_flags & STATUS_FLAG.ROLLING : return
-	_set_status_flag(STATUS_FLAG.ROLLING, true)
-	_roll()
 
-# Actual roll logic. Played once.
-# TODO Might need to consider animation cancel handling.
-func _roll() -> void:
-	# Freezes current animation and triggers flash.
-	animation_player.pause()
-	await _preroll_flash()
+func play_walk() -> void:
+	if animation_player.current_animation != "idle": animation_player.play("idle")
+	animation_player.speed_scale = lerp(1.0, 4.0, movement.get_speed_ratio())
+
+
+func begin_roll_startup() -> void:
+	_cancel_active_action()
+	_set_status_flag(STATUS_FLAG.ROLLING, true)
 	
-	# Play actual rolling animation.
+	animation_player.speed_scale = 1.0
+	animation_player.play("preroll")
+
+
+func begin_roll_sustain() -> void:
 	animation_player.speed_scale = 1.0
 	animation_player.play("rolling")
-	
-	# Cleanup
-	await animation_player.animation_finished
-	_postroll()
 
-# Freeze frames and activates the flash.
-func _preroll_flash() -> void:
-	# Resets the flash if it's currently in use.
-	body_root.modulate = Color(1.0, 1.0, 1.0)
-	
-	# Resets tween, then plays the flash tween.
-	_flash_color(ROLL_FLASH_COLOR, 0.3)
-	
-	# Wait for ROLL_HOLD_FRAMES amount of frames.
-	for frame in ROLL_HOLD_FRAMES:
-		await get_tree().process_frame
 
-# Tweens the glow back to 0 and sets state back to idle.
-func _postroll() -> void:
-	# Cooldown and flag.
-	roll_cooldown = 0.56
-	_set_status_flag(STATUS_FLAG.ROLLING, false)
-	
-	# Resets tween, then replays the flash tween to reset back to normal colors.
-	_flash_color(Color(1.0, 1.0, 1.0), 0.3)
+func begin_roll_end() -> void:
+	animation_player.speed_scale = 1.0
+	animation_player.play("postroll")
 
-# Flash handler.
-func _flash_color(target_color : Color, time : float) -> void:
-	# Reset
-	_kill_flash_tween()
-	flash_tween = create_tween()
-	
-	# Preserves current alpha, then flash the target color.
-	target_color.a = body_root.modulate.a
-	flash_tween.tween_property(body_root, "modulate", target_color, time)\
-		.set_trans(Tween.TRANS_SINE)\
-		.set_ease(Tween.EASE_OUT)
 
-# Kills the flash_tween.
-func _kill_flash_tween():
-	if flash_tween and flash_tween.is_running():
-		flash_tween.kill()
-	flash_tween = null
-
-## Attacking Procedure
-# Finds appropriate attack.
-func _attempt_attack() -> void:
-	# TODO actually have different attacks. For now he just punch
+func start_attack_mode() -> void:
+	_cancel_active_action()
 	_set_status_flag(STATUS_FLAG.ATTACKING, true)
-	
-	var adjusted_attack_speed = 1.0
-	_use_aim()
-	animation_player.speed_scale = adjusted_attack_speed
-	_punch()
-	
-	await animation_player.animation_finished
-	_use_aim(true)
+	animation_player.speed_scale = 1.0
+
+
+func stop_attack_mode() -> void:
 	_set_status_flag(STATUS_FLAG.ATTACKING, false)
+	if aim:
+		aim.apply_to_hands(true)
+	if hit_box:
+		hit_box.end_activation()
 
-# Do a punch.
-func _punch() -> void:
-	animation_player.play("attacking")
-	AudioManager.play_sfx(punch_sfx)
-	_adjust_attack_cooldown(1.0)
 
-# Handles cooldowns.
-func _adjust_attack_cooldown(base : float) -> void :
-	# TODO allow adjustments
-	attack_cooldown = base
-
-## Aiming Procedure
-# Uses the current arrow rotation for where the hands should aim at.
-func _use_aim(reset : bool = false) -> void:
-	if reset:
-		hands.rotation = 0.0
-	elif body_root.scale.y < 0:
-		hands.rotation = -aim_arrow.rotation - PI / 2.0
-	else:
-		hands.rotation = aim_arrow.rotation - PI / 2.0
-
-# Finds appropriate aiming type.
-func _update_aim() -> void:
-	# TODO other aim options
-	match SystemData.aim_mode:
-		SystemData.AIMING_MODE.DEFAULT : _keyboard_aim(false)
-		SystemData.AIMING_MODE.MOUSE : _mouse_aim(false)
-
-# Uses the last directional input to determine aim.
-func _keyboard_aim(_assist : bool = false) -> void:
-	if move_direction == Vector2.ZERO : return
-	var target : float = move_direction.angle() + PI / 2.0
-	aim_arrow.rotation = target
+func begin_hurt() -> void:
+	if is_dead(): return
 	
-	# TODO add aim assist
-	# if assist : _aim_assist()
-
-func _mouse_aim(_assist : bool = false) -> void:
-	aim_arrow.look_at(get_global_mouse_position())
-	aim_arrow.rotation_degrees += 90
-
-func _player_hurt() -> void:
+	_cancel_active_action()
 	animation_player.speed_scale = 1.0
 	animation_player.play("hurt")
-	invuln_cooldown = 1
+	invuln_cooldown = 1.0
 
-# Die.
-func _player_dead() -> void:
-	manager.request_dead()
-	AudioManager.play_sfx(death_sfx)
+
+func begin_death() -> void:
+	if is_dead(): return
+	
+	_cancel_active_action()
+	_set_status_flag(STATUS_FLAG.DEAD, true)
 	animation_player.speed_scale = 1.0
 	animation_player.play("dead")
+	AudioManager.play_sfx(death_sfx)
 
-# Forces a reset every time an animation is finished unless dead.
-func _on_animation_player_animation_finished(anim_name : StringName) -> void:
-	if (anim_name != "RESET") && (anim_name != "dead"):
-		manager.request_reset()
-		animation_player.play("RESET")
-		animation_player.seek(0.0, true)
+
+func _cancel_active_action() -> void:
+	action_token += 1
+	_set_status_flag(STATUS_FLAG.ROLLING, false)
+	_set_status_flag(STATUS_FLAG.ATTACKING, false)
+	
+	if movement: movement.lock_facing(false)
+	
+	if aim: aim.apply_to_hands(true)
+	
+	if hit_box: hit_box.end_activation()
+
+
+func _invuln_handler() -> void:
+	var invuln_now: bool = (status_flags & STATUS_FLAG.INVULN) != 0
+	if invuln_now == was_invuln: return
+	
+	was_invuln = invuln_now
+	
+	if invuln_now: _start_invuln_flash()
+	else: _stop_invuln_flash()
+
+
+func _start_invuln_flash() -> void:
+	_stop_invuln_flash()
+	
+	invuln_tween = create_tween()
+	invuln_tween.set_loops()
+	invuln_tween.tween_property(body_root, "modulate:a", INVULN_FLASH_MIN_ALPHA, INVULN_FLASH_HALF_PERIOD).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	invuln_tween.tween_property(body_root, "modulate:a", 1.0, INVULN_FLASH_HALF_PERIOD).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+
+
+func _stop_invuln_flash() -> void:
+	if invuln_tween and invuln_tween.is_running(): invuln_tween.kill()
+	invuln_tween = null
+	body_root.modulate.a = 1.0
+
+
+func _flash_color(target_color: Color, time: float) -> void:
+	if flash_tween and flash_tween.is_running(): flash_tween.kill()
+	
+	flash_tween = create_tween()
+	target_color.a = body_root.modulate.a
+	flash_tween.tween_property(body_root, "modulate", target_color, time).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+
+
+func _on_status_dead() -> void:
+	if is_dead(): return
+	state_machine.transition_to(&"dead")
+
+
+func _on_animation_player_animation_finished(anim_name: StringName) -> void:
+	if attack and attack.on_attack_animation_finished(anim_name): return
+	
+	match anim_name:
+		&"preroll":
+			roll_startup_finished.emit()
+			
+		&"postroll":
+			roll_cooldown = 0.56
+			_set_status_flag(STATUS_FLAG.ROLLING, false)
+			_flash_color(Color(1.0, 1.0, 1.0), 0.3)
+			roll_finished.emit()
+			
+		&"hurt":
+			hurt_finished.emit()
+			
+		&"dead":
+			death_finished.emit()

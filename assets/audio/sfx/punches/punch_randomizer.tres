@@ -1,0 +1,13 @@
+[gd_resource type="AudioStreamRandomizer" load_steps=4 format=3 uid="uid://cwrbstsb3gjte"]
+
+[ext_resource type="AudioStream" uid="uid://btvilpp0lscov" path="res://assets/audio/sfx/punches/punch_1.ogg" id="1_xg5yj"]
+[ext_resource type="AudioStream" uid="uid://bm7j1r6xe5dj2" path="res://assets/audio/sfx/punches/punch_2.ogg" id="2_m02to"]
+[ext_resource type="AudioStream" uid="uid://bulx4oga848kn" path="res://assets/audio/sfx/punches/punch_3.ogg" id="3_ko2a1"]
+
+[resource]
+random_pitch = 1.25
+random_volume_offset_db = 1.0
+streams_count = 3
+stream_0/stream = ExtResource("1_xg5yj")
+stream_1/stream = ExtResource("2_m02to")
+stream_2/stream = ExtResource("3_ko2a1")

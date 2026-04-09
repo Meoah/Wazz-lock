@@ -25,12 +25,12 @@ func update_bar(player_node: Clive) -> void:
 		_status_bar_label.update_label(player_status)
 
 
-func _update_health_bar(player_status: Status) -> void:
+func _update_health_bar(player_status: StatusComponent) -> void:
 	max_value = player_status.max_health
 	value = player_status.current_health
 
 
-func _update_mana_bar(player_status: Status) -> void:
+func _update_mana_bar(player_status: StatusComponent) -> void:
 	max_value = player_status.max_mana
 	value = player_status.current_mana
 

@@ -5,7 +5,7 @@ class_name BaseEnemy
 @export var health_bar : ProgressBar
 # @export var hurt_box : HurtBox
 # @export var hit_box : HitBox
-@export var status : Status
+@export var status : StatusComponent
 
 func _ready() -> void:
 	# Status

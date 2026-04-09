@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://db63k07edndsu"]
+
+[ext_resource type="Script" uid="uid://b1luu3wc367r4" path="res://scripts/states/player/player_attack_state.gd" id="1_xrqt3"]
+
+[node name="PlayerAttackState" type="Node"]
+script = ExtResource("1_xrqt3")
+state_id = &"attack"
+allowed_transitions = Array[StringName]([&"idle", &"walk", &"hurt", &"dead"])

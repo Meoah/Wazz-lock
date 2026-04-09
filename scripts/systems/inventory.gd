@@ -1,5 +1,5 @@
 extends Node
-class_name Inventory
+class_name InventoryComponent
 
 # TODO Item Database
 const HEALTH_POTION: String = "Health Potion"

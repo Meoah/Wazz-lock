@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://crmvibm52mj4b"]
+
+[ext_resource type="Script" uid="uid://c2dmqut00g845" path="res://scripts/systems/combat/hurt_box.gd" id="1_18hpv"]
+
+[node name="HurtBox" type="Area2D"]
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_18hpv")
+faction = null
+hurtable = null
