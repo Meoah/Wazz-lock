@@ -1,13 +1,14 @@
-[gd_scene load_steps=9 format=4 uid="uid://b410xag3kyeag"]
+[gd_scene load_steps=10 format=4 uid="uid://b410xag3kyeag"]
 
 [ext_resource type="Script" uid="uid://f735godv2lc6" path="res://scripts/game/run/room/room.gd" id="1_2g0sw"]
 [ext_resource type="TileSet" uid="uid://d0ha6r7frwc6h" path="res://assets/textures/enviornment/tile_set.tres" id="1_qo7cs"]
 [ext_resource type="Script" uid="uid://cmivelq4jxjnu" path="res://scripts/game/run/room/tile_handler.gd" id="2_8sk21"]
 [ext_resource type="Script" uid="uid://c7b7iw7u6fxg3" path="res://scripts/game/run/room/enemy_handler.gd" id="3_p5dny"]
 [ext_resource type="Script" uid="uid://dtumni32nsr7b" path="res://scripts/game/run/room/floor_tiles.gd" id="4_o5u5o"]
-[ext_resource type="PackedScene" uid="uid://cgsam8pgivahn" path="res://scenes/props/exit_handler.tscn" id="4_vsomp"]
+[ext_resource type="PackedScene" uid="uid://cgsam8pgivahn" path="res://Scenes/props/exit_handler.tscn" id="4_vsomp"]
 [ext_resource type="Script" uid="uid://dhvmyyaqapscr" path="res://scripts/game/run/room/wall_tiles.gd" id="5_007j1"]
 [ext_resource type="Script" uid="uid://tqfqun2o0wua" path="res://scripts/game/run/room/water_tiles.gd" id="6_oe6ax"]
+[ext_resource type="PackedScene" uid="uid://covcxrd0mfk4b" path="res://Scenes/actors/enemies/_enemy_spawner.tscn" id="8_18xhi"]
 
 [node name="room03" type="Node2D" node_paths=PackedStringArray("_tile_handler", "_enemy_handler", "_exit_handler")]
 script = ExtResource("1_2g0sw")
@@ -36,12 +37,118 @@ script = ExtResource("5_007j1")
 
 [node name="Water" type="TileMapLayer" parent="TileHandler"]
 scale = Vector2(0.125, 0.125)
-tile_map_data = PackedByteArray("AAASAAcAAwAAAAAAAAATAAcAAwAAAAAAAAAUAAcAAwAAAAAAAAAVAAcAAwAAAAAAAAAWAAcAAwAAAAAAAAAXAAcAAwAAAAAAAAAYAAcAAwAAAAAAAAAZAAcAAwAAAAAAAAAaAAcAAwAAAAAAAAAGAAsAAwAAAAAAAAAHAAsAAwAAAAAAAAAHAAwAAwAAAAAAAAAGAAwAAwAAAAAAAAAWAAsAAwAAAAAAAAAXAAsAAwAAAAAAAAAWAAwAAwAAAAAAAAAXAAwAAwAAAAAAAAADAAcAAwAAAAAAAAAEAAcAAwAAAAAAAAAFAAcAAwAAAAAAAAAGAAcAAwAAAAAAAAAHAAcAAwAAAAAAAAAIAAcAAwAAAAAAAAAJAAcAAwAAAAAAAAAKAAcAAwAAAAAAAAALAAcAAwAAAAAAAAABAAcAAwAAAAAAAAACAAcAAwAAAAAAAAAbAAcAAwAAAAAAAAAcAAcAAwAAAAAAAAA=")
+tile_map_data = PackedByteArray("AAASAAcAAwAMAAoAAAATAAcAAwAEAAgAAAAUAAcAAwAEAAgAAAAVAAcAAwAEAAgAAAAWAAcAAwAEAAgAAAAXAAcAAwAEAAgAAAAYAAcAAwAEAAgAAAAZAAcAAwAEAAgAAAAaAAcAAwAEAAgAAAAGAAsAAwAIAAgAAAAHAAsAAwAAAAkAAAAHAAwAAwAIAAkAAAAGAAwAAwAAAAoAAAAWAAsAAwAIAAgAAAAXAAsAAwAAAAkAAAAWAAwAAwAAAAoAAAAXAAwAAwAIAAkAAAADAAcAAwAEAAgAAAAEAAcAAwAEAAgAAAAFAAcAAwAEAAgAAAAGAAcAAwAEAAgAAAAHAAcAAwAEAAgAAAAIAAcAAwAEAAgAAAAJAAcAAwAEAAgAAAAKAAcAAwAEAAgAAAALAAcAAwAEAAsAAAABAAcAAwAMAAoAAAACAAcAAwAEAAgAAAAbAAcAAwAEAAgAAAAcAAcAAwAEAAsAAAA=")
 tile_set = ExtResource("1_qo7cs")
 script = ExtResource("6_oe6ax")
 
 [node name="EnemyHandler" type="Node2D" parent="."]
 script = ExtResource("3_p5dny")
+
+[node name="Slime" parent="EnemyHandler" instance=ExtResource("8_18xhi")]
+position = Vector2(1122, 101)
+
+[node name="Slime2" parent="EnemyHandler" instance=ExtResource("8_18xhi")]
+position = Vector2(865, 96)
+
+[node name="Slime3" parent="EnemyHandler" instance=ExtResource("8_18xhi")]
+position = Vector2(226, 100)
+
+[node name="Slime4" parent="EnemyHandler" instance=ExtResource("8_18xhi")]
+position = Vector2(165, 227)
+
+[node name="Slime5" parent="EnemyHandler" instance=ExtResource("8_18xhi")]
+position = Vector2(672, 412)
+
+[node name="Slime6" parent="EnemyHandler" instance=ExtResource("8_18xhi")]
+position = Vector2(865, 289)
+
+[node name="Slime7" parent="EnemyHandler" instance=ExtResource("8_18xhi")]
+position = Vector2(1311, 161)
+
+[node name="Slime8" parent="EnemyHandler" instance=ExtResource("8_18xhi")]
+position = Vector2(1696, 100)
+
+[node name="Slime9" parent="EnemyHandler" instance=ExtResource("8_18xhi")]
+position = Vector2(1630, 413)
+
+[node name="Slime10" parent="EnemyHandler" instance=ExtResource("8_18xhi")]
+position = Vector2(1696, 286)
+
+[node name="Slime11" parent="EnemyHandler" instance=ExtResource("8_18xhi")]
+position = Vector2(1821, 734)
+
+[node name="Slime12" parent="EnemyHandler" instance=ExtResource("8_18xhi")]
+position = Vector2(1568, 929)
+
+[node name="Slime13" parent="EnemyHandler" instance=ExtResource("8_18xhi")]
+position = Vector2(1312, 927)
+
+[node name="Slime14" parent="EnemyHandler" instance=ExtResource("8_18xhi")]
+position = Vector2(1058, 801)
+
+[node name="Slime15" parent="EnemyHandler" instance=ExtResource("8_18xhi")]
+position = Vector2(354, 926)
+
+[node name="Slime16" parent="EnemyHandler" instance=ExtResource("8_18xhi")]
+position = Vector2(99, 865)
+
+[node name="Slime17" parent="EnemyHandler" instance=ExtResource("8_18xhi")]
+position = Vector2(1506, 670)
+
+[node name="Slime18" parent="EnemyHandler" instance=ExtResource("8_18xhi")]
+position = Vector2(415, 548)
+
+[node name="Slime19" parent="EnemyHandler" instance=ExtResource("8_18xhi")]
+position = Vector2(289, 799)
+
+[node name="Slime20" parent="EnemyHandler" instance=ExtResource("8_18xhi")]
+position = Vector2(545, 162)
+
+[node name="Slime21" parent="EnemyHandler" instance=ExtResource("8_18xhi")]
+position = Vector2(1120, 351)
+
+[node name="Slime22" parent="EnemyHandler" instance=ExtResource("8_18xhi")]
+position = Vector2(863, 737)
+
+[node name="Bubble" parent="EnemyHandler" instance=ExtResource("8_18xhi")]
+position = Vector2(162, 161)
+enemy_type = 1
+
+[node name="Bubble2" parent="EnemyHandler" instance=ExtResource("8_18xhi")]
+position = Vector2(1761, 159)
+enemy_type = 1
+
+[node name="Bubble3" parent="EnemyHandler" instance=ExtResource("8_18xhi")]
+position = Vector2(1760, 928)
+enemy_type = 1
+
+[node name="Bubble4" parent="EnemyHandler" instance=ExtResource("8_18xhi")]
+position = Vector2(161, 930)
+enemy_type = 1
+
+[node name="Bubble5" parent="EnemyHandler" instance=ExtResource("8_18xhi")]
+position = Vector2(991, 671)
+enemy_type = 1
+
+[node name="Slime_Boss" parent="EnemyHandler" instance=ExtResource("8_18xhi")]
+position = Vector2(930, 478)
+enemy_type = 2
+
+[node name="Slime_Boss2" parent="EnemyHandler" instance=ExtResource("8_18xhi")]
+position = Vector2(605, 607)
+enemy_type = 2
+
+[node name="Slime_Boss3" parent="EnemyHandler" instance=ExtResource("8_18xhi")]
+position = Vector2(1313, 609)
+enemy_type = 2
+
+[node name="Slime_Boss4" parent="EnemyHandler" instance=ExtResource("8_18xhi")]
+position = Vector2(1437, 284)
+enemy_type = 2
+
+[node name="Slime_Boss5" parent="EnemyHandler" instance=ExtResource("8_18xhi")]
+position = Vector2(351, 289)
+enemy_type = 2
 
 [node name="ExitHandler" parent="." instance=ExtResource("4_vsomp")]
 
