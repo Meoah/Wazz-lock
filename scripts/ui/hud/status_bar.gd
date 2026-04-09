@@ -41,7 +41,7 @@ func _update_boss_health_bar() -> void:
 		return
 	
 	var boss_node = RunManager.boss_node
-w	var boss_status = boss_node.status
+	var boss_status = boss_node.status
 	
 	max_value = boss_status.max_health
 	value = boss_status.current_health
