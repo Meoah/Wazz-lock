@@ -8,19 +8,15 @@ script = ExtResource("1_qc6hr")
 
 [node name="ExitDrainNorth" parent="." instance=ExtResource("2_gdbqw")]
 position = Vector2(0, -128)
-scale = Vector2(0.063, 0.063)
 
 [node name="ExitDrainEast" parent="." instance=ExtResource("2_gdbqw")]
 position = Vector2(128, 0)
-scale = Vector2(0.063, 0.063)
 exit_direction = 1
 
 [node name="ExitDrainSouth" parent="." instance=ExtResource("2_gdbqw")]
 position = Vector2(0, 128)
-scale = Vector2(0.063, 0.063)
 exit_direction = 2
 
 [node name="ExitDrainWest" parent="." instance=ExtResource("2_gdbqw")]
 position = Vector2(-128, 0)
-scale = Vector2(0.063, 0.063)
 exit_direction = 3

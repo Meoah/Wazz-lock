@@ -48,6 +48,11 @@ folder_colors={
 
 player=""
 
+[gui]
+
+theme/custom="uid://c4g3yq28mqnlo"
+theme/custom_font="uid://basakr0emtm3v"
+
 [input]
 
 ui_select={

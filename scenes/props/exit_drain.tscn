@@ -1,41 +1,41 @@
 [gd_scene load_steps=12 format=3 uid="uid://bq3b20odg2d4j"]
 
 [ext_resource type="Script" uid="uid://cbugcfpqrsaoa" path="res://scripts/game/run/room/exit_drain.gd" id="1_n4mvd"]
-[ext_resource type="Texture2D" uid="uid://dp8uhf8ytc1yu" path="res://assets/textures/props/FloorDrain_Tileset.png" id="2_1d33w"]
+[ext_resource type="Texture2D" uid="uid://lhtq6au2cwts" path="res://assets/textures/props/FloorDrain_Tileset.png" id="2_1d33w"]
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_v8nyo"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_1r480"]
 atlas = ExtResource("2_1d33w")
-region = Rect2(8192, 0, 2048, 2048)
+region = Rect2(512, 0, 128, 128)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_eyvo2"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_bxoru"]
 atlas = ExtResource("2_1d33w")
-region = Rect2(0, 0, 2048, 2048)
+region = Rect2(0, 0, 128, 128)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_7x81x"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_gq71u"]
 atlas = ExtResource("2_1d33w")
-region = Rect2(2048, 0, 2048, 2048)
+region = Rect2(128, 0, 128, 128)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_hpr25"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_acrlt"]
 atlas = ExtResource("2_1d33w")
-region = Rect2(4096, 0, 2048, 2048)
+region = Rect2(256, 0, 128, 128)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_qpl30"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_a2fe0"]
 atlas = ExtResource("2_1d33w")
-region = Rect2(6144, 0, 2048, 2048)
+region = Rect2(384, 0, 128, 128)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_ya8el"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_qx7x0"]
 atlas = ExtResource("2_1d33w")
-region = Rect2(8192, 0, 2048, 2048)
+region = Rect2(512, 0, 128, 128)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_h1fgm"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_pt56l"]
 atlas = ExtResource("2_1d33w")
-region = Rect2(0, 0, 2048, 2048)
+region = Rect2(0, 0, 128, 128)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_qrwy5"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_v8nyo")
+"texture": SubResource("AtlasTexture_1r480")
 }],
 "loop": false,
 "name": &"opened",
@@ -43,27 +43,27 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_eyvo2")
+"texture": SubResource("AtlasTexture_bxoru")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_7x81x")
+"texture": SubResource("AtlasTexture_gq71u")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_hpr25")
+"texture": SubResource("AtlasTexture_acrlt")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_qpl30")
+"texture": SubResource("AtlasTexture_a2fe0")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_ya8el")
+"texture": SubResource("AtlasTexture_qx7x0")
 }],
 "loop": false,
 "name": &"opening",
-"speed": 5.0
+"speed": 8.0
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_h1fgm")
+"texture": SubResource("AtlasTexture_pt56l")
 }],
 "loop": false,
 "name": &"unopened",
@@ -71,10 +71,9 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_j4tbw"]
-size = Vector2(500, 500)
+size = Vector2(64, 64)
 
 [node name="ExitDrain" type="Area2D" node_paths=PackedStringArray("_drain_animated_sprite")]
-scale = Vector2(0.075, 0.075)
 collision_layer = 32768
 collision_mask = 16
 script = ExtResource("1_n4mvd")
@@ -82,11 +81,9 @@ _drain_animated_sprite = NodePath("AnimatedSprite2D")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_qrwy5")
-animation = &"unopened"
-frame_progress = 1.0
+animation = &"opened"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, 13.333336)
 shape = SubResource("RectangleShape2D_j4tbw")
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]
