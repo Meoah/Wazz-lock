@@ -1,15 +1,10 @@
-extends PlayerState
-class_name PlayerDeadState
+extends StateComponent
+class_name PlayerDeadStateComponent
 
-const STATE_NAME : String = "PLAYER_DEAD_STATE"
 
-func _init(parent : StateMachine) -> void:
-	state_name = STATE_NAME
-	super._init(parent)
-
-func enter(previous_state: State, data: Dictionary = {}) -> void:
-	super.enter(previous_state, data)
-	SignalBus.state_player_dead.emit()
-
-func exit(next_state : State) -> void:
-	super.exit(next_state)
+func enter(_previous_state: StateComponent, _data: Dictionary = {}) -> void:
+	if parent is Clive:
+		parent.begin_death()
+		parent.movement.request_stop()
+		parent.movement.clear_impulses()
+		parent.movement.set_movement_enabled(false)

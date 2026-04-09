@@ -3,7 +3,8 @@ class_name Slime
 
 @export var damage_sfx: AudioStream
 @export var death_sfx: AudioStream
-@export var hurt_box: HurtBox
+@export var hurt_box: HurtBoxComponent
+@export var combat_receiver: CombatReceiverComponent
 @export var speed := 80.0
 @export var target: Node2D
 var damaged_timer : float = 0.0

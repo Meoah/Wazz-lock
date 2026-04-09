@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://du637yeji1sc6"]
+
+[ext_resource type="Script" uid="uid://b0hy2noglexpb" path="res://scripts/systems/combat/player_aim.gd" id="1_f54hx"]
+[ext_resource type="Texture2D" uid="uid://ckeymueeg50gj" path="res://assets/textures/actors/clive/Arrow_Clive.svg" id="2_o0rxa"]
+
+[node name="PlayerAim" type="Node2D" node_paths=PackedStringArray("aim_origin", "aim_arrow")]
+script = ExtResource("1_f54hx")
+aim_origin = NodePath("AimOrigin")
+aim_arrow = NodePath("AimOrigin/AimArrow")
+
+[node name="AimOrigin" type="Marker2D" parent="."]
+
+[node name="AimArrow" type="Sprite2D" parent="AimOrigin"]
+self_modulate = Color(1, 1, 1, 0.23529412)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("2_o0rxa")
+offset = Vector2(0, -200)

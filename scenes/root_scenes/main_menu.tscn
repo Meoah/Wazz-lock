@@ -1,7 +1,7 @@
-[gd_scene load_steps=42 format=3 uid="uid://d1l0qt8blrdqy"]
+[gd_scene load_steps=51 format=3 uid="uid://d1l0qt8blrdqy"]
 
 [ext_resource type="Script" uid="uid://fq2ju0bv20vr" path="res://scripts/ui/main_menu/main_menu.gd" id="1_ahahd"]
-[ext_resource type="AudioStream" uid="uid://bj2by42ivi7ut" path="res://assets/audio/electro_bubbles_ui.ogg" id="2_j7oqw"]
+[ext_resource type="AudioStream" uid="uid://bj2by42ivi7ut" path="res://assets/audio/sfx/electro_bubbles_ui.ogg" id="2_j7oqw"]
 [ext_resource type="Texture2D" uid="uid://dexttmjlrvgmo" path="res://assets/PLACEHOLDERS/OUTSOURCED-MUST-DELETE/vecteezy_old-marble-tile-with-cement-texture-cement-and-concrete_9194921.jpg" id="2_xq20w"]
 [ext_resource type="Texture2D" uid="uid://dv6oikklf6uvx" path="res://assets/PLACEHOLDERS/IN-HOUSE/wazzlock.png" id="3_a2lvx"]
 [ext_resource type="PackedScene" uid="uid://c5d81avm06wq6" path="res://scenes/ui/main_menu/save_slot.tscn" id="4_w2ig7"]
@@ -14,8 +14,8 @@
 [ext_resource type="Texture2D" uid="uid://d1gsuht1v2n4a" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/arrow_basic_w_small.png" id="9_ty8fd"]
 [ext_resource type="Texture2D" uid="uid://dj0lbdjoqgnj4" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/arrow_basic_e.png" id="10_7k12g"]
 [ext_resource type="Texture2D" uid="uid://42ei7qig066p" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/panel_brown_damaged.png" id="10_bqd1f"]
-[ext_resource type="Texture2D" uid="uid://c5yf27ql1ronm" path="res://assets/textures/actors/clive/spritesheets/Clive_SpriteSheet_Idle.png" id="11_0ouxr"]
 [ext_resource type="Texture2D" uid="uid://0aol0wqa26hr" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/arrow_basic_e_small.png" id="11_bqd1f"]
+[ext_resource type="Texture2D" uid="uid://croq8g2o017rm" path="res://assets/textures/actors/clive/spritesheets/Clive_Spritesheet.png" id="13_j7oqw"]
 [ext_resource type="Texture2D" uid="uid://bbv2qsiavk038" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/banner_classic_curtain.png" id="14_5tapv"]
 [ext_resource type="Texture2D" uid="uid://bwndnjjrninfg" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/panel_grey.png" id="15_5tapv"]
 [ext_resource type="Script" uid="uid://d15t5xhkfybn7" path="res://scripts/ui/main_menu/cancel.gd" id="16_fcmcp"]
@@ -64,56 +64,41 @@ texture_margin_top = 16.0
 texture_margin_right = 16.0
 texture_margin_bottom = 16.0
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_5tapv"]
-atlas = ExtResource("11_0ouxr")
-region = Rect2(0, 0, 1024, 1024)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_ouvix"]
-atlas = ExtResource("11_0ouxr")
-region = Rect2(1024, 0, 1024, 1024)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_fcmcp"]
-atlas = ExtResource("11_0ouxr")
-region = Rect2(2048, 0, 1024, 1024)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_7spkn"]
-atlas = ExtResource("11_0ouxr")
-region = Rect2(3072, 0, 1024, 1024)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_j7oqw"]
-atlas = ExtResource("11_0ouxr")
-region = Rect2(4096, 0, 1024, 1024)
-
 [sub_resource type="AtlasTexture" id="AtlasTexture_7ma8l"]
-atlas = ExtResource("11_0ouxr")
-region = Rect2(5120, 0, 1024, 1024)
+atlas = ExtResource("13_j7oqw")
+region = Rect2(0, 0, 256, 256)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_njll3"]
-atlas = ExtResource("11_0ouxr")
-region = Rect2(6144, 0, 1024, 1024)
+atlas = ExtResource("13_j7oqw")
+region = Rect2(256, 0, 256, 256)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_xwx60"]
-atlas = ExtResource("11_0ouxr")
-region = Rect2(7168, 0, 1024, 1024)
+atlas = ExtResource("13_j7oqw")
+region = Rect2(512, 0, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nkj75"]
+atlas = ExtResource("13_j7oqw")
+region = Rect2(768, 0, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ucisa"]
+atlas = ExtResource("13_j7oqw")
+region = Rect2(1024, 0, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ls2hl"]
+atlas = ExtResource("13_j7oqw")
+region = Rect2(1280, 0, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ovsjx"]
+atlas = ExtResource("13_j7oqw")
+region = Rect2(1536, 0, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7oaj7"]
+atlas = ExtResource("13_j7oqw")
+region = Rect2(1792, 0, 256, 256)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_nkj75"]
 animations = [{
 "frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_5tapv")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_ouvix")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_fcmcp")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_7spkn")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_j7oqw")
-}, {
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_7ma8l")
 }, {
@@ -122,6 +107,85 @@ animations = [{
 }, {
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_xwx60")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nkj75")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ucisa")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ls2hl")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ovsjx")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7oaj7")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_opa5e"]
+atlas = ExtResource("13_j7oqw")
+region = Rect2(0, 256, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_08pb0"]
+atlas = ExtResource("13_j7oqw")
+region = Rect2(256, 256, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_o4s6e"]
+atlas = ExtResource("13_j7oqw")
+region = Rect2(512, 256, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xj3w1"]
+atlas = ExtResource("13_j7oqw")
+region = Rect2(768, 256, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_iit0b"]
+atlas = ExtResource("13_j7oqw")
+region = Rect2(1024, 256, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gdymn"]
+atlas = ExtResource("13_j7oqw")
+region = Rect2(1280, 256, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_aq05x"]
+atlas = ExtResource("13_j7oqw")
+region = Rect2(1536, 256, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_vldsq"]
+atlas = ExtResource("13_j7oqw")
+region = Rect2(1792, 256, 256, 256)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_oglv1"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_opa5e")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_08pb0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_o4s6e")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xj3w1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_iit0b")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gdymn")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_aq05x")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_vldsq")
 }],
 "loop": true,
 "name": &"default",
@@ -543,11 +607,15 @@ size_flags_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxTexture_ouvix")
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="RunSetup/MarginContainer/VBoxContainer/WeaponSelect/MainWeapon/PanelContainer/VBoxContainer/MarginContainer/PanelContainer"]
-scale = Vector2(0.25, 0.25)
+[node name="CliveBody" type="AnimatedSprite2D" parent="RunSetup/MarginContainer/VBoxContainer/WeaponSelect/MainWeapon/PanelContainer/VBoxContainer/MarginContainer/PanelContainer"]
 sprite_frames = SubResource("SpriteFrames_nkj75")
 autoplay = "default"
 frame_progress = 0.11950734
+centered = false
+
+[node name="CliveHands" type="AnimatedSprite2D" parent="RunSetup/MarginContainer/VBoxContainer/WeaponSelect/MainWeapon/PanelContainer/VBoxContainer/MarginContainer/PanelContainer"]
+sprite_frames = SubResource("SpriteFrames_oglv1")
+autoplay = "default"
 centered = false
 
 [node name="PanelContainer" type="PanelContainer" parent="RunSetup/MarginContainer/VBoxContainer/WeaponSelect/MainWeapon/PanelContainer/VBoxContainer"]

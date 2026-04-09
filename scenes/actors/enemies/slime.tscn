@@ -1,12 +1,15 @@
-[gd_scene load_steps=29 format=3 uid="uid://ccfpuofuxrw58"]
+[gd_scene load_steps=30 format=3 uid="uid://ccfpuofuxrw58"]
 
 [ext_resource type="Texture2D" uid="uid://bhgceoulf4mer" path="res://assets/textures/actors/enemies/slime/Slime_Forest_Spritesheet.png" id="1_1ma3d"]
 [ext_resource type="Script" uid="uid://cq70pbj5lpkap" path="res://scripts/actors/enemies/slime.gd" id="1_2txaw"]
-[ext_resource type="AudioStream" uid="uid://bqmahajqmcyiv" path="res://assets/audio/slime_hit.ogg" id="2_jskh2"]
-[ext_resource type="Script" uid="uid://c2dmqut00g845" path="res://scripts/systems/hurt_box.gd" id="3_dhje3"]
-[ext_resource type="AudioStream" uid="uid://cxmbyf5i8fqk0" path="res://assets/audio/slime_death.ogg" id="3_nh0x5"]
-[ext_resource type="Script" uid="uid://cvj6l5ujm0x8x" path="res://scripts/systems/hit_box.gd" id="4_jskh2"]
+[ext_resource type="AudioStream" uid="uid://bqmahajqmcyiv" path="res://assets/audio/sfx/slime_hit.ogg" id="2_jskh2"]
+[ext_resource type="AudioStream" uid="uid://cxmbyf5i8fqk0" path="res://assets/audio/sfx/slime_death.ogg" id="3_nh0x5"]
+[ext_resource type="PackedScene" uid="uid://bhfb1e2r30ya6" path="res://scenes/components/states/state_machine_component.tscn" id="4_kaj66"]
 [ext_resource type="PackedScene" uid="uid://7r8xbtlsdroq" path="res://scenes/components/status_component.tscn" id="4_tpkli"]
+[ext_resource type="PackedScene" uid="uid://uri1srvne7v3" path="res://scenes/components/movement_component.tscn" id="5_rsbtc"]
+[ext_resource type="PackedScene" uid="uid://v1r2l2tu2qyj" path="res://scenes/components/combat_receiver_component.tscn" id="6_31yll"]
+[ext_resource type="PackedScene" uid="uid://fi4g51qoeha" path="res://scenes/components/hit_box_component.tscn" id="9_dbwag"]
+[ext_resource type="PackedScene" uid="uid://crmvibm52mj4b" path="res://scenes/components/hurt_box_component.tscn" id="10_snipc"]
 
 [sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_nh0x5"]
 random_pitch = 1.5
@@ -134,12 +137,6 @@ animations = [{
 "speed": 8.0
 }]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_34wcl"]
-size = Vector2(1000, 800)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_dhje3"]
-size = Vector2(900, 700)
-
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jskh2"]
 size = Vector2(600, 400)
 
@@ -147,13 +144,19 @@ size = Vector2(600, 400)
 y_sort_enabled = true
 scale = Vector2(0.1, 0.1)
 collision_layer = 256
-collision_mask = 4115
+collision_mask = 4099
 script = ExtResource("1_2txaw")
 damage_sfx = SubResource("AudioStreamRandomizer_nh0x5")
 death_sfx = ExtResource("3_nh0x5")
-hurt_box = NodePath("HurtBox")
+hurt_box = NodePath("")
 health_bar = NodePath("HealthBar")
-status = NodePath("Status")
+status = NodePath("")
+
+[node name="StateMachine" parent="." instance=ExtResource("4_kaj66")]
+
+[node name="Movement" parent="." instance=ExtResource("5_rsbtc")]
+
+[node name="CombatReceiver" parent="." instance=ExtResource("6_31yll")]
 
 [node name="Status" parent="." instance=ExtResource("4_tpkli")]
 
@@ -163,30 +166,15 @@ animation = &"idle"
 autoplay = "idle"
 frame_progress = 0.035266194
 
-[node name="HurtBox" type="Area2D" parent="."]
-collision_layer = 512
-collision_mask = 68
-script = ExtResource("3_dhje3")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox"]
-position = Vector2(-4.410743e-05, -4.9999647)
-scale = Vector2(0.99999946, 0.99999946)
-shape = SubResource("RectangleShape2D_34wcl")
-debug_color = Color(0.6313726, 0.5254902, 0.21568628, 0.41960785)
-
-[node name="EnemyHitBox" type="Area2D" parent="."]
-collision_layer = 1024
-collision_mask = 32
-script = ExtResource("4_jskh2")
-base_damage = 5.0
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="EnemyHitBox"]
-shape = SubResource("RectangleShape2D_dhje3")
-debug_color = Color(1, 0, 0, 0.23529412)
-
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 scale = Vector2(0.99999934, 0.99999934)
 shape = SubResource("RectangleShape2D_jskh2")
+
+[node name="HurtBox" parent="." instance=ExtResource("10_snipc")]
+scale = Vector2(0.9999998, 0.9999998)
+
+[node name="HitBoxComponent" parent="." instance=ExtResource("9_dbwag")]
+scale = Vector2(0.99999994, 0.99999994)
 
 [node name="HealthBar" type="ProgressBar" parent="."]
 modulate = Color(0, 1, 0, 1)

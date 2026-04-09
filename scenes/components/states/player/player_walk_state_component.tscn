@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://ccqileij6fhyv"]
+
+[ext_resource type="Script" uid="uid://bs0xto6ccawxa" path="res://scripts/states/player/player_walk_state.gd" id="1_0segg"]
+
+[node name="PlayerWalkState" type="Node"]
+script = ExtResource("1_0segg")
+state_id = &"walk"
+allowed_transitions = Array[StringName]([&"idle", &"roll", &"attack", &"hurt", &"dead"])

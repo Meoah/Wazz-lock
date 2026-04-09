@@ -10,13 +10,13 @@ const MANA_TYPE: String = "Mana"
 @export var _regen_label: RichTextLabel
 
 
-func update_label(player_status: Status) -> void:
+func update_label(player_status: StatusComponent) -> void:
 	match bar_type:
 		HEALTH_TYPE:	_update_health_status(player_status)
 		MANA_TYPE:		_update_mana_status(player_status)
 
 
-func _update_health_status(player_status: Status) -> void:
+func _update_health_status(player_status: StatusComponent) -> void:
 	_value_label.text = "%.0f / %.0f" % [player_status.current_health, player_status.max_health]
 	
 	var regen_string: String = ""
@@ -28,7 +28,7 @@ func _update_health_status(player_status: Status) -> void:
 	
 
 
-func _update_mana_status(player_status: Status) -> void:
+func _update_mana_status(player_status: StatusComponent) -> void:
 	_value_label.text = "%.0f / %.0f" % [player_status.current_mana, player_status.max_mana]
 	
 	var regen_string: String = ""
