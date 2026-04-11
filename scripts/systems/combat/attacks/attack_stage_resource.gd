@@ -19,6 +19,12 @@ enum StageMode {
 @export var pause_mana_regen_while_active: bool = false
 @export var mana_regen_scale_while_active: float = 1.0
 
+@export_category("Aim")
+@export var apply_aim_to_hands_on_start: bool = true
+@export var allow_live_aim_updates: bool = false
+@export var hands_follow_live_aim: bool = false
+@export var lock_facing_during_stage: bool = true
+
 @export_category("Damage")
 @export var damage_multiplier: float = 1.0
 @export var knockback_multiplier: float = 1.0

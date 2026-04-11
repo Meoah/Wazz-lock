@@ -33,6 +33,8 @@ enum AttackInputType {
 @export var attack_motion_enabled: bool = false
 @export var attack_motion_multiplier: float = 1.0
 @export var attack_motion_uses_attack_direction: bool = true
+@export var allow_live_aim_updates: bool = false
+@export var hands_follow_live_aim: bool = false
 
 var pending_start_input: int = AttackInputType.NONE
 
@@ -216,9 +218,14 @@ func _start_stage(stage: AttackStage, input_type: int) -> bool:
 		committed_attack_direction = movement.last_non_zero_direction
 	
 	movement.face_direction(committed_attack_direction)
-	movement.lock_facing(true)
+	movement.lock_facing(stage.lock_facing_during_stage)
 	
-	if aim: aim.apply_to_hands()
+	allow_live_aim_updates = stage.allow_live_aim_updates
+	hands_follow_live_aim = stage.hands_follow_live_aim
+	
+	if aim:
+		if stage.apply_aim_to_hands_on_start: aim.apply_to_hands()
+		else: aim.apply_to_hands(true)
 	
 	_apply_hitbox_modifiers_for_stage(stage)
 	_apply_mana_regen_rules_for_stage(stage, false)
@@ -281,13 +288,14 @@ func _submit_followup_press(input_type: int) -> void:
 	if next_stage == null:
 		return
 
+	if cancel_window_open and queued_next_stage_id == StringName():
+		_start_stage(next_stage, input_type)
+		return
+
 	if accept_window_open:
 		queued_next_stage_id = next_stage.stage_id
 		queued_next_input = input_type
 		return
-
-	if cancel_window_open and queued_next_stage_id == StringName():
-		_start_stage(next_stage, input_type)
 
 
 func _resolve_next_stage_from_press(input_type: int) -> AttackStage:
@@ -458,6 +466,8 @@ func _clear_runtime_attack_flags() -> void:
 	attack_motion_enabled = false
 	attack_motion_multiplier = 1.0
 	attack_motion_uses_attack_direction = true
+	allow_live_aim_updates = false
+	hands_follow_live_aim = false
 
 
 func _clear_queue() -> void:

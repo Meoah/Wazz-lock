@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cbm7vod68ve1q"
-path="res://.godot/imported/Plunger_SpriteSheet.png-2d7f1888df595a52bffc6d33c29759e7.ctex"
+uid="uid://b6glhx2l7spv0"
+path="res://.godot/imported/Wazz-lock_Tutorial.png-ec63eb1a95c0b32ae661e6f56b1414d7.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/textures/actors/clive/spritesheets/weapons/Plunger_SpriteSheet.png"
-dest_files=["res://.godot/imported/Plunger_SpriteSheet.png-2d7f1888df595a52bffc6d33c29759e7.ctex"]
+source_file="res://assets/textures/ui/screens/Wazz-lock_Tutorial.png"
+dest_files=["res://.godot/imported/Wazz-lock_Tutorial.png-ec63eb1a95c0b32ae661e6f56b1414d7.ctex"]
 
 [params]
 

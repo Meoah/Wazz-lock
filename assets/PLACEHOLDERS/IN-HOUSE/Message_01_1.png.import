@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dv6oikklf6uvx"
-path="res://.godot/imported/wazzlock.png-357890bea8f03206d95aae2e67749819.ctex"
+uid="uid://btprjpbbxhlss"
+path="res://.godot/imported/Message_01_1.png-3444633223b56ef2188c93b53e812ac8.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/PLACEHOLDERS/IN-HOUSE/wazzlock.png"
-dest_files=["res://.godot/imported/wazzlock.png-357890bea8f03206d95aae2e67749819.ctex"]
+source_file="res://assets/PLACEHOLDERS/IN-HOUSE/Message_01_1.png"
+dest_files=["res://.godot/imported/Message_01_1.png-3444633223b56ef2188c93b53e812ac8.ctex"]
 
 [params]
 

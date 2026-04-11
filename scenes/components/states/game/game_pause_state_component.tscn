@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://b5664r6tafqn5"]
+
+[ext_resource type="Script" uid="uid://bdxki5q8gx5ij" path="res://scripts/states/game/pause_state.gd" id="1_g13qs"]
+
+[node name="GamePauseState" type="Node"]
+script = ExtResource("1_g13qs")
+state_id = &"pause"
+allowed_transitions = Array[StringName]([&"main_menu", &"play"])

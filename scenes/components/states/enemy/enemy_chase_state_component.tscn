@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://cgqo1wcg5puou"]
+
+[ext_resource type="Script" uid="uid://dynkw5kdj6mej" path="res://scripts/states/enemies/enemy_chase_state.gd" id="1_h38v7"]
+
+[node name="EnemyChaseState" type="Node"]
+script = ExtResource("1_h38v7")
+state_id = &"chase"
+allowed_transitions = Array[StringName]([&"search", &"hurt", &"dead"])

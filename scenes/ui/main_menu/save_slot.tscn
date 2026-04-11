@@ -148,7 +148,7 @@ animations = [{
 "speed": 5.0
 }]
 
-[node name="SaveSlot" type="Control" node_paths=PackedStringArray("_animated_sprite_clive_body", "_animated_sprite_clive_hands", "_label_slot_number")]
+[node name="SaveSlot" type="Control" node_paths=PackedStringArray("_animated_sprite_clive_body", "_animated_sprite_clive_hands", "_label_slot_number", "_label_save_data")]
 modulate = Color(0.5, 0.5, 0.5, 1)
 custom_minimum_size = Vector2(390, 553)
 layout_mode = 3
@@ -159,6 +159,7 @@ script = ExtResource("2_7jev8")
 _animated_sprite_clive_body = NodePath("PanelContainer/MarginContainer/VBoxContainer/MarginContainer/PanelContainer/CliveBody")
 _animated_sprite_clive_hands = NodePath("PanelContainer/MarginContainer/VBoxContainer/MarginContainer/PanelContainer/CliveHands")
 _label_slot_number = NodePath("TextureRect/SlotNumber")
+_label_save_data = NodePath("PanelContainer/MarginContainer/VBoxContainer/SaveData/RichTextLabel")
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
 layout_mode = 1

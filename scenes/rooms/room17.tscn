@@ -38,6 +38,20 @@ tile_map_data = PackedByteArray("AAAGAAsAAwAEAAQAAAAGAAwAAwAAAAoAAAAHAAsAAwAAAAU
 tile_set = ExtResource("2_eol0m")
 script = ExtResource("5_43k3s")
 
+[node name="ExitHandler" parent="." instance=ExtResource("7_82am3")]
+
+[node name="ExitDrainNorth" parent="ExitHandler" index="0"]
+position = Vector2(960, 128)
+
+[node name="ExitDrainEast" parent="ExitHandler" index="1"]
+position = Vector2(1792, 512)
+
+[node name="ExitDrainSouth" parent="ExitHandler" index="2"]
+position = Vector2(960, 960)
+
+[node name="ExitDrainWest" parent="ExitHandler" index="3"]
+position = Vector2(128, 511.99994)
+
 [node name="EnemyHandler" type="Node2D" parent="."]
 script = ExtResource("6_ceu8k")
 
@@ -198,19 +212,5 @@ enemy_type = 1
 [node name="Bubble8" parent="EnemyHandler" instance=ExtResource("8_350hm")]
 position = Vector2(164, 924)
 enemy_type = 1
-
-[node name="ExitHandler" parent="." instance=ExtResource("7_82am3")]
-
-[node name="ExitDrainNorth" parent="ExitHandler" index="0"]
-position = Vector2(960, 128)
-
-[node name="ExitDrainEast" parent="ExitHandler" index="1"]
-position = Vector2(1792, 512)
-
-[node name="ExitDrainSouth" parent="ExitHandler" index="2"]
-position = Vector2(960, 960)
-
-[node name="ExitDrainWest" parent="ExitHandler" index="3"]
-position = Vector2(128, 511.99994)
 
 [editable path="ExitHandler"]

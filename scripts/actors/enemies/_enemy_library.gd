@@ -9,6 +9,6 @@ enum EnemyTypes {
 
 const ENEMY_PATHS: Dictionary = {
 	EnemyTypes.SLIME: "res://scenes/actors/enemies/slime.tscn",
-	EnemyTypes.BUBBLE: "res://scenes/actors/enemies/slime.tscn",
-	EnemyTypes.BOSS_SLIME: "res://scenes/actors/enemies/boss_slime.tscn",
+	EnemyTypes.BUBBLE: "res://scenes/actors/enemies/slime.tscn", #placeholder
+	EnemyTypes.BOSS_SLIME: "res://scenes/actors/enemies/slime.tscn", #placeholder
 }

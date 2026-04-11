@@ -10,9 +10,23 @@ class_name AimComponent
 func _process(_delta: float) -> void:
 	if !actor: return
 	if actor.has_method("is_dead") and actor.is_dead(): return
-	if actor.has_method("is_attacking") and actor.is_attacking(): return
+
+	var paused: bool = _is_game_paused()
+	if aim_arrow:
+		aim_arrow.visible = !paused
+
+	if paused:
+		return
 	
+	var attacking: bool = actor.has_method("is_attacking") and actor.is_attacking()
+	var allow_live_aim: bool = attacking and actor.has_method("attack_allows_live_aim_updates") and actor.attack_allows_live_aim_updates()
+	
+	if attacking and not allow_live_aim: return
+
 	_update_aim_rotation()
+
+	if attacking and actor.has_method("attack_hands_follow_live_aim") and actor.attack_hands_follow_live_aim():
+		apply_to_hands()
 
 
 func _update_aim_rotation() -> void:
@@ -53,3 +67,8 @@ func get_aim_rotation() -> float:
 
 func get_aim_direction() -> Vector2:
 	return Vector2.UP.rotated(aim_origin.global_rotation)
+
+
+func _is_game_paused() -> bool:
+	var current_state: StateComponent = GameManager.get_current_state()
+	return current_state != null and current_state.state_id == &"pause"

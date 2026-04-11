@@ -5,6 +5,16 @@ signal hit_received(hit_data: HitData)
 signal hurt_triggered(hit_data: HitData)
 signal death_triggered(hit_data: HitData)
 
+enum HitResponseMode {
+	INTERRUPTIBLE,
+	SUPER_ARMOR,
+	BLOCK
+}
+
+@export var hit_response_mode: HitResponseMode = HitResponseMode.INTERRUPTIBLE
+@export_range(0.0, 1.0, 0.01) var block_damage_scale: float = 0.0
+@export var block_reaction_animation: StringName = &"block_hit"
+
 @export_category("References")
 @export var actor: Node
 @export var status: StatusComponent
@@ -49,28 +59,49 @@ func receive_hit(hit_data: HitData) -> bool:
 	if not can_receive_hit(hit_data):
 		return false
 
-	var accepted := status.request_damage(hit_data.damage)
+	var damage_to_apply := hit_data.damage
+	var should_apply_knockback := apply_knockback
+	var should_trigger_hurt := false
+	var reaction_animation: StringName = &"hurt"
+
+	match hit_response_mode:
+		HitResponseMode.INTERRUPTIBLE:
+			should_trigger_hurt = hit_data.poise_damage > status.poise
+
+		HitResponseMode.SUPER_ARMOR:
+			should_apply_knockback = false
+			should_trigger_hurt = false
+
+		HitResponseMode.BLOCK:
+			damage_to_apply *= block_damage_scale
+			should_apply_knockback = apply_knockback
+			should_trigger_hurt = true
+			reaction_animation = block_reaction_animation
+
+	var accepted := true
+	if damage_to_apply > 0.0:
+		accepted = status.request_damage(damage_to_apply)
+
 	if not accepted:
 		return false
 
 	if use_floating_text:
-		_emit_damage_text(hit_data)
+		_emit_damage_text_value(damage_to_apply)
 
-	if apply_knockback:
+	if should_apply_knockback:
 		var impulse := _resolve_impulse(hit_data)
 		if impulse != Vector2.ZERO:
 			_apply_impulse(impulse, hit_data)
 
 	var killed := status.current_health <= 0.0
-	var poise_broken := hit_data.poise_damage > status.poise
 
 	_notify_actor_of_hit(hit_data)
 	hit_received.emit(hit_data)
 
 	if killed:
 		_handle_death(hit_data)
-	elif poise_broken:
-		_handle_hurt(hit_data)
+	elif should_trigger_hurt:
+		_handle_hurt(hit_data, reaction_animation)
 
 	return true
 
@@ -95,9 +126,12 @@ func _apply_impulse(impulse: Vector2, hit_data: HitData) -> void:
 		(resolved_actor as CharacterBody2D).velocity += impulse
 
 
-func _handle_hurt(hit_data: HitData) -> void:
+func _handle_hurt(hit_data: HitData, reaction_animation: StringName = &"hurt") -> void:
 	if state_machine and hurt_state_id != StringName():
-		state_machine.transition_to(hurt_state_id, {"hit_data": hit_data})
+		state_machine.transition_to(hurt_state_id, {
+			"hit_data": hit_data,
+			"reaction_animation": reaction_animation
+		})
 
 	var resolved_actor := _get_actor()
 	if resolved_actor and resolved_actor.has_method("on_hurt_received"):
@@ -123,13 +157,13 @@ func _notify_actor_of_hit(hit_data: HitData) -> void:
 		resolved_actor.on_hit_received(hit_data)
 
 
-func _emit_damage_text(hit_data: HitData) -> void:
+func _emit_damage_text_value(damage_value: float) -> void:
 	var origin: Node2D = floating_text_origin
 	if origin == null and _get_actor() is Node2D:
 		origin = _get_actor() as Node2D
 
 	if origin:
-		SignalBus.floating_text.emit("%.1f" % -hit_data.damage, origin.global_position)
+		SignalBus.floating_text.emit("%.1f" % -damage_value, origin.global_position)
 
 
 func _get_actor() -> Node:

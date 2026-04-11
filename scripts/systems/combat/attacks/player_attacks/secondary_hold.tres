@@ -8,13 +8,13 @@
 script = ExtResource("3_47fpl")
 stage_id = &"secondary_hold"
 animation_name = &"attack_secondary_hold"
-flat_mana_cost = 10.0
+flat_mana_cost = 30.0
 mana_regen_scale_while_active = 0.25
+apply_aim_to_hands_on_start = false
 poise_multiplier = 2.0
 can_charge = true
 charge_start_animation_name = &"attack_secondary_hold"
 charge_loop_animation_name = &"attack_secondary_hold_loop"
-charge_sustain_mana_per_second = 50.0
 mana_regen_scale_while_charging = 0.25
 charge_tiers = Array[ExtResource("1_c7mys")]([ExtResource("2_5nhdo")])
 metadata/_custom_type_script = "uid://ce7k5u25qaxdt"

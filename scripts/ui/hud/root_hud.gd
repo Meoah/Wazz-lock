@@ -11,3 +11,7 @@ func _ready() -> void:
 
 func show_game_hud() -> void:
 	game_hud.show()
+
+
+func hide_game_hud() -> void:
+	game_hud.hide()

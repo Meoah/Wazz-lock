@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b0o30caqerh2g"
-path="res://.godot/imported/Clive_Placeholder.PNG-189ed2b06c3dc9e81ef1ab99b7cd7acd.ctex"
+uid="uid://dolydhvkq7t6s"
+path="res://.godot/imported/Screenshot_2026-04-08_131229.png-61a240632b9fbb135f13236e3f85c69a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/textures/actors/clive/Clive_Placeholder.PNG"
-dest_files=["res://.godot/imported/Clive_Placeholder.PNG-189ed2b06c3dc9e81ef1ab99b7cd7acd.ctex"]
+source_file="res://assets/textures/ui/screens/Screenshot_2026-04-08_131229.png"
+dest_files=["res://.godot/imported/Screenshot_2026-04-08_131229.png-61a240632b9fbb135f13236e3f85c69a.ctex"]
 
 [params]
 

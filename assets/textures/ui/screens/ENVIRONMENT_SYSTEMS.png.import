@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dexttmjlrvgmo"
-path="res://.godot/imported/vecteezy_old-marble-tile-with-cement-texture-cement-and-concrete_9194921.jpg-72178fea6ed93785a38ee90a6bb6c9f3.ctex"
+uid="uid://1n6qihdx4vuk"
+path="res://.godot/imported/ENVIRONMENT_SYSTEMS.png-2762bd4f2cc3aa0a44670009aad5ea2e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/PLACEHOLDERS/OUTSOURCED-MUST-DELETE/vecteezy_old-marble-tile-with-cement-texture-cement-and-concrete_9194921.jpg"
-dest_files=["res://.godot/imported/vecteezy_old-marble-tile-with-cement-texture-cement-and-concrete_9194921.jpg-72178fea6ed93785a38ee90a6bb6c9f3.ctex"]
+source_file="res://assets/textures/ui/screens/ENVIRONMENT_SYSTEMS.png"
+dest_files=["res://.godot/imported/ENVIRONMENT_SYSTEMS.png-2762bd4f2cc3aa0a44670009aad5ea2e.ctex"]
 
 [params]
 

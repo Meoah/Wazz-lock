@@ -1,6 +1,6 @@
 [gd_resource type="SpriteFrames" load_steps=54 format=3 uid="uid://bn7n4attqwpwq"]
 
-[ext_resource type="Texture2D" uid="uid://cbm7vod68ve1q" path="res://assets/textures/actors/clive/spritesheets/weapons/Plunger_SpriteSheet.png" id="1_ishwm"]
+[ext_resource type="Texture2D" uid="uid://cbm7vod68ve1q" path="res://assets/textures/actors/clive/spritesheets/weapons/plunger/Plunger_SpriteSheet.png" id="1_ishwm"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_lypka"]
 atlas = ExtResource("1_ishwm")

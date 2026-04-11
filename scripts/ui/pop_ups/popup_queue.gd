@@ -9,6 +9,7 @@ var _number_paused : int = 0
 @export var _blocker : Blocker
 
 func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	# The PopupQueue itself blocks mouse inputs from getting to the SceneRoot. 
 	#	Therefore, it must be hidden on ready to prevent unwanted blocking.
 	self.visible = false

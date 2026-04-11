@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://cyyi4wbsc7jf3"]
+
+[ext_resource type="Script" uid="uid://bno0y7s5qvnix" path="res://scripts/states/game/play_state.gd" id="1_tcklp"]
+
+[node name="GamePlayState" type="Node"]
+script = ExtResource("1_tcklp")
+state_id = &"play"
+allowed_transitions = Array[StringName]([&"main_menu", &"pause"])

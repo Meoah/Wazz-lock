@@ -1,6 +1,9 @@
 extends StateComponent
 class_name PlayerRollStateComponent
 
+@export var mana_regen_source_id: StringName = &"roll"
+@export var pause_mana_regen_while_rolling: bool = false
+@export var mana_regen_scale_while_rolling: float = 0.5
 @export var entry_mana_cost: float = 20.0
 @export var sustain_mana_per_second: float = 8.0
 @export var sustain_mana_ramp_per_second: float = 12.0
@@ -36,6 +39,9 @@ func enter(_previous_state: StateComponent, _data: Dictionary = {}) -> void:
 	rolling_active = true
 	parent.movement.lock_direction(false)
 	parent.begin_roll_sustain()
+	
+	parent.status.set_mana_regen_paused(mana_regen_source_id, pause_mana_regen_while_rolling)
+	parent.status.set_mana_regen_scale(mana_regen_source_id, mana_regen_scale_while_rolling)
 
 
 func physics_update(delta: float) -> void:
@@ -70,6 +76,7 @@ func physics_update(delta: float) -> void:
 func exit(_next_state: StateComponent) -> void:
 	if parent is Clive:
 		parent.movement.lock_direction(false)
+		parent.status.clear_mana_regen_control(mana_regen_source_id)
 
 
 func _begin_postroll() -> void:
@@ -79,6 +86,7 @@ func _begin_postroll() -> void:
 	ending = true
 	rolling_active = false
 	parent.movement.lock_direction(false)
+	parent.status.clear_mana_regen_control(mana_regen_source_id)
 	parent.begin_roll_end()
 	
 	await parent.roll_finished

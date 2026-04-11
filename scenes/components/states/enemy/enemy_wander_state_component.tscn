@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://cj84htr7yelpo"]
+
+[ext_resource type="Script" uid="uid://ckdnva6d44x81" path="res://scripts/states/enemies/enemy_wander_state.gd" id="1_t715n"]
+
+[node name="EnemyWanderState" type="Node"]
+script = ExtResource("1_t715n")
+state_id = &"wander"
+allowed_transitions = Array[StringName]([&"chase", &"hurt", &"dead"])

@@ -12,7 +12,7 @@ signal dead
 @export var _base_health_regen: float = 0.0
 
 @export var _base_max_mana: float = 100.0
-@export var _base_mana_regen: float = 10.0
+@export var _base_mana_regen: float = 1.0
 
 @export var _base_damage: float = 10.0
 @export var _base_defense: float = 10.0

@@ -5,6 +5,10 @@ class_name MovementComponent
 @export var body_root: Node2D
 @export var flip_visuals: bool = true
 @export var impulse_decay: float = 900.0
+@export var transfer_impulse_on_body_collision: bool = false
+@export_range(0.0, 1.0, 0.05) var collision_push_ratio: float = 0.75
+@export var min_collision_push_speed: float = 40.0
+@export var collision_push_decay: float = 1400.0
 
 var body: CharacterBody2D
 var desired_direction: Vector2 = Vector2.ZERO
@@ -14,6 +18,7 @@ var movement_enabled: bool = true
 var direction_locked: bool = false
 var facing_locked: bool = false
 var external_velocity: Vector2 = Vector2.ZERO
+var collision_push_velocity: Vector2 = Vector2.ZERO
 
 func setup(new_body: CharacterBody2D) -> void:
 	body = new_body
@@ -40,8 +45,12 @@ func set_movement_enabled(enabled: bool) -> void:
 func add_impulse(impulse: Vector2) -> void:
 	external_velocity += impulse
 
+func add_collision_push(impulse: Vector2) -> void:
+	collision_push_velocity += impulse
+
 func clear_impulses() -> void:
 	external_velocity = Vector2.ZERO
+	collision_push_velocity = Vector2.ZERO
 
 func physics_step(delta: float) -> void:
 	if !body:
@@ -51,14 +60,20 @@ func physics_step(delta: float) -> void:
 	if movement_enabled:
 		locomotion = desired_direction * base_speed * speed_multiplier
 
-	body.velocity = locomotion + external_velocity
+	var transferable_impulse := external_velocity
+	body.velocity = locomotion + external_velocity + collision_push_velocity
 
 	if flip_visuals and not facing_locked:
 		if desired_direction.x < 0.0: _flip_h(true)
 		elif desired_direction.x > 0.0: _flip_h(false)
 
 	body.move_and_slide()
+
+	if transfer_impulse_on_body_collision:
+		_push_bodies_from_slide_collisions(transferable_impulse)
+
 	external_velocity = external_velocity.move_toward(Vector2.ZERO, impulse_decay * delta)
+	collision_push_velocity = collision_push_velocity.move_toward(Vector2.ZERO, collision_push_decay * delta)
 
 func get_speed_ratio() -> float:
 	if body == null or base_speed <= 0.0:
@@ -84,3 +99,31 @@ func lock_facing(enabled: bool) -> void:
 func face_direction(direction: Vector2) -> void:
 	if direction.x < 0.0: _flip_h(true)
 	elif direction.x > 0.0: _flip_h(false)
+
+
+func _push_bodies_from_slide_collisions(source_impulse: Vector2) -> void:
+	if body == null:
+		return
+
+	if source_impulse.length() < min_collision_push_speed:
+		return
+
+	var push_dir := source_impulse.normalized()
+
+	for i in range(body.get_slide_collision_count()):
+		var collision := body.get_slide_collision(i)
+		if collision == null:
+			continue
+
+		var collider := collision.get_collider()
+		if collider == null or collider == body:
+			continue
+
+		var forward_speed := source_impulse.dot(-collision.get_normal())
+		if forward_speed <= 0.0:
+			continue
+
+		var push_impulse := push_dir * forward_speed * collision_push_ratio
+
+		if collider.has_method("apply_collision_push"):
+			collider.apply_collision_push(push_impulse, body)

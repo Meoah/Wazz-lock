@@ -51,13 +51,27 @@ func _info_back() -> void:
 
 
 func _start_new_run() -> void:
+	if !SaveManager.has_current_slot(): return
+
 	SignalBus.button_pressed.emit()
 	_main_menu_parent.move_to_run_setup()
 
 
 func _start_continue() -> void:
+	if _button_continue.disabled:
+		return
+
+	if !SaveManager.has_current_slot():
+		return
+
+	var save_data := SaveManager.load_current_slot()
+	if save_data.is_empty():
+		refresh_for_current_slot()
+		return
+
 	SignalBus.button_pressed.emit()
-	pass # TODO goes back to saved run
+	RunManager.queue_continue_run(save_data)
+	GameManager.request_play()
 
 
 func _start_hub() -> void:
@@ -74,3 +88,27 @@ func _start_settings() -> void:
 func _start_back() -> void:
 	SignalBus.button_pressed.emit()
 	_main_menu_parent.move_to_save_slots()
+
+
+func refresh_for_current_slot() -> void:
+	if !SaveManager.has_current_slot():
+		_panel_previous_run.visible = false
+		_button_continue.disabled = true
+		return
+
+	var summary := SaveManager.get_current_slot_summary()
+	var has_save: bool = summary.get("has_save", false)
+
+	_panel_previous_run.visible = has_save
+	_button_continue.disabled = !has_save
+
+	if has_save:
+		@warning_ignore("integer_division")
+		var play_minutes: int = int(summary.get("play_time_seconds", 0)) / 60
+		_label_previous_run.text = "[center][b]%s[/b]\nChapter %s\n%dm played[/center]" % [
+			str(summary.get("display_name", "Player")),
+			str(summary.get("chapter", 1)),
+			play_minutes
+		]
+	else:
+		_label_previous_run.text = "[center]No run in this slot yet.[/center]"

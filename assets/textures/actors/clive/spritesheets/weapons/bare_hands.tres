@@ -1,0 +1,67 @@
+[gd_resource type="SpriteFrames" load_steps=10 format=3 uid="uid://df6yfqich2rj5"]
+
+[ext_resource type="Texture2D" uid="uid://croq8g2o017rm" path="res://assets/textures/actors/clive/spritesheets/Clive_Spritesheet.png" id="1_rrq37"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_576c7"]
+atlas = ExtResource("1_rrq37")
+region = Rect2(0, 256, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_umy3v"]
+atlas = ExtResource("1_rrq37")
+region = Rect2(256, 256, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_68wwc"]
+atlas = ExtResource("1_rrq37")
+region = Rect2(512, 256, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2b5q1"]
+atlas = ExtResource("1_rrq37")
+region = Rect2(768, 256, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3loqa"]
+atlas = ExtResource("1_rrq37")
+region = Rect2(1024, 256, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xuyci"]
+atlas = ExtResource("1_rrq37")
+region = Rect2(1280, 256, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_r5tpg"]
+atlas = ExtResource("1_rrq37")
+region = Rect2(1536, 256, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qx54q"]
+atlas = ExtResource("1_rrq37")
+region = Rect2(1792, 256, 256, 256)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_576c7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_umy3v")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_68wwc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2b5q1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3loqa")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xuyci")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_r5tpg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qx54q")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 8.0
+}]

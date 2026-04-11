@@ -8,6 +8,7 @@ script = ExtResource("2_mnq1g")
 stage_id = &"primary_start"
 stage_mode = 1
 animation_name = &"attack_primary_start"
+allow_live_aim_updates = true
 tap_branch_stage_id = &"primary_tap_1"
 hold_branch_stage_id = &"primary_tap_1"
 metadata/_custom_type_script = "uid://ce7k5u25qaxdt"

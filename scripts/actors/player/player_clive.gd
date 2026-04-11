@@ -24,13 +24,15 @@ signal death_finished
 @export_category("Children Nodes")
 @export var animation_player: AnimationPlayer
 @export var body_root: Node2D
-@export var hands: AnimatedSprite2D
+@export var hands: Node2D
 @export var health_bar: ProgressBar
 
-const INVULN_FLASH_MIN_ALPHA := 0.25
-const INVULN_FLASH_HALF_PERIOD := 0.06
-const ROLL_HOLD_FRAMES := 15
-const ROLL_FLASH_COLOR := Color(0.255, 0.733, 0.953)
+@export_category("Weapon Nodes")
+@export var weapon_sprite: AnimatedSprite2D
+@export var weapon_vfx: AnimatedSprite2D
+
+const INVULN_FLASH_MIN_ALPHA: float = 0.25
+const INVULN_FLASH_HALF_PERIOD: float = 0.06
 
 var move_direction: Vector2 = Vector2.ZERO
 
@@ -98,7 +100,26 @@ func _physics_process(delta: float) -> void:
 	movement.physics_step(delta)
 
 
+func _can_accept_gameplay_input() -> bool:
+	var current_state: StateComponent = GameManager.get_current_state()
+	return current_state != null and current_state.state_id == &"play"
+
+
+func _clear_transient_inputs() -> void:
+	input_flags = 0
+	move_direction = Vector2.ZERO
+	roll_requested = false
+	potion_requested = false
+	primary_attack_held = false
+	secondary_attack_held = false
+	dodge_held = false
+
+
 func _input(event: InputEvent) -> void:
+	if !_can_accept_gameplay_input():
+		_clear_transient_inputs()
+		return
+
 	if event.is_action_pressed("move_left"): _set_input_flag(INPUT_FLAG.MOVE_LEFT, true)
 	if event.is_action_released("move_left"): _set_input_flag(INPUT_FLAG.MOVE_LEFT, false)
 	
@@ -157,12 +178,46 @@ func has_move_input() -> bool: return move_direction != Vector2.ZERO
 func get_move_direction() -> Vector2: return move_direction
 func is_dodge_held() -> bool: return dodge_held
 
+func attack_allows_live_aim_updates() -> bool: return attack and attack.allow_live_aim_updates
+
+func attack_hands_follow_live_aim() -> bool: return attack and attack.hands_follow_live_aim
+
 
 func is_attack_button_held(input_type: int) -> bool:
 	match input_type:
 		PlayerAttackComponent.AttackInputType.PRIMARY: return primary_attack_held
 		PlayerAttackComponent.AttackInputType.SECONDARY: return secondary_attack_held
 	return false
+
+
+func apply_weapon_loadout(weapon_id: String) -> void:
+	var normalized_weapon_id: String = RunManager.normalize_weapon_id(weapon_id)
+
+	match normalized_weapon_id:
+		RunManager.WEAPON_ID_PLUNGER:
+			_apply_plunger_loadout()
+		RunManager.WEAPON_ID_BARE_HANDS:
+			_apply_bare_hands_placeholder_loadout()
+		_:
+			_apply_plunger_loadout()
+
+
+func _apply_plunger_loadout() -> void:
+	if weapon_sprite:
+		weapon_sprite.visible = true
+		weapon_sprite.animation = &"plunger_idle"
+		weapon_sprite.frame = 0
+
+	if weapon_vfx:
+		weapon_vfx.visible = true
+		weapon_vfx.animation = &"empty"
+		weapon_vfx.frame = 0
+
+
+func _apply_bare_hands_placeholder_loadout() -> void:
+	# Temporary fallback while Bare Hands stays locked and has no dedicated assets/attack content yet.
+	_apply_plunger_loadout()
+
 
 func _validate_components() -> void:
 	if state_machine == null: push_error("Clive missing StateMachineComponent")
@@ -175,6 +230,8 @@ func _validate_components() -> void:
 	if animation_player == null: push_error("Clive missing AnimationPlayer")
 	if body_root == null: push_error("Clive missing BodyRoot")
 	if aim == null: push_error("Clive missing AimComponent")
+	if weapon_sprite == null: push_error("Clive missing WeaponSprite")
+	if weapon_vfx == null: push_error("Clive missing WeaponVFX")
 
 
 func _update_timers(delta: float) -> void:
@@ -269,7 +326,7 @@ func play_idle() -> void:
 
 func play_walk() -> void:
 	if animation_player.current_animation != "idle": animation_player.play("idle")
-	animation_player.speed_scale = lerp(1.0, 4.0, movement.get_speed_ratio())
+	animation_player.speed_scale = lerp(1.0, 2.0, movement.get_speed_ratio())
 
 
 func begin_roll_startup() -> void:
@@ -304,12 +361,12 @@ func stop_attack_mode() -> void:
 		hit_box.end_activation()
 
 
-func begin_hurt() -> void:
+func begin_hurt(animation_name: StringName = &"hurt") -> void:
 	if is_dead(): return
-	
+
 	_cancel_active_action()
 	animation_player.speed_scale = 1.0
-	animation_player.play("hurt")
+	animation_player.play(animation_name)
 	invuln_cooldown = 1.0
 
 
@@ -360,14 +417,6 @@ func _stop_invuln_flash() -> void:
 	body_root.modulate.a = 1.0
 
 
-func _flash_color(target_color: Color, time: float) -> void:
-	if flash_tween and flash_tween.is_running(): flash_tween.kill()
-	
-	flash_tween = create_tween()
-	target_color.a = body_root.modulate.a
-	flash_tween.tween_property(body_root, "modulate", target_color, time).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-
-
 func _on_status_dead() -> void:
 	if is_dead(): return
 	state_machine.transition_to(&"dead")
@@ -379,15 +428,14 @@ func _on_animation_player_animation_finished(anim_name: StringName) -> void:
 	match anim_name:
 		&"preroll":
 			roll_startup_finished.emit()
-			
+
 		&"postroll":
 			roll_cooldown = 0.56
 			_set_status_flag(STATUS_FLAG.ROLLING, false)
-			_flash_color(Color(1.0, 1.0, 1.0), 0.3)
 			roll_finished.emit()
-			
-		&"hurt":
+
+		&"hurt", &"block_hit":
 			hurt_finished.emit()
-			
+
 		&"dead":
 			death_finished.emit()
