@@ -1,18 +1,22 @@
-[gd_scene load_steps=10 format=3 uid="uid://cpv5i74img1v3"]
+[gd_scene load_steps=14 format=3 uid="uid://cpv5i74img1v3"]
 
 [ext_resource type="Script" uid="uid://dbaxi2jjyn2im" path="res://scripts/managers/game_manager.gd" id="1_hwd4i"]
 [ext_resource type="PackedScene" uid="uid://d1l0qt8blrdqy" path="res://scenes/root_scenes/main_menu.tscn" id="2_eaq8r"]
 [ext_resource type="Script" uid="uid://dlyqy2ujtb70s" path="res://scripts/ui/pop_ups/popup_queue.gd" id="2_glms7"]
 [ext_resource type="PackedScene" uid="uid://bixe33bv0wwac" path="res://scenes/root_scenes/run_root.tscn" id="3_q8mjp"]
 [ext_resource type="PackedScene" uid="uid://bo6oudf3dtprg" path="res://scenes/ui/pop_ups/blocker.tscn" id="3_udu3i"]
+[ext_resource type="PackedScene" uid="uid://bhfb1e2r30ya6" path="res://scenes/components/states/state_machine_component.tscn" id="4_0rse5"]
+[ext_resource type="PackedScene" uid="uid://cgacaebnl3w74" path="res://scenes/components/states/game/game_main_menu_state_component.tscn" id="5_aonbx"]
 [ext_resource type="PackedScene" uid="uid://dllmwyqxu8cl7" path="res://scenes/ui/hud/root_hud.tscn" id="5_jdad8"]
+[ext_resource type="PackedScene" uid="uid://b5664r6tafqn5" path="res://scenes/components/states/game/game_pause_state_component.tscn" id="6_lcbjr"]
+[ext_resource type="PackedScene" uid="uid://cyyi4wbsc7jf3" path="res://scenes/components/states/game/game_play_state_component.tscn" id="7_30v7y"]
 [ext_resource type="PackedScene" uid="uid://b62nwhb2eckl1" path="res://scenes/ui/tooltip_layer.tscn" id="7_q8mjp"]
 
 [sub_resource type="Theme" id="Theme_k4jhu"]
 
 [sub_resource type="Theme" id="Theme_jdad8"]
 
-[node name="GameManager" type="Control" node_paths=PackedStringArray("scene_root", "popup_queue", "tooltip_layer", "root_hud")]
+[node name="GameManager" type="Control" node_paths=PackedStringArray("state_machine", "scene_root", "popup_queue", "tooltip_layer", "root_hud")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -22,12 +26,22 @@ grow_vertical = 2
 mouse_filter = 2
 theme = SubResource("Theme_k4jhu")
 script = ExtResource("1_hwd4i")
+state_machine = NodePath("StateMachine")
 scene_root = NodePath("SceneRoot")
 popup_queue = NodePath("CanvasLayer/PopupQueue")
 tooltip_layer = NodePath("CanvasLayer/TooltipLayer")
 root_hud = NodePath("RootHUD")
 main_menu_scene = ExtResource("2_eaq8r")
 dungeon_root = ExtResource("3_q8mjp")
+
+[node name="StateMachine" parent="." instance=ExtResource("4_0rse5")]
+initial_state_id = &"main_menu"
+
+[node name="GameMainMenuState" parent="StateMachine" instance=ExtResource("5_aonbx")]
+
+[node name="GamePauseState" parent="StateMachine" instance=ExtResource("6_lcbjr")]
+
+[node name="GamePlayState" parent="StateMachine" instance=ExtResource("7_30v7y")]
 
 [node name="SceneRoot" type="Control" parent="."]
 layout_mode = 1

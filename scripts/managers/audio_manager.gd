@@ -1,6 +1,7 @@
 extends Node
 
 ## Save Data Constants and Variables
+const SETTINGS_SAVE_PATH : String = "user://audio_settings.dat"
 const SAVE_KEY_VOLUMES : String = "volumes"
 const SAVE_KEY_BGM_PROGRESS : String = "bgm_progress"
 
@@ -62,15 +63,11 @@ var dialogue_last_play_time_by_key : Dictionary = {}
 var dialogue_rng : RandomNumberGenerator = RandomNumberGenerator.new()
 
 func _ready() -> void:
-	# TODO Pulls audio save data.
-	var audio_save_data : Dictionary = {}
-	# Ensures sounds run while paused.
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	# Setup systems.
 	_setup_bgm()
 	_setup_sfx()
 	_setup_dialogue()
-	load_audio_data(audio_save_data)
+	load_settings_from_disk()
 
 ## Outputs all audio-related save data.
 func save_audio_data() -> Dictionary:
@@ -88,6 +85,37 @@ func load_audio_data(incoming_data : Dictionary) -> void:
 	# Apply saved BGM progress if data has it, otherwise clear BGM progress.
 	if incoming_data.has(SAVE_KEY_BGM_PROGRESS) : set_bgm_progress_save_data(incoming_data[SAVE_KEY_BGM_PROGRESS])
 	else : clear_bgm_progress()
+
+
+func save_settings_to_disk() -> bool:
+	var file : FileAccess = FileAccess.open(SETTINGS_SAVE_PATH, FileAccess.WRITE)
+	if file == null:
+		push_error("Failed to open audio settings file for writing: %s" % SETTINGS_SAVE_PATH)
+		return false
+
+	file.store_var({
+		SAVE_KEY_VOLUMES: _get_volume_save_data()
+	})
+	return true
+
+
+func load_settings_from_disk() -> void:
+	if not FileAccess.file_exists(SETTINGS_SAVE_PATH):
+		load_audio_data({})
+		return
+
+	var file : FileAccess = FileAccess.open(SETTINGS_SAVE_PATH, FileAccess.READ)
+	if file == null:
+		push_error("Failed to open audio settings file for reading: %s" % SETTINGS_SAVE_PATH)
+		load_audio_data({})
+		return
+
+	var loaded_data : Variant = file.get_var()
+	if loaded_data is Dictionary:
+		load_audio_data(loaded_data)
+	else:
+		load_audio_data({})
+
 
 ## Small helper class to enable awaits.
 class FinishDetection extends RefCounted:
@@ -132,6 +160,15 @@ func set_bus_volume_linear(incoming_bus_name : String, incoming_linear : float) 
 	
 	# Apply the volume to the bus if valid match.
 	_apply_bus_volume_linear(incoming_bus_name, clamped_linear)
+	save_settings_to_disk()
+
+func get_bus_volume_linear(incoming_bus_name : String) -> float:
+	match incoming_bus_name:
+		BUS_MASTER: return master_volume_linear
+		BUS_BGM: return bgm_volume_linear
+		BUS_SFX: return sfx_volume_linear
+		BUS_DIALOGUE: return dialogue_volume_linear
+	return 1.0
 
 ## Returns with the audio volume data as a [Dictionary].
 func _get_volume_save_data() -> Dictionary:

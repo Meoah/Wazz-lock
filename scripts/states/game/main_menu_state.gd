@@ -1,20 +1,13 @@
-extends State
-class_name MainMenuState
-
-const STATE_NAME : String = "MAIN_MENU_STATE"
+extends StateComponent
+class_name MainMenuStateComponent
 
 signal signal_main_menu
 
-func _init(parent : StateMachine) -> void:
-	state_name = STATE_NAME
-	super._init(parent)
-	
-func enter(previous_state : State, data : Dictionary = {}) -> void:
-	super.enter(previous_state, data)
-	GameManager.clear_popup_queue()
-	GameManager.change_scene_deferred(GameManager.main_menu_scene)
-	
+func enter(_previous_state: StateComponent, _data: Dictionary = {}) -> void:
+	parent.root_hud.hide_game_hud()
+	parent.clear_popup_queue()
+	parent.change_scene_deferred(parent.main_menu_scene)
 	signal_main_menu.emit()
-	
-func exit(next_state : State) -> void:
-	super.exit(next_state)
+
+func exit(_next_state: StateComponent) -> void:
+	pass

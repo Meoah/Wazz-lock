@@ -1,9 +1,9 @@
 extends Node
 
-const SAVE_SLOTS : int = 3
-const SAVE_PATH_TEMPLATE : String = ""
+const SAVE_SLOTS: int = 3
+const SAVE_PATH_TEMPLATE: String = "user://save_slot_%d.dat"
 
-var current_slot_index : int = -1
+var current_slot_index: int = -1
 
 
 func set_current_slot(slot_index : int) -> void:
@@ -12,6 +12,21 @@ func set_current_slot(slot_index : int) -> void:
 		return
 	
 	current_slot_index = slot_index
+
+
+func clear_current_slot() -> void:
+	current_slot_index = -1
+
+
+func has_current_slot() -> bool:
+	return _is_valid_slot(current_slot_index)
+
+
+func get_current_slot_summary() -> Dictionary:
+	if not has_current_slot():
+		return {}
+
+	return get_slot_summary(current_slot_index)
 
 
 func get_slot_path(slot_index: int) -> String:
@@ -121,11 +136,21 @@ func load_slot_data(slot_index: int) -> Dictionary:
 
 
 func delete_slot(slot_index: int) -> bool:
+	if not _is_valid_slot(slot_index):
+		return false
+
 	if not slot_has_save(slot_index):
+		if current_slot_index == slot_index:
+			clear_current_slot()
 		return true
 
 	var error_code: int = DirAccess.remove_absolute(get_slot_path(slot_index))
-	return error_code == OK
+	var was_deleted: bool = error_code == OK
+
+	if was_deleted and current_slot_index == slot_index:
+		clear_current_slot()
+
+	return was_deleted
 
 
 func _is_valid_slot(slot_index: int) -> bool:

@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://cio6sxohm71p0"]
+
+[ext_resource type="Script" uid="uid://cgs0ahjsaitrj" path="res://scripts/states/enemies/enemy_dead_state.gd" id="1_hurk8"]
+
+[node name="EnemyDeadState" type="Node"]
+script = ExtResource("1_hurk8")
+state_id = &"dead"

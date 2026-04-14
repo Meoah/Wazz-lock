@@ -21,8 +21,8 @@ SignalBus="*res://scripts/util/signal_bus.gd"
 SystemData="*res://scripts/systems/system_data.gd"
 AudioManager="*res://scripts/managers/audio_manager.gd"
 SaveManager="*res://scripts/managers/save_manager.gd"
-RunManager="*res://scripts/managers/run_manager.gd"
 GameManager="*res://scenes/game_manager.tscn"
+RunManager="*res://scripts/managers/run_manager.gd"
 
 [debug]
 

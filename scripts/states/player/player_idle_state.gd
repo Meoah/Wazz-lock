@@ -1,18 +1,24 @@
-extends PlayerState
-class_name PlayerIdleState
+extends StateComponent
+class_name PlayerIdleStateComponent
 
-const STATE_NAME : String = "PLAYER_IDLE_STATE"
 
-func _init(parent : StateMachine) -> void:
-	state_name = STATE_NAME
-	super._init(parent)
+func enter(_previous_state: StateComponent, _data: Dictionary = {}) -> void:
+	if parent is Clive:
+		parent.play_idle()
 
-func enter(previous_state: State, data: Dictionary = {}) -> void:
-	super.enter(previous_state, data)
-	SignalBus.state_player_idle.emit()
 
-func exit(next_state : State) -> void:
-	super.exit(next_state)
+func physics_update(_delta: float) -> void:
+	if parent is Clive:
+		parent.movement.request_stop()
 
-func allows_movement() -> bool:
-	return true
+
+func update(_delta: float) -> void:
+	if parent is Clive:
+		if		parent.consume_roll_request(20.0):		machine.transition_to(&"roll")
+		elif	parent.has_move_input():			machine.transition_to(&"walk")
+		else:
+			var attack_input: int = parent.attack.consume_start_input()
+			if attack_input != PlayerAttackComponent.AttackInputType.NONE:
+				machine.transition_to(&"attack", {"attack_input_type": attack_input})
+			elif parent.has_move_input():
+				machine.transition_to(&"walk")

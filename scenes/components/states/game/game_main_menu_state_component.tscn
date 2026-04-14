@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://cgacaebnl3w74"]
+
+[ext_resource type="Script" uid="uid://nahq1e2j5b38" path="res://scripts/states/game/main_menu_state.gd" id="1_rfw76"]
+
+[node name="GameMainMenuState" type="Node"]
+script = ExtResource("1_rfw76")
+state_id = &"main_menu"
+allowed_transitions = Array[StringName]([&"play"])

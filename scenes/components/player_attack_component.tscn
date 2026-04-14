@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://dbhnfr78x260c"]
+
+[ext_resource type="Script" uid="uid://drwjtdtujbafh" path="res://scripts/systems/combat/attacks/player_attack.gd" id="1_n3c02"]
+
+[node name="PlayerAttack" type="Node"]
+script = ExtResource("1_n3c02")

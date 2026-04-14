@@ -1,5 +1,7 @@
 extends Node
-class_name Status
+class_name StatusComponent
+
+signal dead
 
 @export_category("Data")
 @export_enum("Player", "Enemy", "Boss") var type
@@ -10,7 +12,7 @@ class_name Status
 @export var _base_health_regen: float = 0.0
 
 @export var _base_max_mana: float = 100.0
-@export var _base_mana_regen: float = 10.0
+@export var _base_mana_regen: float = 1.0
 
 @export var _base_damage: float = 10.0
 @export var _base_defense: float = 10.0
@@ -31,16 +33,15 @@ var defense: float = 0.0
 var knockback: float = 0.0
 var poise: float = 0.0
 
-# TODO Inventory manager
-var potion_count: int = 3
-
 var is_ready: bool = false
 var is_active: bool = false
 
 var regen_tick_counter: float = 0.0
 var regen_tick: float = 0.5
 
-signal dead
+var _mana_regen_pause_sources: Dictionary = {}
+var _mana_regen_scale_sources: Dictionary = {}
+
 
 func _ready() -> void:
 	set_process(false)
@@ -138,6 +139,8 @@ func _update_status() -> void:
 	defense = final_defense
 	knockback = final_knockback
 	poise = final_poise
+	
+	_refresh_runtime_mana_regen()
 
 
 func _set_current_health() -> void:
@@ -148,3 +151,39 @@ func _set_current_health() -> void:
 func _set_current_mana() -> void:
 	var final_current_mana = _base_max_mana
 	current_mana = final_current_mana
+
+func set_mana_regen_paused(source_id: StringName, paused: bool) -> void:
+	if paused:
+		_mana_regen_pause_sources[source_id] = true
+	else:
+		_mana_regen_pause_sources.erase(source_id)
+
+	_refresh_runtime_mana_regen()
+
+
+func set_mana_regen_scale(source_id: StringName, scale: float) -> void:
+	if is_equal_approx(scale, 1.0):
+		_mana_regen_scale_sources.erase(source_id)
+	else:
+		_mana_regen_scale_sources[source_id] = max(scale, 0.0)
+
+	_refresh_runtime_mana_regen()
+
+
+func clear_mana_regen_control(source_id: StringName) -> void:
+	_mana_regen_pause_sources.erase(source_id)
+	_mana_regen_scale_sources.erase(source_id)
+	_refresh_runtime_mana_regen()
+
+
+func _refresh_runtime_mana_regen() -> void:
+	var final_regen := _base_mana_regen
+
+	if not _mana_regen_pause_sources.is_empty():
+		mana_regen = 0.0
+		return
+
+	for scale in _mana_regen_scale_sources.values():
+		final_regen *= scale
+
+	mana_regen = final_regen

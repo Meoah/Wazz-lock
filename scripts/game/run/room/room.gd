@@ -39,6 +39,7 @@ func _check_clear_condition() -> void:
 func _cleared() -> void:
 	_exit_handler.open_all_exits()
 	data.cleared = true
+	SignalBus.request_run_save.emit()
 
 
 

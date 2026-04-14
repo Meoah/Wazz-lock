@@ -1,16 +1,21 @@
-extends RefCounted
-class_name State
+extends Node
+class_name StateComponent
 
-# State Data
-var state_name : String
-var _parent : StateMachine
+@export var state_id: StringName
+@export var allowed_transitions: Array[StringName] = []
 
-func _init(parent: StateMachine) -> void:
-	_parent = parent
+var machine: StateMachineComponent
+var parent: Node
 
-# Getter.
-func get_parent() -> StateMachine : return _parent
+func setup(new_machine: StateMachineComponent, new_parent: Node) -> void:
+	machine = new_machine
+	parent = new_parent
 
-## Functions to be overwriten by child.
-func enter(_previous_state: State, _data: Dictionary = {}) -> void : pass
-func exit(_next_state: State) -> void : pass
+func can_transition_to(target_state_id: StringName) -> bool:
+	return target_state_id in allowed_transitions
+
+func enter(_previous_state: StateComponent, _data: Dictionary = {}) -> void: pass
+func exit(_next_state: StateComponent) -> void: pass
+func update(_delta: float) -> void: pass
+func physics_update(_delta: float) -> void: pass
+func handle_input(_event: InputEvent) -> void: pass

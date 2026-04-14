@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://bih7fy2s6je5x"]
+
+[ext_resource type="Script" uid="uid://23natd0ln171" path="res://scripts/states/player/player_hurt_state.gd" id="1_v1a4d"]
+
+[node name="PlayerHurtState" type="Node"]
+script = ExtResource("1_v1a4d")
+state_id = &"hurt"
+allowed_transitions = Array[StringName]([&"walk", &"idle", &"dead"])

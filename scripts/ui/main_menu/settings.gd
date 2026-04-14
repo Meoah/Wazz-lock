@@ -2,13 +2,55 @@ extends Control
 
 @export_category("Parent Nodes")
 @export var _main_menu_parent: MainMenu
+
 @export_category("Children Nodes")
+@export var _label_info: RichTextLabel
+@export var _slider_master: HSlider
+@export var _value_master: Label
+@export var _slider_bgm: HSlider
+@export var _value_bgm: Label
+@export var _slider_sfx: HSlider
+@export var _value_sfx: Label
+@export var _slider_dialogue: HSlider
+@export var _value_dialogue: Label
 @export var _button_back: Button
 
 
 func _ready() -> void:
-	SignalBus.button_pressed.emit()
 	_button_back.pressed.connect(_start_back)
+
+	_slider_master.value_changed.connect(_on_slider_value_changed.bind(AudioManager.BUS_MASTER, _value_master))
+	_slider_bgm.value_changed.connect(_on_slider_value_changed.bind(AudioManager.BUS_BGM, _value_bgm))
+	_slider_sfx.value_changed.connect(_on_slider_value_changed.bind(AudioManager.BUS_SFX, _value_sfx))
+	_slider_dialogue.value_changed.connect(_on_slider_value_changed.bind(AudioManager.BUS_DIALOGUE, _value_dialogue))
+
+	_sync_from_audio_manager()
+	_label_info.text = "[center]Adjust overall and per-bus audio levels.[/center]"
+
+
+func _sync_from_audio_manager() -> void:
+	_set_slider_without_signal(_slider_master, AudioManager.get_bus_volume_linear(AudioManager.BUS_MASTER))
+	_set_slider_without_signal(_slider_bgm, AudioManager.get_bus_volume_linear(AudioManager.BUS_BGM))
+	_set_slider_without_signal(_slider_sfx, AudioManager.get_bus_volume_linear(AudioManager.BUS_SFX))
+	_set_slider_without_signal(_slider_dialogue, AudioManager.get_bus_volume_linear(AudioManager.BUS_DIALOGUE))
+
+	_update_percent_label(_value_master, _slider_master.value)
+	_update_percent_label(_value_bgm, _slider_bgm.value)
+	_update_percent_label(_value_sfx, _slider_sfx.value)
+	_update_percent_label(_value_dialogue, _slider_dialogue.value)
+
+
+func _set_slider_without_signal(slider: HSlider, value: float) -> void:
+	slider.set_value_no_signal(value)
+
+
+func _update_percent_label(label: Label, value: float) -> void:
+	label.text = "%d%%" % int(round(value * 100.0))
+
+
+func _on_slider_value_changed(value: float, bus_name: String, value_label: Label) -> void:
+	AudioManager.set_bus_volume_linear(bus_name, value)
+	_update_percent_label(value_label, value)
 
 
 func _start_back() -> void:
