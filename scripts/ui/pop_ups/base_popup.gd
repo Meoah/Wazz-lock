@@ -3,7 +3,9 @@ extends Control
 
 enum POPUP_TYPE{
 	GENERIC,
-	PAUSE
+	PAUSE,
+	REWARD,
+	LEVEL_COMPLETE
 }
 
 #Bit Flags

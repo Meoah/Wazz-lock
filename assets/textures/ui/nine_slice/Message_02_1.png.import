@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bib7um0qpf24g"
-path="res://.godot/imported/Button_-_Red.png-c5d434a900353a785d0ac806a0a97d0d.ctex"
+uid="uid://dyfe66i20mlrh"
+path="res://.godot/imported/Message_02_1.png-6ff838c7ad9a4686329076473cdfb648.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/PLACEHOLDERS/IN-HOUSE/Button_-_Red.png"
-dest_files=["res://.godot/imported/Button_-_Red.png-c5d434a900353a785d0ac806a0a97d0d.ctex"]
+source_file="res://assets/textures/ui/nine_slice/Message_02_1.png"
+dest_files=["res://.godot/imported/Message_02_1.png-6ff838c7ad9a4686329076473cdfb648.ctex"]
 
 [params]
 

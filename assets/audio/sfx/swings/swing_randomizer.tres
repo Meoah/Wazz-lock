@@ -1,0 +1,13 @@
+[gd_resource type="AudioStreamRandomizer" load_steps=4 format=3 uid="uid://ceacbcjtwkdq3"]
+
+[ext_resource type="AudioStream" uid="uid://ctfeku7qldga" path="res://assets/audio/sfx/swings/swing1.ogg" id="1_0erq8"]
+[ext_resource type="AudioStream" uid="uid://bgvq6sb7iaxg3" path="res://assets/audio/sfx/swings/swing2.ogg" id="2_4u3fq"]
+[ext_resource type="AudioStream" uid="uid://dty7fai768nyp" path="res://assets/audio/sfx/swings/swing3.ogg" id="3_sbyke"]
+
+[resource]
+random_pitch = 1.25
+random_volume_offset_db = 1.0
+streams_count = 3
+stream_0/stream = ExtResource("1_0erq8")
+stream_1/stream = ExtResource("2_4u3fq")
+stream_2/stream = ExtResource("3_sbyke")

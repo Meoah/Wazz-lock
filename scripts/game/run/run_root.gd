@@ -155,7 +155,9 @@ func _serialize_level_data(level_data: Dictionary[Vector2i, RoomData]) -> Dictio
 			"cleared": room_data.cleared,
 			"difficulty": room_data.difficulty,
 			"scene_path": room_data.scene_path,
-			"room_type": int(room_data.room_type),
+			"room_type": room_data.room_type as RoomData.RoomType,
+			"objective_type": room_data.objective_type as RoomData.ObjectiveType,
+			"encounter_profile": room_data.encounter_profile as RoomData.EncounterProfile,
 			"metadata": room_data.metadata.duplicate(true),
 			"connections": connections
 		}
@@ -170,13 +172,15 @@ func _deserialize_level_data(saved_level_data: Dictionary) -> Dictionary[Vector2
 	for key in saved_level_data.keys():
 		var room_dict: Dictionary = saved_level_data.get(key, {})
 		
-		var room_data := RoomData.new()
+		var room_data: RoomData = RoomData.new()
 		room_data.grid_pos = _array_to_grid(room_dict.get("grid_pos", [0, 0]))
 		room_data.discovered = bool(room_dict.get("discovered", false))
 		room_data.cleared = bool(room_dict.get("cleared", false))
 		room_data.difficulty = int(room_dict.get("difficulty", 0))
 		room_data.scene_path = str(room_dict.get("scene_path", ""))
-		room_data.room_type = int(room_dict.get("room_type", RoomData.RoomType.NORMAL))
+		room_data.room_type = room_dict.get("room_type", RoomData.RoomType.NORMAL) as RoomData.RoomType
+		room_data.objective_type = room_dict.get("objective_type", RoomData.ObjectiveType.EXTERMINATE) as RoomData.ObjectiveType
+		room_data.encounter_profile = room_dict.get("encounter_profile", RoomData.EncounterProfile.BALANCED) as RoomData.EncounterProfile
 		
 		var loaded_metadata: Dictionary = room_dict.get("metadata", {})
 		room_data.metadata.clear()

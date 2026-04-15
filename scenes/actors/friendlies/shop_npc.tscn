@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://bo1g4iy30q74e"]
+
+[ext_resource type="Script" uid="uid://driavuxpgymxi" path="res://scripts/actors/friendlies/shop_npc.gd" id="1_5qrea"]
+
+[node name="ShopNPC" type="Node2D"]
+script = ExtResource("1_5qrea")

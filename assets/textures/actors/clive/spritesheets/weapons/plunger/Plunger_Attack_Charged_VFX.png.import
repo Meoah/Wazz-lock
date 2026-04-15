@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ignda6maobc8"
-path="res://.godot/imported/Button_-_Selection.png-e525851e7221f956e96f3c15672d9396.ctex"
+uid="uid://cs8fiylmtk6o4"
+path="res://.godot/imported/Plunger_Attack_Charged_VFX.png-2520832986a9f8e08ae459675eb83b86.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/PLACEHOLDERS/IN-HOUSE/Button_-_Selection.png"
-dest_files=["res://.godot/imported/Button_-_Selection.png-e525851e7221f956e96f3c15672d9396.ctex"]
+source_file="res://assets/textures/actors/clive/spritesheets/weapons/plunger/Plunger_Attack_Charged_VFX.png"
+dest_files=["res://.godot/imported/Plunger_Attack_Charged_VFX.png-2520832986a9f8e08ae459675eb83b86.ctex"]
 
 [params]
 

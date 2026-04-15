@@ -50,7 +50,7 @@ game_hud = NodePath("GameHUD")
 script = ExtResource("2_50mfl")
 floating_text_scene = ExtResource("3_8sqsm")
 
-[node name="GameHUD" type="Control" parent="." node_paths=PackedStringArray("_status_bars", "_stat_values", "minimap_node")]
+[node name="GameHUD" type="Control" parent="." node_paths=PackedStringArray("_status_bars", "_stat_values", "minimap_node", "_objective_name_label", "_objective_description_label", "_objective_progress_label")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -63,6 +63,9 @@ script = ExtResource("4_468kv")
 _status_bars = [NodePath("StatusBars/Health"), NodePath("StatusBars/Mana"), NodePath("BossHealthBar/BossHealth")]
 _stat_values = [NodePath("Currency/Money/MoneyValue"), NodePath("Currency/Meta/MetaValue"), NodePath("Status/Damage/DamageValue"), NodePath("Status/Defense/DefenseValue"), NodePath("Status/Knockback/KnockbackValue"), NodePath("Status/Poise/PoiseValue"), NodePath("Timer/Timer/TimerLabel"), NodePath("Potion/Potion/PotionValue")]
 minimap_node = NodePath("Minimap/ViewportMask/SubViewport/Minimap")
+_objective_name_label = NodePath("Objective/Objective/ObjectiveName")
+_objective_description_label = NodePath("Objective/Objective/DescriptionMargin/ObjectiveDescription")
+_objective_progress_label = NodePath("Objective/Objective/ProgressMargin/ObjectiveProgress")
 
 [node name="StatusBars" type="VBoxContainer" parent="GameHUD"]
 layout_mode = 1
@@ -562,3 +565,44 @@ fit_content = true
 autowrap_mode = 0
 script = ExtResource("10_klb5v")
 stat_type = "Potion"
+
+[node name="Objective" type="MarginContainer" parent="GameHUD"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -40.0
+offset_right = 40.0
+grow_vertical = 0
+theme_override_constants/margin_left = 30
+theme_override_constants/margin_bottom = 30
+
+[node name="Objective" type="VBoxContainer" parent="GameHUD/Objective"]
+layout_mode = 2
+
+[node name="ObjectiveName" type="Label" parent="GameHUD/Objective/Objective"]
+layout_mode = 2
+text = "Room Type"
+
+[node name="DescriptionMargin" type="MarginContainer" parent="GameHUD/Objective/Objective"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+
+[node name="ObjectiveDescription" type="RichTextLabel" parent="GameHUD/Objective/Objective/DescriptionMargin"]
+layout_mode = 2
+bbcode_enabled = true
+text = "Description of room clear requirements
+"
+fit_content = true
+autowrap_mode = 0
+
+[node name="ProgressMargin" type="MarginContainer" parent="GameHUD/Objective/Objective"]
+layout_mode = 2
+theme_override_constants/margin_left = 30
+
+[node name="ObjectiveProgress" type="RichTextLabel" parent="GameHUD/Objective/Objective/ProgressMargin"]
+layout_mode = 2
+bbcode_enabled = true
+text = "Progress: 0/0"
+fit_content = true
+autowrap_mode = 0
