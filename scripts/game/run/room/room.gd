@@ -163,7 +163,11 @@ func _cleared() -> void:
 			pass
 		
 		_:
-			GameManager.show_popup(BasePopup.POPUP_TYPE.REWARD)
+			GameManager.show_popup(BasePopup.POPUP_TYPE.REWARD, {
+			"room_difficulty": data.difficulty,
+			"reward_pool_id": "standard",
+			"choice_count": 3
+				})
 	
 	SignalBus.request_run_save.emit()
 

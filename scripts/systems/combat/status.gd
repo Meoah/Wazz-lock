@@ -18,6 +18,7 @@ signal dead
 @export var _base_defense: float = 10.0
 @export var _base_knockback: float = 1.0
 @export var _base_poise: float = 1.0
+@export var _base_move_speed: float = 200.0
 
 # Public Variables
 var max_health: float = 0.0
@@ -32,6 +33,7 @@ var damage: float = 0.0
 var defense: float = 0.0
 var knockback: float = 0.0
 var poise: float = 0.0
+var move_speed: float = 0.0
 
 var is_ready: bool = false
 var is_active: bool = false
@@ -130,6 +132,7 @@ func _update_status() -> void:
 	var final_defense = _base_defense
 	var final_knockback = _base_knockback
 	var final_poise = _base_poise
+	var final_move_speed = _base_move_speed
 	
 	max_health = final_max_health
 	health_regen = final_health_regen
@@ -139,6 +142,7 @@ func _update_status() -> void:
 	defense = final_defense
 	knockback = final_knockback
 	poise = final_poise
+	move_speed = final_move_speed
 	
 	_refresh_runtime_mana_regen()
 
@@ -177,7 +181,7 @@ func clear_mana_regen_control(source_id: StringName) -> void:
 
 
 func _refresh_runtime_mana_regen() -> void:
-	var final_regen := _base_mana_regen
+	var final_regen: float = _base_mana_regen
 
 	if not _mana_regen_pause_sources.is_empty():
 		mana_regen = 0.0
@@ -187,3 +191,30 @@ func _refresh_runtime_mana_regen() -> void:
 		final_regen *= scale
 
 	mana_regen = final_regen
+
+
+func apply_permanent_stat_bonus(stat_id: String, amount: float) -> void:
+	var old_max_health: float = max_health
+	var old_max_mana: float = max_mana
+	
+	match stat_id:
+		"max_health": _base_max_health += amount
+		"max_mana": _base_max_mana += amount
+		"damage": _base_damage += amount
+		"defense": _base_defense += amount
+		"knockback": _base_knockback += amount
+		"poise": _base_poise += amount
+		"health_regen": _base_health_regen += amount
+		"mana_regen": _base_mana_regen += amount
+		"move_speed": _base_move_speed += amount
+		_: return
+	
+	_update_status()
+	
+	if stat_id == "max_health":
+		current_health += max_health - old_max_health
+		current_health = clamp(current_health, 0.0, max_health)
+	
+	if stat_id == "max_mana":
+		current_mana += max_mana - old_max_mana
+		current_mana = clamp(current_mana, 0.0, max_mana)

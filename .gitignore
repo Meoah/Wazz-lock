@@ -20,3 +20,4 @@ save_file.json
 # Ignore Releases
 Releases/
 /android/
+*.zip

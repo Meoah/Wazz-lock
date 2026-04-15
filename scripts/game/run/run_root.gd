@@ -12,6 +12,7 @@ var current_room_grid_pos: Vector2i = Vector2i.ZERO
 
 func _ready() -> void:
 	set_process(false)
+	add_to_group("run_root")
 	
 	minimap_node = GameManager.root_hud.game_hud.minimap_node
 	room_scene_paths = _load_room_scene_paths()
@@ -116,10 +117,46 @@ func _get_player() -> Clive:
 	return get_tree().get_first_node_in_group("player") as Clive
 
 
+func apply_reward_card_choice(card: RewardCardData) -> void:
+	var player: Clive = get_tree().get_first_node_in_group("player") as Clive
+	if player:
+		RewardLibrary.apply_card_to_player(card, player)
+
+	var total_difficulty_increase: int = RewardLibrary.FLAT_PICK_DIFFICULTY_INCREASE + int(card.hidden_difficulty_increase)
+	_increase_uncleared_room_difficulty(total_difficulty_increase)
+
+	save_run()
+
+
+func apply_reward_skip() -> void:
+	_increase_uncleared_room_difficulty(RewardLibrary.FLAT_PICK_DIFFICULTY_INCREASE)
+	save_run()
+
+
+func _increase_uncleared_room_difficulty(amount: int) -> void:
+	for room_data in current_level_data.values():
+		if room_data.cleared:
+			continue
+
+		room_data.difficulty += amount
+
+
 func _apply_current_weapon_to_player() -> void:
 	var player: Clive = _get_player()
 	if player and player.has_method("apply_weapon_loadout"):
 		player.apply_weapon_loadout(RunManager.current_weapon_id)
+
+
+func _apply_saved_player_bonuses() -> void:
+	var player: Clive = get_tree().get_first_node_in_group("player") as Clive
+	if !player or !player.status: return
+	
+	for stat_id in RunManager.player_stat_bonuses.keys():
+		var amount: float = float(RunManager.player_stat_bonuses[stat_id])
+		if is_zero_approx(amount):
+			continue
+		
+		player.status.apply_permanent_stat_bonus(stat_id, amount)
 
 
 func _serialize_level_data(level_data: Dictionary[Vector2i, RoomData]) -> Dictionary:
@@ -234,7 +271,8 @@ func build_save_state() -> Dictionary:
 		"run_manager": {
 			"current_money": RunManager.current_money,
 			"current_meta": RunManager.current_meta,
-			"current_run_timer": RunManager.current_run_timer
+			"current_run_timer": RunManager.current_run_timer,
+			"player_stat_bonuses": RunManager.player_stat_bonuses.duplicate(true)
 		}
 	}
 
@@ -268,6 +306,11 @@ func _apply_saved_run_state(saved_state: Dictionary) -> void:
 	RunManager.current_meta = float(run_manager_data.get("current_meta", 0.0))
 	RunManager.current_run_timer = float(run_manager_data.get("current_run_timer", 0.0))
 	
+	RunManager.player_stat_bonuses = run_manager_data.get(
+		"player_stat_bonuses",
+		RunManager.PLAYER_BONUS_DEFAULTS.duplicate(true)
+			)
+	
 	current_room_grid_pos = _array_to_grid(saved_state.get("current_room_grid_pos", [0, 0]))
 	var room_data: RoomData = current_level_data.get(current_room_grid_pos)
 	
@@ -277,12 +320,13 @@ func _apply_saved_run_state(saved_state: Dictionary) -> void:
 	
 	if room_data:
 		enter_room(room_data)
-
+		
 		var player: Clive = get_tree().get_first_node_in_group("player") as Clive
 		if player:
 			player.global_position = _array_to_vector2(saved_state.get("player_global_position", [0.0, 0.0]))
-
+		
 		_apply_current_weapon_to_player()
+		_apply_saved_player_bonuses()
 
 
 func enter_room(room_data: RoomData, entrance_direction: int = -1) -> void:

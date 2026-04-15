@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="RewardPoolData" load_steps=7 format=3 uid="uid://c1687vx3ng3w6"]
+
+[ext_resource type="Script" uid="uid://dq4iblqldg3v0" path="res://scripts/systems/rewards/reward_card_data_resource.gd" id="1_8yqhd"]
+[ext_resource type="Resource" uid="uid://p2vlyb25g2lh" path="res://resources/rewards/cards/common/damage_1_common.tres" id="2_0p7j4"]
+[ext_resource type="Script" uid="uid://be4mjojuo4gub" path="res://scripts/systems/rewards/reward_pool_data_resource.gd" id="2_ru2nv"]
+[ext_resource type="Resource" uid="uid://ci5voxl6oe2a7" path="res://resources/rewards/cards/common/health_10_common.tres" id="3_0p7j4"]
+[ext_resource type="Resource" uid="uid://b7mv7xo1m31fk" path="res://resources/rewards/cards/common/mana_5_common.tres" id="4_stjg6"]
+[ext_resource type="Resource" uid="uid://cnccbn38s5cn0" path="res://resources/rewards/cards/common/damage_3_uncommon.tres" id="5_stjg6"]
+
+[resource]
+script = ExtResource("2_ru2nv")
+cards = Array[ExtResource("1_8yqhd")]([ExtResource("2_0p7j4"), ExtResource("3_0p7j4"), ExtResource("4_stjg6"), ExtResource("5_stjg6")])
+metadata/_custom_type_script = "uid://be4mjojuo4gub"

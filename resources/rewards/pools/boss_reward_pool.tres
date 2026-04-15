@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="RewardPoolData" load_steps=4 format=3 uid="uid://dp3mvktt7cokl"]
+
+[ext_resource type="Script" uid="uid://dq4iblqldg3v0" path="res://scripts/systems/rewards/reward_card_data_resource.gd" id="1_xrf7t"]
+[ext_resource type="Resource" uid="uid://hqnym2ct5ilr" path="res://resources/rewards/cards/boss/attack_5_boss.tres" id="2_28g8a"]
+[ext_resource type="Script" uid="uid://be4mjojuo4gub" path="res://scripts/systems/rewards/reward_pool_data_resource.gd" id="5_s0bae"]
+
+[resource]
+script = ExtResource("5_s0bae")
+cards = Array[ExtResource("1_xrf7t")]([ExtResource("2_28g8a")])
+metadata/_custom_type_script = "uid://be4mjojuo4gub"

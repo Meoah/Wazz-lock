@@ -72,9 +72,10 @@ var action_token: int = 0
 func _ready() -> void:
 	_validate_components()
 	
-	status.setup()
-	status.request_active()
-	status.dead.connect(_on_status_dead)
+	if status:
+		status.setup()
+		status.request_active()
+		_sync_movement_speed_from_status()
 
 	movement.setup(self)
 	movement.set_movement_enabled(true)
@@ -89,6 +90,7 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	_sync_movement_speed_from_status()
 	_update_timers(delta)
 	_update_status()
 	_handle_potion()
@@ -232,6 +234,11 @@ func _validate_components() -> void:
 	if aim == null: push_error("Clive missing AimComponent")
 	if weapon_sprite == null: push_error("Clive missing WeaponSprite")
 	if weapon_vfx == null: push_error("Clive missing WeaponVFX")
+
+
+func _sync_movement_speed_from_status() -> void:
+	if movement and status:
+		movement.base_speed = status.move_speed
 
 
 func _update_timers(delta: float) -> void:

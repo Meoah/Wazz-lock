@@ -1,0 +1,84 @@
+[gd_scene load_steps=5 format=3 uid="uid://b6svsiv117mlp"]
+
+[ext_resource type="Script" uid="uid://bl2r6sijjx5sh" path="res://scripts/ui/pop_ups/reward/reward_popup.gd" id="1_2m6y2"]
+[ext_resource type="Texture2D" uid="uid://btprjpbbxhlss" path="res://assets/textures/ui/nine_slice/Message_01_1.png" id="2_spq6s"]
+[ext_resource type="PackedScene" uid="uid://ck2j8aryoa2ax" path="res://scenes/ui/pop_ups/reward/reward_card.tscn" id="3_ij5a8"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_ts53e"]
+texture = ExtResource("2_spq6s")
+texture_margin_left = 8.0
+texture_margin_top = 8.0
+texture_margin_right = 8.0
+texture_margin_bottom = 8.0
+
+[node name="RewardPopup" type="Control" node_paths=PackedStringArray("_label_title", "_card_a", "_card_b", "_card_c", "_button_reroll", "_button_skip")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_2m6y2")
+_label_title = NodePath("PanelContainer/VBoxContainer/Title")
+_card_a = NodePath("PanelContainer/VBoxContainer/CardsRow/CardA")
+_card_b = NodePath("PanelContainer/VBoxContainer/CardsRow/CardB")
+_card_c = NodePath("PanelContainer/VBoxContainer/CardsRow/CardC")
+_button_reroll = NodePath("PanelContainer/VBoxContainer/ActionsRow/Reroll")
+_button_skip = NodePath("PanelContainer/VBoxContainer/ActionsRow/Skip")
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(800, 400)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -387.0
+offset_top = -245.0
+offset_right = 387.0
+offset_bottom = 245.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_ts53e")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 2
+text = "Choose your reward"
+horizontal_alignment = 1
+
+[node name="CardsRow" type="HBoxContainer" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="CardA" parent="PanelContainer/VBoxContainer/CardsRow" instance=ExtResource("3_ij5a8")]
+layout_mode = 2
+
+[node name="CardB" parent="PanelContainer/VBoxContainer/CardsRow" instance=ExtResource("3_ij5a8")]
+layout_mode = 2
+
+[node name="CardC" parent="PanelContainer/VBoxContainer/CardsRow" instance=ExtResource("3_ij5a8")]
+layout_mode = 2
+
+[node name="ActionsRow" type="HBoxContainer" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 10
+
+[node name="Reroll" type="Button" parent="PanelContainer/VBoxContainer/ActionsRow"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_horizontal = 6
+theme_override_font_sizes/font_size = 32
+text = "Reroll"
+
+[node name="Skip" type="Button" parent="PanelContainer/VBoxContainer/ActionsRow"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_horizontal = 6
+theme_override_font_sizes/font_size = 32
+text = "Skip"
