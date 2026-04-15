@@ -14,18 +14,25 @@ func _ready() -> void:
 	#	Therefore, it must be hidden on ready to prevent unwanted blocking.
 	self.visible = false
 
-# Force resets the queue.
 func clear_queue() -> void:
 	# Resets the blocker and stops the tween if in the middle of transition.
 	_blocker.kill_tween()
 	_blocker.set_alpha(0.0, false)
+
 	# Finds all popups in the queue and frees them.
-	for each : BasePopup in _queue.values():
+	var queued_popups: Array = _queue.values()
+	for each: BasePopup in queued_popups:
 		each.visible = false
-		_queue.erase(each.name)
 		each.queue_free()
+
+	_queue.clear()
+	_number_paused = 0
+
 	# Same reason as we have it in _ready().
 	self.visible = false
+
+	if GameManager.get_current_state() and GameManager.get_current_state().state_id == &"pause":
+		GameManager.request_unpause()
 
 ## Procedure: Show Popup
 # Find the popup within the PopupLibrary by type, then sets up the popup according to given parameters.

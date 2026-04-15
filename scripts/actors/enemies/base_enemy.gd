@@ -19,6 +19,7 @@ class_name BaseEnemy
 @export_category("Awareness")
 @export var detection_radius: float = 220.0
 @export var search_reach_radius: float = 12.0
+@export var global_aggro_enabled: bool = false
 
 var target_in_sight: bool = false
 var last_known_target_position: Vector2 = Vector2.ZERO
@@ -191,7 +192,13 @@ func _update_awareness(delta: float) -> void:
 		time_since_target_seen = INF
 		return
 
-	var to_target := target.global_position - global_position
+	if global_aggro_enabled:
+		target_in_sight = true
+		last_known_target_position = target.global_position
+		time_since_target_seen = 0.0
+		return
+
+	var to_target: Vector2 = target.global_position - global_position
 	if to_target.length() <= detection_radius:
 		target_in_sight = true
 		last_known_target_position = target.global_position
@@ -206,6 +213,36 @@ func has_target_in_sight() -> bool:
 
 func has_target_memory() -> bool:
 	return time_since_target_seen < INF
+
+
+func set_global_aggro_enabled(enabled: bool) -> void:
+	global_aggro_enabled = enabled
+
+
+func apply_spawn_variant_modifiers(config: Dictionary) -> void:
+	if status:
+		var health_multiplier: float = float(config.get("health_multiplier", 1.0))
+		var damage_multiplier: float = float(config.get("damage_multiplier", 1.0))
+		var defense_multiplier: float = float(config.get("defense_multiplier", 1.0))
+		var poise_multiplier: float = float(config.get("poise_multiplier", 1.0))
+		
+		var previous_max_health: float = max(status.max_health, 1.0)
+		var health_ratio: float = status.current_health / previous_max_health
+		
+		status.max_health *= health_multiplier
+		status.current_health = clamp(status.max_health * health_ratio, 0.0, status.max_health)
+		status.damage *= damage_multiplier
+		status.defense *= defense_multiplier
+		status.poise *= poise_multiplier
+	
+	if movement:
+		var speed_multiplier: float = float(config.get("speed_multiplier", 1.0))
+		movement.base_speed *= speed_multiplier
+	
+	if body_root:
+		var scale_multiplier: float = float(config.get("scale_multiplier", 1.0))
+		body_root.scale *= scale_multiplier
+		body_root.modulate = config.get("modulate", Color.WHITE)
 
 
 func move_toward_point(point: Vector2, stop_distance: float = 0.0, speed_multiplier: float = 1.0) -> void:

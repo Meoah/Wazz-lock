@@ -39,6 +39,7 @@ window/stretch/mode="viewport"
 folder_colors={
 "res://assets/": "green",
 "res://assets/PLACEHOLDERS/": "red",
+"res://resources/": "teal",
 "res://scenes/": "yellow",
 "res://scripts/": "orange",
 "res://shaders/": "purple"

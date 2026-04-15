@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="RewardCardData" load_steps=5 format=3 uid="uid://p2vlyb25g2lh"]
+
+[ext_resource type="Script" uid="uid://dia3qnhck4r1o" path="res://scripts/systems/rewards/reward_effect_data_resource.gd" id="1_ktki3"]
+[ext_resource type="Texture2D" uid="uid://c1vkg448fex15" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/sword.png" id="2_58lje"]
+[ext_resource type="Script" uid="uid://dq4iblqldg3v0" path="res://scripts/systems/rewards/reward_card_data_resource.gd" id="3_0fqcc"]
+
+[sub_resource type="Resource" id="Resource_5r3yk"]
+script = ExtResource("1_ktki3")
+amount = 1.0
+metadata/_custom_type_script = "uid://dia3qnhck4r1o"
+
+[resource]
+script = ExtResource("3_0fqcc")
+card_id = "damage_1_common"
+display_name = "+1 Damage"
+description = "More damage."
+icon = ExtResource("2_58lje")
+hidden_difficulty_increase = 6
+effects = Array[ExtResource("1_ktki3")]([SubResource("Resource_5r3yk")])
+metadata/_custom_type_script = "uid://dq4iblqldg3v0"

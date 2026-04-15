@@ -113,22 +113,17 @@ position = Vector2(1119, 285)
 
 [node name="Slime_Boss" parent="EnemyHandler" instance=ExtResource("7_a2g46")]
 position = Vector2(608, 545)
-enemy_type = 2
 
 [node name="Slime_Boss2" parent="EnemyHandler" instance=ExtResource("7_a2g46")]
 position = Vector2(1313, 542)
-enemy_type = 2
 
 [node name="Slime_Boss3" parent="EnemyHandler" instance=ExtResource("7_a2g46")]
 position = Vector2(1056, 799)
-enemy_type = 2
 
 [node name="Bubble" parent="EnemyHandler" instance=ExtResource("7_a2g46")]
 position = Vector2(861, 413)
-enemy_type = 1
 
 [node name="Bubble2" parent="EnemyHandler" instance=ExtResource("7_a2g46")]
 position = Vector2(1059, 610)
-enemy_type = 1
 
 [editable path="ExitHandler"]

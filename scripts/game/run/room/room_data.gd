@@ -10,6 +10,25 @@ enum RoomType {
 }
 
 
+enum ObjectiveType {
+	AUTO_WIN,
+	EXTERMINATE,
+	SURVIVAL,
+	BOSS,
+	PUZZLE,
+	SHOP
+}
+
+
+enum EncounterProfile {
+	BALANCED,
+	SWARM,
+	BRUISER,
+	BOSS_ADDS,
+	SHOP
+}
+
+
 enum Directions {
 	NORTH_EXIT,
 	EAST_EXIT,
@@ -22,9 +41,11 @@ enum Directions {
 var grid_pos: Vector2i
 var discovered: bool = false
 var cleared: bool = false
-var difficulty: int = 0
+var difficulty: int = 10
 var scene_path: String
 var room_type: RoomType = RoomType.NORMAL
+var objective_type: ObjectiveType = ObjectiveType.EXTERMINATE
+var encounter_profile: EncounterProfile = EncounterProfile.BALANCED
 
 
 var connections: Dictionary[Directions, RoomData] = {

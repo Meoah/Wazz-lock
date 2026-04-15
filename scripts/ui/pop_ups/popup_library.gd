@@ -5,6 +5,8 @@ class_name PopupLibrary
 const _BLOCKER = preload("res://scenes/ui/pop_ups/blocker.tscn")
 const _GENERIC = preload("res://scenes/ui/pop_ups/generic_popup.tscn")
 const _PAUSE = preload("res://scenes/ui/pop_ups/pause_popup.tscn")
+const _REWARD = preload("res://scenes/ui/pop_ups/reward/reward_popup.tscn")
+const _LEVEL_COMPLETE = preload("res://scenes/ui/pop_ups/level_complete_popup.tscn")
 
 # Returns a popup with desired parameters if requested.
 static func create_popup(popup_type: int, params: Dictionary = {}) -> BasePopup:
@@ -13,9 +15,13 @@ static func create_popup(popup_type: int, params: Dictionary = {}) -> BasePopup:
 	
 	# Look for the requested popup and instantiate it.
 	match popup_type:
-		BasePopup.POPUP_TYPE.PAUSE: #TODO Pause Menu. This is here for demonstration purposes.
+		BasePopup.POPUP_TYPE.PAUSE:
 			popup = _PAUSE.instantiate()
-		_: # Default
+		BasePopup.POPUP_TYPE.REWARD:
+			popup = _REWARD.instantiate()
+		BasePopup.POPUP_TYPE.LEVEL_COMPLETE:
+			popup = _LEVEL_COMPLETE.instantiate()
+		_:
 			popup = _GENERIC.instantiate()
 	
 	# Sets the parameters if there are any.

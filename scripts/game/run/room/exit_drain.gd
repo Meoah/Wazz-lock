@@ -5,13 +5,15 @@ class_name ExitDrain
 @export var exit_direction: RoomData.Directions
 @export var _drain_animated_sprite: AnimatedSprite2D
 
+
 var destination_room_data: RoomData = null
 var is_can_trigger: bool = false
 var is_opened: bool = false
 
 
 func setup() -> void:
-	if is_opened: _drain_animated_sprite.play("opened")
+	if is_opened: _drain_animated_sprite.play(&"opened")
+	else: _drain_animated_sprite.play(&"unopened")
 
 
 func set_destination(new_destination: RoomData) -> void:
@@ -24,10 +26,14 @@ func disarm_until_leave() -> void:
 
 
 func open() -> void:
-	_drain_animated_sprite.play("opening")
-	await _drain_animated_sprite.animation_finished
+	if is_opened:
+		_drain_animated_sprite.play(&"opened")
+		return
+	
 	is_opened = true
-	_drain_animated_sprite.play("opened")
+	_drain_animated_sprite.play(&"opening")
+	await _drain_animated_sprite.animation_finished
+	_drain_animated_sprite.play(&"opened")
 
 
 func _on_body_entered(body: Node2D) -> void:
