@@ -17,20 +17,34 @@ const RARITY_COLORS: Dictionary = {
 @export var _label_text: RichTextLabel
 
 var _card: RewardCardData
+var _is_hovering: bool = false
 
 
 func _ready() -> void:
 	_button.pressed.connect(_on_pressed)
+	_button.mouse_entered.connect(_on_mouse_entered)
+	_button.mouse_exited.connect(_on_mouse_exited)
+	set_process(false)
+
+
+func _process(_delta: float) -> void:
+	if !_is_hovering:
+		return
+
+	var tooltip_layer: TooltipLayer = GameManager.get_tooltip_layer()
+	if tooltip_layer:
+		tooltip_layer.update_tooltip_position(get_global_mouse_position())
 
 
 func set_card(card: RewardCardData) -> void:
 	_card = card
 	visible = card != null
-	
+
 	if !card:
 		self_modulate = Color.WHITE
+		_hide_tooltip()
 		return
-	
+
 	_icon.texture = card.icon
 	_label_text.text = "[center]%s[/center]" % card.display_name
 	_apply_rarity_tint()
@@ -40,10 +54,39 @@ func _apply_rarity_tint() -> void:
 	if !_card:
 		self_modulate = Color.WHITE
 		return
-	
+
 	self_modulate = RARITY_COLORS.get(_card.rarity, Color.WHITE)
+
+
+func _on_mouse_entered() -> void:
+	if !_card:
+		return
+
+	_is_hovering = true
+	set_process(true)
+
+	var tooltip_layer: TooltipLayer = GameManager.get_tooltip_layer()
+	if tooltip_layer:
+		tooltip_layer.show_tooltip(
+			get_global_mouse_position(),
+			"[center][color=#d9d9d9]%s[/color][/center]" % [_card.description]
+		)
+
+
+func _on_mouse_exited() -> void:
+	_hide_tooltip()
+
+
+func _hide_tooltip() -> void:
+	_is_hovering = false
+	set_process(false)
+
+	var tooltip_layer: TooltipLayer = GameManager.get_tooltip_layer()
+	if tooltip_layer:
+		tooltip_layer.hide_tooltip()
 
 
 func _on_pressed() -> void:
 	if _card:
+		_hide_tooltip()
 		selected.emit(_card)

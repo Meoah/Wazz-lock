@@ -235,7 +235,7 @@ func setup(room_data: RoomData) -> void:
 	set_process(true)
 
 
-func _restore_friendly_runtime_state(snapshots: Array[Dictionary]) -> void:
+func _restore_friendly_runtime_state(snapshots: Array) -> void:
 	if snapshots.is_empty():
 		if clear_condition == ClearConditions.SHOP:
 			_spawn_shop_friendlies()

@@ -14,10 +14,10 @@ func _ready() -> void:
 	tooltip_panel.z_index = 100
 
 # Sets the text then attempts to set the tooltip to the target location.
-func _show_tooltip(target_global_position : Vector2, incoming_text : String) -> void:
+func show_tooltip(target_global_position : Vector2, incoming_text : String) -> void:
 	# Abort if there's no text to be shown.
 	if !incoming_text:
-		_hide_tooltip()
+		hide_tooltip()
 		return
 	
 	tooltip_label.text = incoming_text
@@ -25,11 +25,11 @@ func _show_tooltip(target_global_position : Vector2, incoming_text : String) -> 
 	_set_tooltip_position(target_global_position)
 
 # Makes the tooltip invisible.
-func _hide_tooltip() -> void:
+func hide_tooltip() -> void:
 	tooltip_panel.visible = false
 
 # Only move the tooltip to the specified location.
-func _update_tooltip_position(target_global_position : Vector2) -> void:
+func update_tooltip_position(target_global_position : Vector2) -> void:
 	if !tooltip_panel.visible : return
 	_set_tooltip_position(target_global_position)
 

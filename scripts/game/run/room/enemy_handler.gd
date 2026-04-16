@@ -346,7 +346,7 @@ func capture_runtime_state() -> Array[Dictionary]:
 	return snapshots
 
 
-func restore_runtime_state(snapshots: Array[Dictionary]) -> void:
+func restore_runtime_state(snapshots: Array) -> void:
 	clear_alive_enemies()
 	
 	for snapshot in snapshots:
