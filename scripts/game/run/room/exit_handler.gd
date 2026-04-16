@@ -18,7 +18,7 @@ func setup_exits(room_data: RoomData) -> void:
 		if destination:
 			exit_drain.show()
 			exit_drain.set_destination(destination)
-			exit_drain.is_opened = room_data.cleared
+			exit_drain.is_opened = room_data.cleared or destination.cleared
 			exit_drain.setup()
 		else:
 			exit_drain.hide()

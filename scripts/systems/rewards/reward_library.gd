@@ -1,7 +1,7 @@
 extends RefCounted
 class_name RewardLibrary
 
-const FLAT_PICK_DIFFICULTY_INCREASE: int = 10
+const FLAT_PICK_DIFFICULTY_INCREASE: int = 2
 const BASE_REROLL_COST: int = 10
 
 const STANDARD_POOL: RewardPoolData = preload("res://resources/rewards/pools/standard_reward_pool.tres")

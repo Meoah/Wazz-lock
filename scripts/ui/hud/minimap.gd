@@ -5,10 +5,21 @@ class_name Minimap
 @export var tilemap: TileMapLayer
 @export var player_marker: Node2D
 @export var minimap_camera: Camera2D
+@export var icons_root: Node2D
 
+const CLEARED_ICON_ALPHA: float = 0.45
+const UNCLEARED_ICON_ALPHA: float = 1.0
+
+const OBJECTIVE_GLYPHS: Dictionary = {
+	RoomData.ObjectiveType.AUTO_WIN: "!",
+	RoomData.ObjectiveType.EXTERMINATE: "X",
+	RoomData.ObjectiveType.SURVIVAL: "T",
+	RoomData.ObjectiveType.BOSS: "B",
+	RoomData.ObjectiveType.PUZZLE: "?",
+	RoomData.ObjectiveType.SHOP: "$",
+}
 
 const SOURCE_ID: int = 1
-
 
 var mask_to_atlas: Dictionary = {
 	-1: Vector2i(5, 0), # Undiscovered
@@ -32,13 +43,55 @@ var mask_to_atlas: Dictionary = {
 }
 
 
-func draw_minimap(level_data: Dictionary[Vector2i, RoomData]) -> void:
+func draw_minimap(level_data: Dictionary[Vector2i, RoomData], current_room_pos: Vector2i = Vector2i.ZERO) -> void:
 	tilemap.clear()
-
+	_clear_icons()
+	
+	var current_room: RoomData = level_data.get(current_room_pos)
+	
 	for room_data in level_data.values():
-		var mask: int = _get_room_mask(room_data)
-		var atlas: Vector2i = mask_to_atlas.get(mask, null)
+		var show_layout: bool = room_data.discovered or room_data.grid_pos == current_room_pos
+		var mask: int = -1 if !show_layout else _get_room_mask(room_data)
+		var atlas: Vector2i = mask_to_atlas.get(mask, mask_to_atlas[-1])
 		tilemap.set_cell(room_data.grid_pos, SOURCE_ID, atlas)
+		
+		if _should_show_objective_icon(room_data, current_room):
+			_add_objective_icon(room_data)
+
+
+func _clear_icons() -> void:
+	for child in icons_root.get_children():
+		child.queue_free()
+
+
+func _has_cleared_neighbor(room_data: RoomData) -> bool:
+	for destination in room_data.connections.values():
+		if destination and destination.cleared:
+			return true
+	
+	return false
+
+
+func _should_show_objective_icon(room_data: RoomData, _current_room: RoomData) -> bool:
+	if int(room_data.objective_type) == int(RoomData.ObjectiveType.BOSS): return true
+	if room_data.discovered: return true
+	if _has_cleared_neighbor(room_data): return true
+	
+	return false
+
+
+func _add_objective_icon(room_data: RoomData) -> void:
+	var glyph: String = OBJECTIVE_GLYPHS.get(room_data.objective_type, "?")
+	
+	var label := Label.new()
+	label.text = glyph
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.size = Vector2(32, 32)
+	label.position = tilemap.map_to_local(room_data.grid_pos) - label.size * 0.5
+	label.modulate.a = CLEARED_ICON_ALPHA if room_data.cleared else UNCLEARED_ICON_ALPHA
+	
+	icons_root.add_child(label)
 
 
 func _get_room_mask(room: RoomData) -> int:

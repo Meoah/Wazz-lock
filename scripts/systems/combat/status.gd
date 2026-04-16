@@ -193,6 +193,17 @@ func _refresh_runtime_mana_regen() -> void:
 	mana_regen = final_regen
 
 
+func resolve_damage_after_defense(incoming_damage: float) -> float:
+	var raw_damage: float = max(incoming_damage, 0.0)
+	if raw_damage <= 0.0:
+		return 0.0
+
+	var defense_value: float = max(defense, 0.0)
+	var mitigation_scale: float = 100.0 / (100.0 + defense_value)
+
+	return raw_damage * mitigation_scale
+
+
 func apply_permanent_stat_bonus(stat_id: String, amount: float) -> void:
 	var old_max_health: float = max_health
 	var old_max_mana: float = max_mana

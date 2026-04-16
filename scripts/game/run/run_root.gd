@@ -8,6 +8,7 @@ var current_level_data: Dictionary[Vector2i, RoomData]
 var current_room_instance: Room = null
 var is_changing_room: bool = false
 var current_room_grid_pos: Vector2i = Vector2i.ZERO
+var is_player_death_sequence_running: bool = false
 
 
 func _ready() -> void:
@@ -21,6 +22,8 @@ func _ready() -> void:
 		SignalBus.change_room.connect(_on_change_room)
 	if !SignalBus.request_run_save.is_connected(save_run):
 		SignalBus.request_run_save.connect(save_run)
+	if !SignalBus.request_minimap_refresh.is_connected(_refresh_minimap):
+		SignalBus.request_minimap_refresh.connect(_refresh_minimap)
 	
 	GameManager.root_hud.show_game_hud()
 	
@@ -33,7 +36,7 @@ func _ready() -> void:
 		_apply_saved_run_state(saved_state)
 	else:
 		current_level_data = _generate_and_build_level()
-		minimap_node.draw_minimap(current_level_data)
+		minimap_node.draw_minimap(current_level_data, current_room_grid_pos)
 		
 		var first_room: RoomData = current_level_data.get(Vector2i.ZERO)
 		if first_room:
@@ -70,15 +73,17 @@ func _load_room_scene_paths() -> Array[String]:
 
 
 func _generate_and_build_level() -> Dictionary[Vector2i, RoomData]:
-	# TODO save data functionality
-	# TODO variable number of generated rooms
-	
 	var level_data: Dictionary[Vector2i, RoomData]
-	level_data = LevelGenerator.new().generate_rooms(10)
-	
+	level_data = LevelGenerator.new().generate_rooms(RunManager.get_current_level_room_count())
+
+	var base_difficulty: int = RunManager.get_current_level_start_difficulty()
+
 	for room_data in level_data.values():
 		var scene_path: String = _get_random_room_scene()
-		if scene_path: room_data.scene_path = scene_path
+		if scene_path:
+			room_data.scene_path = scene_path
+		
+		room_data.difficulty = base_difficulty
 	
 	return level_data
 
@@ -115,6 +120,69 @@ func _array_to_vector2(data: Variant) -> Vector2:
 
 func _get_player() -> Clive:
 	return get_tree().get_first_node_in_group("player") as Clive
+
+
+func _start_new_floor() -> void:
+	current_level_data = _generate_and_build_level()
+	minimap_node.draw_minimap(current_level_data, current_room_grid_pos)
+
+	var first_room: RoomData = current_level_data.get(Vector2i.ZERO)
+	if first_room:
+		enter_room(first_room)
+		_apply_current_weapon_to_player()
+		save_run()
+
+
+func advance_to_next_level() -> void:
+	RunManager.advance_to_next_floor()
+	_start_new_floor()
+
+
+func enter_endless_mode() -> void:
+	RunManager.enter_endless_mode()
+	_start_new_floor()
+
+
+func begin_player_death_sequence(player: Clive) -> void:
+	if is_player_death_sequence_running:
+		return
+
+	is_player_death_sequence_running = true
+	RunManager.is_timer_active = false
+
+	if current_room_instance:
+		current_room_instance.on_player_death_started()
+
+	call_deferred("_run_player_death_sequence", player)
+
+
+func _run_player_death_sequence(player: Clive) -> void:
+	await _play_player_death_slowmo(player)
+	
+	if is_instance_valid(player):
+		await player.death_finished
+		
+		if player.movement:
+			player.movement.request_stop()
+			player.movement.clear_impulses()
+			player.movement.set_movement_enabled(false)
+	
+	await get_tree().create_timer(0.5).timeout
+	
+	GameManager.show_popup(
+		BasePopup.POPUP_TYPE.GAME_OVER,
+		RunManager.build_game_over_popup_params()
+			)
+
+
+func _play_player_death_slowmo(_player: Clive) -> void:
+	Engine.time_scale = 0.15
+	await get_tree().create_timer(0.22, true, false, true).timeout
+	
+	Engine.time_scale = 0.45
+	await get_tree().create_timer(0.18, true, false, true).timeout
+	
+	Engine.time_scale = 1.0
 
 
 func apply_reward_card_choice(card: RewardCardData) -> void:
@@ -157,6 +225,25 @@ func _apply_saved_player_bonuses() -> void:
 			continue
 		
 		player.status.apply_permanent_stat_bonus(stat_id, amount)
+
+
+func _apply_saved_player_runtime_state(saved_state: Dictionary) -> void:
+	var player: Clive = _get_player()
+	if !player or !player.status: return
+
+	var player_status_data: Dictionary = saved_state.get("player_status", {})
+
+	player.status.current_health = clamp(
+		float(player_status_data.get("current_health", player.status.max_health)),
+		0.0,
+		player.status.max_health
+	)
+
+	player.status.current_mana = clamp(
+		float(player_status_data.get("current_mana", player.status.max_mana)),
+		0.0,
+		player.status.max_mana
+	)
 
 
 func _serialize_level_data(level_data: Dictionary[Vector2i, RoomData]) -> Dictionary:
@@ -267,14 +354,25 @@ func build_save_state() -> Dictionary:
 		"weapon_id": RunManager.current_weapon_id,
 		"current_room_grid_pos": [current_room_grid_pos.x, current_room_grid_pos.y],
 		"player_global_position": [player.global_position.x, player.global_position.y],
+		"player_status": {
+			"current_health": player.status.current_health if player.status else 0.0,
+			"current_mana": player.status.current_mana if player.status else 0.0,
+				},
 		"level_data": _serialize_level_data(current_level_data),
 		"run_manager": {
 			"current_money": RunManager.current_money,
 			"current_meta": RunManager.current_meta,
 			"current_run_timer": RunManager.current_run_timer,
-			"player_stat_bonuses": RunManager.player_stat_bonuses.duplicate(true)
-		}
-	}
+			"player_stat_bonuses": RunManager.player_stat_bonuses.duplicate(true),
+			"current_level_phase": int(RunManager.current_level_phase),
+			"endless_depth": RunManager.endless_depth,
+			"current_level_timer": RunManager.current_level_timer,
+			"current_level_silver_gained": RunManager.current_level_silver_gained,
+			"current_level_gold_gained": RunManager.current_level_gold_gained,
+			"total_run_silver_gained": RunManager.total_run_silver_gained,
+			"total_run_gold_gained": RunManager.total_run_gold_gained,
+				}
+			}
 
 
 func save_run() -> void:
@@ -287,9 +385,10 @@ func save_run() -> void:
 	
 	SaveManager.save_current_slot(state, {
 		"player_name": "Clive",
-		"chapter": 1,
-		"play_time_seconds": int(RunManager.current_run_timer)
-	})
+		"chapter": RunManager.get_current_level_label(),
+		"play_time_seconds": int(RunManager.current_run_timer),
+		"total_gold": int(RunManager.current_meta)
+			})
 
 
 func _apply_saved_run_state(saved_state: Dictionary) -> void:
@@ -299,13 +398,19 @@ func _apply_saved_run_state(saved_state: Dictionary) -> void:
 	if current_level_data.is_empty():
 		current_level_data = _generate_and_build_level()
 	
-	minimap_node.draw_minimap(current_level_data)
+	minimap_node.draw_minimap(current_level_data, current_room_grid_pos)
 	
 	var run_manager_data: Dictionary = saved_state.get("run_manager", {})
 	RunManager.current_money = float(run_manager_data.get("current_money", 0.0))
 	RunManager.current_meta = float(run_manager_data.get("current_meta", 0.0))
 	RunManager.current_run_timer = float(run_manager_data.get("current_run_timer", 0.0))
-	
+	RunManager.current_level_phase = run_manager_data.get("current_level_phase", RunManager.LevelPhase.FLOOR_1)
+	RunManager.endless_depth = int(run_manager_data.get("endless_depth", 0))
+	RunManager.current_level_timer = float(run_manager_data.get("current_level_timer", 0.0))
+	RunManager.current_level_silver_gained = int(run_manager_data.get("current_level_silver_gained", 0))
+	RunManager.current_level_gold_gained = int(run_manager_data.get("current_level_gold_gained", 0))
+	RunManager.total_run_silver_gained = int(run_manager_data.get("total_run_silver_gained", 0))
+	RunManager.total_run_gold_gained = int(run_manager_data.get("total_run_gold_gained", 0))	
 	RunManager.player_stat_bonuses = run_manager_data.get(
 		"player_stat_bonuses",
 		RunManager.PLAYER_BONUS_DEFAULTS.duplicate(true)
@@ -327,6 +432,20 @@ func _apply_saved_run_state(saved_state: Dictionary) -> void:
 		
 		_apply_current_weapon_to_player()
 		_apply_saved_player_bonuses()
+		_apply_saved_player_runtime_state(saved_state)
+
+
+func finalize_game_over_to_main_menu() -> void:
+	Engine.time_scale = 1.0
+	RunManager.is_timer_active = false
+
+	if SaveManager.has_current_slot():
+		SaveManager.clear_current_run_but_keep_meta({
+			"player_name": "Clive",
+			"chapter": "Run Failed",
+			"play_time_seconds": int(RunManager.current_run_timer),
+			"total_gold": int(RunManager.current_meta)
+		})
 
 
 func enter_room(room_data: RoomData, entrance_direction: int = -1) -> void:
@@ -334,6 +453,7 @@ func enter_room(room_data: RoomData, entrance_direction: int = -1) -> void:
 	room_data.discovered = true
 	
 	if current_room_instance:
+		current_room_instance.write_back_runtime_state()
 		current_room_instance.queue_free()
 		current_room_instance = null
 	
@@ -356,6 +476,7 @@ func enter_room(room_data: RoomData, entrance_direction: int = -1) -> void:
 		else:
 			player.global_position = current_room_instance.global_position
 	
+	minimap_node.draw_minimap(current_level_data, room_data.grid_pos)
 	minimap_node.move_player_marker_to_room(room_data)
 
 func _on_change_room(room_data: RoomData, entrance_direction: int) -> void:
@@ -383,3 +504,8 @@ func _unhandled_input(event: InputEvent) -> void:
 
 	GameManager.show_popup(BasePopup.POPUP_TYPE.PAUSE)
 	get_viewport().set_input_as_handled()
+
+
+func _refresh_minimap() -> void:
+	minimap_node.draw_minimap(current_level_data, current_room_grid_pos)
+	minimap_node.move_player_marker_to_room(current_level_data.get(current_room_grid_pos))

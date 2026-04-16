@@ -78,10 +78,13 @@ func receive_hit(hit_data: HitData) -> bool:
 			should_trigger_hurt = true
 			reaction_animation = block_reaction_animation
 
-	var accepted := true
+	var accepted: bool = true
+	if damage_to_apply > 0.0 and status:
+		damage_to_apply = status.resolve_damage_after_defense(damage_to_apply)
+	
 	if damage_to_apply > 0.0:
 		accepted = status.request_damage(damage_to_apply)
-
+		
 	if not accepted:
 		return false
 

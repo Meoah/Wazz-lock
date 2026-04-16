@@ -11,6 +11,7 @@ enum ClearConditions{
 }
 
 @export var clear_condition: ClearConditions = ClearConditions.EXTERMINATE
+@export var _shop_npc_scene: PackedScene
 @export_category("Children Nodes")
 @export var _tile_handler: TileHandler
 @export var _enemy_handler: EnemyHandler
@@ -157,7 +158,10 @@ func _cleared() -> void:
 	
 	match clear_condition:
 		ClearConditions.BOSS:
-			GameManager.show_popup(BasePopup.POPUP_TYPE.LEVEL_COMPLETE)
+			GameManager.show_popup(
+				BasePopup.POPUP_TYPE.LEVEL_COMPLETE,
+				RunManager.build_level_complete_popup_params()
+					)
 		
 		ClearConditions.AUTO_WIN, ClearConditions.SHOP:
 			pass
@@ -169,6 +173,7 @@ func _cleared() -> void:
 			"choice_count": 3
 				})
 	
+	SignalBus.request_minimap_refresh.emit()
 	SignalBus.request_run_save.emit()
 
 
@@ -178,38 +183,77 @@ func setup(room_data: RoomData) -> void:
 	_survival_elapsed = 0.0
 	clear_condition = _resolve_clear_condition_from_data()
 	_enemy_handler.set_encounter_profile(data.encounter_profile)
-	
+	_enemy_handler.setup_spawn_context(_tile_handler)
 	_exit_handler.setup_exits(data)
+	_survival_elapsed = float(data.metadata.get("survival_elapsed", 0.0))
+	var runtime_initialized: bool = bool(data.metadata.get("runtime_initialized", false))
 	
 	if data.cleared:
 		_enemy_handler.stop_spawning()
 		_exit_handler.open_all_exits()
+		_restore_friendly_runtime_state(data.metadata.get("friendly_snapshots", []))
 		_refresh_objective_hud()
 		set_process(false)
 		return
 	
-	match clear_condition:
-		ClearConditions.AUTO_WIN:
-			_enemy_handler.stop_spawning()
-		
-		ClearConditions.EXTERMINATE:
-			_enemy_handler.begin_static_spawn(float(data.difficulty))
-		
-		ClearConditions.SURVIVAL:
-			_enemy_handler.begin_survival_mode(float(data.difficulty), float(data.metadata.get("respawn_delay_seconds", 3.0)))
-		
-		ClearConditions.BOSS:
-			_enemy_handler.begin_boss_mode(float(data.difficulty), float(data.metadata.get("respawn_delay_seconds", 3.0)))
-		
-		ClearConditions.SHOP:
-			_enemy_handler.stop_spawning()
-			_spawn_shop_friendlies()
-		
-		_:
-			_enemy_handler.begin_static_spawn(float(data.difficulty))
+	if runtime_initialized:
+		_enemy_handler.configure_runtime_mode_from_room(
+			clear_condition,
+			float(data.difficulty),
+			float(data.metadata.get("respawn_delay_seconds", 3.0))
+				)
+		_enemy_handler.restore_runtime_state(data.metadata.get("enemy_snapshots", []))
+		_restore_friendly_runtime_state(data.metadata.get("friendly_snapshots", []))
+	else:
+		match clear_condition:
+			ClearConditions.AUTO_WIN:
+				_enemy_handler.stop_spawning()
+			
+			ClearConditions.EXTERMINATE:
+				_enemy_handler.begin_static_spawn(float(data.difficulty))
+			
+			ClearConditions.SURVIVAL:
+				_enemy_handler.begin_survival_mode(
+					float(data.difficulty),
+					float(data.metadata.get("respawn_delay_seconds", 3.0))
+				)
+			
+			ClearConditions.BOSS:
+				_enemy_handler.begin_boss_mode(
+					float(data.difficulty),
+					float(data.metadata.get("respawn_delay_seconds", 3.0))
+				)
+			
+			ClearConditions.SHOP:
+				_enemy_handler.stop_spawning()
+				_spawn_shop_friendlies()
+			
+			_:
+				_enemy_handler.begin_static_spawn(float(data.difficulty))
 	
 	_refresh_objective_hud()
 	set_process(true)
+
+
+func _restore_friendly_runtime_state(snapshots: Array[Dictionary]) -> void:
+	if snapshots.is_empty():
+		if clear_condition == ClearConditions.SHOP:
+			_spawn_shop_friendlies()
+		return
+	
+	for snapshot in snapshots:
+		var scene_path: String = str(snapshot.get("scene_path", ""))
+		if scene_path.is_empty(): continue
+		
+		var packed: PackedScene = load(scene_path)
+		if !packed: continue
+		
+		var npc: Node2D = packed.instantiate() as Node2D
+		if !npc: continue
+		
+		var pos_data: Array = snapshot.get("position", [0.0, 0.0])
+		npc.global_position = Vector2(float(pos_data[0]), float(pos_data[1]))
+		add_child(npc)
 
 
 func get_spawn_exit(entrance_direction: int = -1) -> ExitDrain:
@@ -221,19 +265,47 @@ func get_spawn_position(entrance_direction: int = -1) -> Vector2:
 
 
 func _spawn_shop_friendlies() -> void:
-	var spawners: Array[Node] = find_children("*", "FriendlySpawner", true, false)
+	if !_shop_npc_scene or !_tile_handler: return
 	
-	for node in spawners:
-		var spawner: FriendlySpawner = node as FriendlySpawner
-		if !spawner: continue
+	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
+	rng.randomize()
+	
+	var spawn_position: Variant = _tile_handler.pick_floor_spawn_position(rng)
+	if !spawn_position: return
+	
+	var npc: Node2D = _shop_npc_scene.instantiate() as Node2D
+	if !npc: return
+	
+	npc.global_position = spawn_position
+	add_child(npc)
+
+
+func write_back_runtime_state() -> void:
+	if !data: return
+	
+	data.metadata["runtime_initialized"] = true
+	data.metadata["survival_elapsed"] = _survival_elapsed
+	data.metadata["enemy_snapshots"] = _enemy_handler.capture_runtime_state()
+	data.metadata["friendly_snapshots"] = _capture_friendly_runtime_state()
+
+
+func _capture_friendly_runtime_state() -> Array[Dictionary]:
+	var snapshots: Array[Dictionary] = []
+	
+	for node in get_tree().get_nodes_in_group("shop_npc"):
+		if !is_instance_valid(node): continue
+		if node.get_parent() != self: continue
 		
-		spawner.hide()
-		
-		var npc_scene: PackedScene = spawner.friendly_scene
-		if !npc_scene: continue
-		
-		var npc: Node2D = npc_scene.instantiate() as Node2D
-		if !npc: continue
-		
-		npc.position = spawner.position
-		add_child(npc)
+		snapshots.append({
+			"scene_path": _shop_npc_scene.resource_path if _shop_npc_scene else "",
+			"position": [node.global_position.x, node.global_position.y],
+		})
+	
+	return snapshots
+
+
+func on_player_death_started() -> void:
+	set_process(false)
+
+	if _enemy_handler:
+		_enemy_handler.on_player_death_started()

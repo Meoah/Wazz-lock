@@ -96,19 +96,30 @@ func refresh_for_current_slot() -> void:
 		_button_continue.disabled = true
 		return
 
-	var summary := SaveManager.get_current_slot_summary()
+	var summary: Dictionary = SaveManager.get_current_slot_summary()
+	var has_slot_data: bool = summary.get("has_slot_data", false)
 	var has_save: bool = summary.get("has_save", false)
 
-	_panel_previous_run.visible = has_save
+	_panel_previous_run.visible = has_slot_data
 	_button_continue.disabled = !has_save
 
-	if has_save:
+	if has_slot_data:
 		@warning_ignore("integer_division")
 		var play_minutes: int = int(summary.get("play_time_seconds", 0)) / 60
-		_label_previous_run.text = "[center][b]%s[/b]\nChapter %s\n%dm played[/center]" % [
-			str(summary.get("display_name", "Player")),
-			str(summary.get("chapter", 1)),
-			play_minutes
-		]
+		var total_gold: int = int(summary.get("total_gold", 0))
+
+		if has_save:
+			_label_previous_run.text = "[center][b]%s[/b]\nChapter %s\nGold: %d\n%dm played[/center]" % [
+				str(summary.get("display_name", "Player")),
+				str(summary.get("chapter", 1)),
+				total_gold,
+				play_minutes
+					]
+		else:
+			_label_previous_run.text = "[center][b]%s[/b]\n%s\nGold: %d\nNo active run[/center]" % [
+				str(summary.get("display_name", "Player")),
+				str(summary.get("chapter", "Run Failed")),
+				total_gold
+					]
 	else:
 		_label_previous_run.text = "[center]No run in this slot yet.[/center]"

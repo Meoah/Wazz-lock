@@ -298,14 +298,14 @@ func on_death_received(_hit_data: HitData) -> void:
 	input_flags = 0
 	roll_requested = false
 	potion_requested = false
+	_clear_transient_inputs()
 
 	if hit_box:
 		hit_box.end_activation()
 
-	if movement:
-		movement.request_stop()
-		movement.clear_impulses()
-		movement.set_movement_enabled(false)
+	if hurt_box:
+		hurt_box.hurtable = false
+		hurt_box.monitoring = false
 
 
 func _update_move_direction() -> void:

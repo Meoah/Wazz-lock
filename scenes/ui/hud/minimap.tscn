@@ -56,11 +56,12 @@ animations = [{
 "speed": 5.0
 }]
 
-[node name="Minimap" type="Node2D" node_paths=PackedStringArray("tilemap", "player_marker", "minimap_camera")]
+[node name="Minimap" type="Node2D" node_paths=PackedStringArray("tilemap", "player_marker", "minimap_camera", "icons_root")]
 script = ExtResource("1_radbx")
 tilemap = NodePath("Map")
 player_marker = NodePath("PlayerMarker")
 minimap_camera = NodePath("Camera2D")
+icons_root = NodePath("Icons")
 
 [node name="Map" type="TileMapLayer" parent="."]
 tile_map_data = PackedByteArray("AAD+////AQABAAEAAAD+/wAAAQAAAAMAAAD+/wEAAQABAAAAAAD/////AQACAAMAAAD//wAAAQAEAAIAAAD//wEAAQADAAEAAAAAAP7/AQABAAEAAAAAAP//AQAEAAMAAAAAAAAAAQABAAIAAAAAAAEAAQAAAAAAAAABAP7/AQADAAQAAAABAP//AQAEAAMAAAABAAAAAQAEAAMAAAABAAEAAQAAAAMAAAACAP7/AQADAAAAAAACAAEAAQADAAAAAAA=")
@@ -76,3 +77,5 @@ animation = &"marker"
 position = Vector2(40, 40)
 position_smoothing_enabled = true
 position_smoothing_speed = 2.0
+
+[node name="Icons" type="Node2D" parent="."]

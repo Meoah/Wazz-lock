@@ -84,8 +84,8 @@ func _on_area_entered(area: Area2D) -> void:
 
 
 func _build_hit_data(target_hurt_box: HurtBoxComponent) -> HitData:
-	var hit_data := HitData.new()
-	var offset := target_hurt_box.global_position - global_position
+	var hit_data: HitData = HitData.new()
+	var offset: Vector2 = target_hurt_box.global_position - global_position
 
 	hit_data.source = self
 	hit_data.instigator = _get_owner_actor()
@@ -99,9 +99,9 @@ func _build_hit_data(target_hurt_box: HurtBoxComponent) -> HitData:
 	
 	hit_data.faction = faction
 	
-
-	var attacker_status := _get_attacker_status()
+	var attacker_status: StatusComponent = _get_attacker_status()
 	if attacker_status:
+		hit_data.damage *= attacker_status.damage
 		hit_data.knockback_force *= attacker_status.knockback
 		hit_data.poise_damage *= attacker_status.knockback
 

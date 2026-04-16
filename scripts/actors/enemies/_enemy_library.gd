@@ -22,6 +22,18 @@ const FLOOR_1_BOSS_POOL: Array[String] = [
 	"res://scenes/actors/enemies/boss_slime.tscn"
 ]
 
+const FLOOR_2_BOSS_POOL: Array[String] = [
+	"res://scenes/actors/enemies/boss_slime.tscn"
+]
+
+const FLOOR_3_BOSS_POOL: Array[String] = [
+	"res://scenes/actors/enemies/boss_slime.tscn"
+]
+
+const ENDLESS_BOSS_POOL: Array[String] = [
+	"res://scenes/actors/enemies/boss_slime.tscn"
+]
+
 const PROFILE_ARCHETYPE_WEIGHTS: Dictionary = {
 	RoomData.EncounterProfile.BALANCED: {
 		EnemyArchetype.MELEE_SLIME: 55.0,
@@ -59,33 +71,74 @@ static func get_scene_path_for_archetype(archetype: EnemyArchetype) -> String:
 	return ARCHETYPE_SCENES.get(archetype, "")
 
 
-static func get_boss_pool_for_floor(floor_index: int = 1) -> Array[String]:
-	match floor_index:
-		1:
+static func get_boss_pool(pool_id: String) -> Array[String]:
+	match pool_id:
+		"floor_1":
 			return FLOOR_1_BOSS_POOL.duplicate()
+		"floor_2":
+			return FLOOR_2_BOSS_POOL.duplicate()
+		"floor_3":
+			return FLOOR_3_BOSS_POOL.duplicate()
+		"endless":
+			return ENDLESS_BOSS_POOL.duplicate()
+			
 	return FLOOR_1_BOSS_POOL.duplicate()
 
 
-static func pick_random_boss_scene_path(rng: RandomNumberGenerator, floor_index: int = 1) -> String:
-	var pool: Array[String] = get_boss_pool_for_floor(floor_index)
+static func pick_random_boss_scene_path(rng: RandomNumberGenerator, pool_id: String) -> String:
+	var pool: Array[String] = get_boss_pool(pool_id)
 	if pool.is_empty():
 		return ""
 	return pool[rng.randi_range(0, pool.size() - 1)]
+
+
+static func roll_currency_drop(enemy: BaseEnemy, rng: RandomNumberGenerator) -> Dictionary:
+	var role: String = str(enemy.get_meta("spawn_role", "normal"))
+	var variant: EnemyVariant = enemy.get_meta("enemy_variant", EnemyVariant.NORMAL)
+
+	if role == "boss":
+		return {
+			"silver": rng.randi_range(25, 40),
+			"gold": rng.randi_range(3, 5)
+		}
+
+	if variant == EnemyVariant.ELITE:
+		return {
+			"silver": rng.randi_range(6, 12),
+			"gold": rng.randi_range(1, 2)
+		}
+
+	return {
+		"silver": rng.randi_range(1, 4),
+		"gold": 0
+	}
 
 
 static func get_archetype_weights_for_profile(profile: RoomData.EncounterProfile) -> Dictionary:
 	return PROFILE_ARCHETYPE_WEIGHTS.get(profile, PROFILE_ARCHETYPE_WEIGHTS[RoomData.EncounterProfile.BALANCED])
 
 
-static func pick_weighted_archetype_for_profile(profile: RoomData.EncounterProfile, rng: RandomNumberGenerator) -> EnemyArchetype:
-	var weights: Dictionary = get_archetype_weights_for_profile(profile)
-	if weights.is_empty(): return EnemyArchetype.MELEE_SLIME
+static func pick_weighted_archetype_for_spawn(profile: RoomData.EncounterProfile, difficulty_percent: float, rng: RandomNumberGenerator) -> EnemyArchetype:
+	var weights: Dictionary = get_archetype_weights_for_profile(profile).duplicate(true)
+	
+	# Higher difficulty shifts some weight out of melee and into ranged/tank.
+	var t: float = clamp((difficulty_percent - 10.0) / 100.0, 0.0, 1.0)
+	
+	if weights.has(EnemyArchetype.MELEE_SLIME):
+		weights[EnemyArchetype.MELEE_SLIME] = max(10.0, float(weights[EnemyArchetype.MELEE_SLIME]) - (12.0 * t))
+	
+	if weights.has(EnemyArchetype.RANGED_SLIME):
+		weights[EnemyArchetype.RANGED_SLIME] = float(weights[EnemyArchetype.RANGED_SLIME]) + (5.0 * t)
+	
+	if weights.has(EnemyArchetype.TANK_SLIME):
+		weights[EnemyArchetype.TANK_SLIME] = float(weights[EnemyArchetype.TANK_SLIME]) + (7.0 * t)
 	
 	var total_weight: float = 0.0
 	for weight in weights.values():
 		total_weight += float(weight)
 	
-	if total_weight <= 0.0: return EnemyArchetype.MELEE_SLIME
+	if total_weight <= 0.0:
+		return EnemyArchetype.MELEE_SLIME
 	
 	var roll: float = rng.randf_range(0.0, total_weight)
 	var running_total: float = 0.0

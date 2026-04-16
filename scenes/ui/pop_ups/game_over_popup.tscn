@@ -1,35 +1,34 @@
-[gd_scene load_steps=6 format=3 uid="uid://bmonqb7urqfh6"]
+[gd_scene load_steps=6 format=3 uid="uid://cuotyor6xys28"]
 
-[ext_resource type="Script" uid="uid://x1g2ngvmckpq" path="res://scripts/ui/pop_ups/level_complete_popup.gd" id="1_33gnd"]
-[ext_resource type="Texture2D" uid="uid://btprjpbbxhlss" path="res://assets/textures/ui/nine_slice/Message_01_1.png" id="2_wyk6y"]
-[ext_resource type="Texture2D" uid="uid://dacwqdq6hqt8b" path="res://assets/textures/ui/nine_slice/Transparent.png" id="3_wyk6y"]
+[ext_resource type="Script" uid="uid://didaer4bhrjew" path="res://scripts/ui/game_over_popup.gd" id="1_8n4bu"]
+[ext_resource type="Texture2D" uid="uid://btprjpbbxhlss" path="res://assets/textures/ui/nine_slice/Message_01_1.png" id="2_b2m1o"]
+[ext_resource type="Texture2D" uid="uid://dacwqdq6hqt8b" path="res://assets/textures/ui/nine_slice/Transparent.png" id="3_1lttn"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_ts53e"]
-texture = ExtResource("2_wyk6y")
+texture = ExtResource("2_b2m1o")
 texture_margin_left = 8.0
 texture_margin_top = 8.0
 texture_margin_right = 8.0
 texture_margin_bottom = 8.0
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_k8o74"]
-texture = ExtResource("3_wyk6y")
+texture = ExtResource("3_1lttn")
 texture_margin_left = 8.0
 texture_margin_top = 8.0
 texture_margin_right = 8.0
 texture_margin_bottom = 8.0
 
-[node name="LevelCompletePopup" type="Control" node_paths=PackedStringArray("_label_title", "_label_body", "_button_primary", "_button_secondary")]
+[node name="GameOverPopup" type="Control" node_paths=PackedStringArray("_label_title", "_label_body", "_button_return")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_33gnd")
+script = ExtResource("1_8n4bu")
 _label_title = NodePath("PanelContainer/VBoxContainer/TitleContainer/Title")
 _label_body = NodePath("PanelContainer/VBoxContainer/BodyContainer/Body")
-_button_primary = NodePath("PanelContainer/VBoxContainer/ActionRow/Primary")
-_button_secondary = NodePath("PanelContainer/VBoxContainer/ActionRow/Secondary")
+_button_return = NodePath("PanelContainer/VBoxContainer/ActionRow/Return")
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
 layout_mode = 1
@@ -58,7 +57,7 @@ theme_override_styles/panel = SubResource("StyleBoxTexture_k8o74")
 [node name="Title" type="Label" parent="PanelContainer/VBoxContainer/TitleContainer"]
 layout_mode = 2
 size_flags_vertical = 0
-text = "Level Complete"
+text = "Game Over"
 horizontal_alignment = 1
 
 [node name="BodyContainer" type="PanelContainer" parent="PanelContainer/VBoxContainer"]
@@ -77,12 +76,7 @@ horizontal_alignment = 1
 [node name="ActionRow" type="HBoxContainer" parent="PanelContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="Secondary" type="Button" parent="PanelContainer/VBoxContainer/ActionRow"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Cancel"
-
-[node name="Primary" type="Button" parent="PanelContainer/VBoxContainer/ActionRow"]
+[node name="Return" type="Button" parent="PanelContainer/VBoxContainer/ActionRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Proceed"

@@ -219,6 +219,21 @@ func set_global_aggro_enabled(enabled: bool) -> void:
 	global_aggro_enabled = enabled
 
 
+func on_player_death_started() -> void:
+	target = null
+	target_in_sight = false
+	last_known_target_position = global_position
+	time_since_target_seen = INF
+	global_aggro_enabled = false
+	
+	if movement:
+		movement.request_stop()
+		movement.clear_impulses()
+	
+	if hit_box:
+		hit_box.end_activation()
+
+
 func apply_spawn_variant_modifiers(config: Dictionary) -> void:
 	if status:
 		var health_multiplier: float = float(config.get("health_multiplier", 1.0))

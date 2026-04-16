@@ -7,6 +7,7 @@ const _GENERIC = preload("res://scenes/ui/pop_ups/generic_popup.tscn")
 const _PAUSE = preload("res://scenes/ui/pop_ups/pause_popup.tscn")
 const _REWARD = preload("res://scenes/ui/pop_ups/reward/reward_popup.tscn")
 const _LEVEL_COMPLETE = preload("res://scenes/ui/pop_ups/level_complete_popup.tscn")
+const _GAME_OVER = preload("res://scenes/ui/pop_ups/game_over_popup.tscn")
 
 # Returns a popup with desired parameters if requested.
 static func create_popup(popup_type: int, params: Dictionary = {}) -> BasePopup:
@@ -21,6 +22,8 @@ static func create_popup(popup_type: int, params: Dictionary = {}) -> BasePopup:
 			popup = _REWARD.instantiate()
 		BasePopup.POPUP_TYPE.LEVEL_COMPLETE:
 			popup = _LEVEL_COMPLETE.instantiate()
+		BasePopup.POPUP_TYPE.GAME_OVER:
+			popup = _GAME_OVER.instantiate()
 		_:
 			popup = _GENERIC.instantiate()
 	
