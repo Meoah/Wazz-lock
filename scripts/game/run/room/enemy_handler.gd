@@ -101,7 +101,8 @@ func begin_boss_mode(difficulty_percent: float, respawn_delay_seconds: float = 3
 
 
 func _spawn_static_enemies(difficulty_percent: float) -> void:
-	if !_spawning_enabled: return
+	if !_spawning_enabled:
+		return
 
 	var target_count: int = _get_static_spawn_count_from_difficulty(difficulty_percent)
 	var attempts_remaining: int = max(target_count * 3, 3)
@@ -109,7 +110,7 @@ func _spawn_static_enemies(difficulty_percent: float) -> void:
 	while target_count > 0 and attempts_remaining > 0:
 		var spawn_archetype: EnemyLibrary.EnemyArchetype = _pick_spawn_archetype()
 		var spawn_variant: EnemyLibrary.EnemyVariant = _pick_spawn_variant()
-		var spawned: bool = _spawn_enemy(spawn_archetype, spawn_variant, "normal", false)
+		var spawned: bool = _spawn_enemy(spawn_archetype, spawn_variant, "normal", false, true)
 
 		if spawned:
 			target_count -= 1
@@ -130,6 +131,13 @@ func _pick_spawn_archetype() -> EnemyLibrary.EnemyArchetype:
 		return EnemyLibrary.EnemyArchetype.MELEE_SLIME
 
 	return EnemyLibrary.pick_weighted_archetype_for_spawn(_encounter_profile, _difficulty_modifier, _rng)
+
+
+func _has_room_water() -> bool:
+	if _tile_handler == null:
+		return false
+
+	return not _tile_handler.get_water_spawn_positions().is_empty()
 
 
 func _resolve_spawn_archetype(requested_archetype: EnemyLibrary.EnemyArchetype) -> EnemyLibrary.EnemyArchetype:
@@ -168,14 +176,17 @@ func _spawn_enemy(
 	use_global_aggro: bool,
 	allow_drops: bool = true
 ) -> bool:
-	if !_tile_handler: return false
+	if !_tile_handler:
+		return false
 
 	var resolved_enemy_archetype: EnemyLibrary.EnemyArchetype = _resolve_spawn_archetype(enemy_archetype)
 	var enemy_path: String = EnemyLibrary.get_scene_path_for_archetype(resolved_enemy_archetype)
-	if enemy_path.is_empty(): return false
+	if enemy_path.is_empty():
+		return false
 
 	var enemy_scene: PackedScene = load(enemy_path)
-	if !enemy_scene: return false
+	if !enemy_scene:
+		return false
 
 	var avoid_global: Vector2 = Vector2.INF
 	var player: Node2D = get_tree().get_first_node_in_group("player") as Node2D
@@ -193,10 +204,12 @@ func _spawn_enemy(
 	if spawn_position == null and resolved_enemy_archetype == EnemyLibrary.EnemyArchetype.RANGED_SLIME:
 		resolved_enemy_archetype = EnemyLibrary.EnemyArchetype.MELEE_SLIME
 		enemy_path = EnemyLibrary.get_scene_path_for_archetype(resolved_enemy_archetype)
-		if enemy_path.is_empty(): return false
+		if enemy_path.is_empty():
+			return false
 
 		enemy_scene = load(enemy_path)
-		if !enemy_scene: return false
+		if !enemy_scene:
+			return false
 
 		spawn_position = _tile_handler.pick_spawn_position_for_archetype(
 			resolved_enemy_archetype,
@@ -206,10 +219,12 @@ func _spawn_enemy(
 			_get_occupied_enemy_positions()
 		)
 
-	if spawn_position == null: return false
+	if spawn_position == null:
+		return false
 
 	var enemy_child: BaseEnemy = enemy_scene.instantiate() as BaseEnemy
-	if !enemy_child: return false
+	if !enemy_child:
+		return false
 
 	enemy_child.global_position = spawn_position
 	enemy_child.set_meta("enemy_archetype", int(resolved_enemy_archetype))
@@ -221,6 +236,7 @@ func _spawn_enemy(
 	add_child(enemy_child)
 	enemy_list.append(enemy_child)
 
+	_apply_enemy_display_name(enemy_child, resolved_enemy_archetype)
 	_apply_variant_to_enemy(enemy_child, enemy_variant)
 
 	if enemy_child.has_method("set_global_aggro_enabled"):
@@ -231,16 +247,74 @@ func _spawn_enemy(
 
 	return true
 
-# TODO give variants actual changes
 func _apply_variant_to_enemy(enemy: BaseEnemy, enemy_variant: EnemyLibrary.EnemyVariant) -> void:
+	if enemy == null:
+		return
+
 	enemy.set_meta("enemy_variant", int(enemy_variant))
-	
+	enemy.set_meta("display_prefix", "")
+	enemy.set_meta("display_prefix_color", Color.WHITE)
+	enemy.set_meta("display_suffix", "")
+	enemy.set_meta("display_suffix_color", Color.WHITE)
+	enemy.set_meta("affix_id", "")
+
+	var enemy_archetype: EnemyLibrary.EnemyArchetype = enemy.get_meta(
+		"enemy_archetype",
+		EnemyLibrary.EnemyArchetype.MELEE_SLIME
+	)
+
 	match enemy_variant:
 		EnemyLibrary.EnemyVariant.NORMAL:
-			pass
-		
+			enemy.apply_spawn_variant_modifiers({
+				"scale_multiplier": 1.0
+			})
+
 		EnemyLibrary.EnemyVariant.ELITE:
-			pass
+			var elite_affix: EnemyAffixResource = EnemyLibrary.pick_random_affix_for_archetype(enemy_archetype, _rng)
+			if elite_affix == null:
+				return
+
+			enemy.set_meta("affix_id", elite_affix.id)
+			enemy.set_meta("display_prefix", elite_affix.display_prefix)
+			enemy.set_meta("display_prefix_color", elite_affix.prefix_color)
+
+			enemy.apply_spawn_variant_modifiers({
+				"health_multiplier": elite_affix.health_multiplier,
+				"damage_multiplier": elite_affix.damage_multiplier,
+				"defense_multiplier": elite_affix.defense_multiplier,
+				"poise_multiplier": elite_affix.poise_multiplier,
+				"speed_multiplier": elite_affix.speed_multiplier,
+				"scale_multiplier": 1.5
+			})
+
+		EnemyLibrary.EnemyVariant.BOSS:
+			var boss_affix: EnemyAffixResource = EnemyLibrary.pick_random_affix_for_archetype(enemy_archetype, _rng)
+			if boss_affix == null:
+				return
+
+			enemy.set_meta("affix_id", boss_affix.id)
+			enemy.set_meta("display_prefix", boss_affix.display_prefix)
+			enemy.set_meta("display_prefix_color", boss_affix.prefix_color)
+			enemy.set_meta("display_suffix", "[BOSS]")
+			enemy.set_meta("display_suffix_color", Color(1.0, 0.25, 0.25, 1.0))
+
+			enemy.apply_spawn_variant_modifiers({
+				"health_multiplier": boss_affix.health_multiplier * 2.0,
+				"damage_multiplier": boss_affix.damage_multiplier * 1.5,
+				"defense_multiplier": boss_affix.defense_multiplier * 1.35,
+				"poise_multiplier": boss_affix.poise_multiplier * 1.5,
+				"speed_multiplier": boss_affix.speed_multiplier,
+				"scale_multiplier": 2.0
+			})
+
+func _apply_enemy_display_name(enemy: BaseEnemy, enemy_archetype: EnemyLibrary.EnemyArchetype) -> void:
+	if enemy == null:
+		return
+
+	if enemy.status == null:
+		return
+
+	enemy.status.actor_name = EnemyLibrary.get_archetype_display_name(enemy_archetype)
 
 
 func _award_currency_drops(enemy: BaseEnemy) -> void:
@@ -320,38 +394,49 @@ func _spawn_boss_once() -> void:
 	if _boss_spawned_once: return
 	if !_tile_handler: return
 
-	var boss_scene_path: String = EnemyLibrary.pick_random_boss_scene_path(_rng, RunManager.get_current_boss_pool_id())
+	var allow_ranged: bool = _has_room_water()
+	var boss_archetype: EnemyLibrary.EnemyArchetype = EnemyLibrary.pick_random_boss_archetype(
+		_rng,
+		RunManager.get_current_boss_pool_id(),
+		allow_ranged
+	)
+
+	var boss_scene_path: String = EnemyLibrary.get_scene_path_for_archetype(boss_archetype)
 	if boss_scene_path.is_empty(): return
 
 	var boss_scene: PackedScene = load(boss_scene_path)
 	if !boss_scene: return
 
-	var spawn_position: Variant = _tile_handler.pick_floor_spawn_position(
+	var spawn_position: Variant = _tile_handler.pick_spawn_position_for_archetype(
+		boss_archetype,
 		_rng,
 		(get_tree().get_first_node_in_group("player") as Node2D).global_position if get_tree().get_first_node_in_group("player") else Vector2.INF,
 		MIN_SAFE_SPAWN_DISTANCE,
 		_get_occupied_enemy_positions()
-			)
+	)
 	if !spawn_position: return
-	
+
 	var boss_child: BaseEnemy = boss_scene.instantiate() as BaseEnemy
 	if !boss_child: return
-	
+
 	boss_child.global_position = spawn_position
 	boss_child.set_meta("spawn_role", "boss")
-	boss_child.set_meta("enemy_variant", -1)
-	boss_child.set_meta("enemy_archetype", -1)
+	boss_child.set_meta("enemy_variant", int(EnemyLibrary.EnemyVariant.BOSS))
+	boss_child.set_meta("enemy_archetype", int(boss_archetype))
 	boss_child.set_meta("enemy_scene_path", boss_scene_path)
-	
+
 	add_child(boss_child)
 	enemy_list.append(boss_child)
-	
+
+	_apply_enemy_display_name(boss_child, boss_archetype)
+	_apply_variant_to_enemy(boss_child, EnemyLibrary.EnemyVariant.BOSS)
+
 	if boss_child.has_method("set_global_aggro_enabled"):
 		boss_child.set_global_aggro_enabled(true)
-	
+
 	if boss_child.combat_receiver and !boss_child.combat_receiver.death_triggered.is_connected(_on_enemy_death.bind(boss_child)):
 		boss_child.combat_receiver.death_triggered.connect(_on_enemy_death.bind(boss_child))
-	
+
 	_boss_spawned_once = true
 
 

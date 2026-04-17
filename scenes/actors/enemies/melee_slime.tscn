@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://cpa57mx1iejg0"]
+[gd_scene load_steps=23 format=3 uid="uid://cpa57mx1iejg0"]
 
 [ext_resource type="Script" uid="uid://cgsuwrws1132j" path="res://scripts/actors/enemies/melee_slime.gd" id="1_revep"]
 [ext_resource type="AudioStream" uid="uid://bqmahajqmcyiv" path="res://assets/audio/sfx/slime_hit.ogg" id="2_2mvsx"]
@@ -16,6 +16,7 @@
 [ext_resource type="SpriteFrames" uid="uid://yhrnab5b25jw" path="res://assets/textures/actors/enemies/slime/melee/melee_slime.tres" id="14_2mvsx"]
 [ext_resource type="PackedScene" uid="uid://crmvibm52mj4b" path="res://scenes/components/hurt_box_component.tscn" id="14_rqpcn"]
 [ext_resource type="PackedScene" uid="uid://fi4g51qoeha" path="res://scenes/components/hit_box_component.tscn" id="15_s2ijn"]
+[ext_resource type="PackedScene" uid="uid://k50he66se3ip" path="res://scenes/components/overhead_component.tscn" id="17_vpw1n"]
 
 [sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_nh0x5"]
 random_pitch = 1.5
@@ -26,15 +27,15 @@ stream_0/stream = ExtResource("2_2mvsx")
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jskh2"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_kaj66"]
-radius = 60.00001
+radius = 45.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_rsbtc"]
-radius = 50.0
+radius = 37.5
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jt0ol"]
-size = Vector2(64, 64)
+size = Vector2(48, 48)
 
-[node name="MeleeSlime" type="CharacterBody2D" node_paths=PackedStringArray("state_machine", "movement", "combat_receiver", "status", "hurt_box", "hit_box", "attack_hit_box", "body_root", "health_bar")]
+[node name="MeleeSlime" type="CharacterBody2D" node_paths=PackedStringArray("state_machine", "movement", "combat_receiver", "status", "hurt_box", "hit_box", "attack_hit_box", "overhead", "body_root")]
 y_sort_enabled = true
 collision_layer = 256
 collision_mask = 4359
@@ -48,8 +49,8 @@ status = NodePath("Status")
 hurt_box = NodePath("HurtBox")
 hit_box = NodePath("PassiveHitBox")
 attack_hit_box = NodePath("ActiveHitBox")
+overhead = NodePath("Overhead")
 body_root = NodePath("AnimatedSprite2D")
-health_bar = NodePath("HealthBar")
 
 [node name="StateMachine" parent="." instance=ExtResource("4_b4mk0")]
 initial_state_id = &"wander"
@@ -84,6 +85,7 @@ _base_knockback = 2.0
 _base_poise = 0.0
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+scale = Vector2(0.752, 0.752)
 sprite_frames = ExtResource("14_2mvsx")
 animation = &"idle"
 autoplay = "idle"
@@ -124,13 +126,4 @@ faction = &"enemy"
 shape = SubResource("RectangleShape2D_jt0ol")
 debug_color = Color(0.78031605, 0.4195712, 0.3264042, 0.42000002)
 
-[node name="HealthBar" type="ProgressBar" parent="."]
-modulate = Color(0, 1, 0, 1)
-layout_direction = 1
-offset_left = -64.0
-offset_top = -192.0
-offset_right = 64.0
-offset_bottom = -182.0
-value = 75.0
-show_percentage = false
-metadata/_edit_use_anchors_ = true
+[node name="Overhead" parent="." instance=ExtResource("17_vpw1n")]

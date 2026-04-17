@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3 uid="uid://cudrre38qqi53"]
+[gd_scene load_steps=24 format=3 uid="uid://cudrre38qqi53"]
 
 [ext_resource type="Script" uid="uid://jean8knuvya7" path="res://scripts/actors/enemies/tank_slime.gd" id="1_7em7h"]
 [ext_resource type="AudioStream" uid="uid://bqmahajqmcyiv" path="res://assets/audio/sfx/slime_hit.ogg" id="2_14d2g"]
@@ -17,6 +17,7 @@
 [ext_resource type="SpriteFrames" uid="uid://cl4gtmmdkvtp3" path="res://assets/textures/actors/enemies/slime/tank/tank_slime_body.tres" id="14_t8vda"]
 [ext_resource type="SpriteFrames" uid="uid://waio4ocvdph8" path="res://assets/textures/actors/enemies/slime/tank/tank_slime_vfx.tres" id="15_ejlud"]
 [ext_resource type="PackedScene" uid="uid://fi4g51qoeha" path="res://scenes/components/hit_box_component.tscn" id="15_rirds"]
+[ext_resource type="PackedScene" uid="uid://k50he66se3ip" path="res://scenes/components/overhead_component.tscn" id="18_ejlud"]
 
 [sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_nh0x5"]
 random_pitch = 1.5
@@ -35,7 +36,7 @@ radius = 75.0
 [sub_resource type="CircleShape2D" id="CircleShape2D_a87v6"]
 radius = 324.0
 
-[node name="TankSlime" type="CharacterBody2D" node_paths=PackedStringArray("attack_vfx_sprite", "state_machine", "movement", "combat_receiver", "status", "hurt_box", "hit_box", "attack_hit_box", "body_root", "health_bar")]
+[node name="TankSlime" type="CharacterBody2D" node_paths=PackedStringArray("attack_vfx_sprite", "state_machine", "movement", "combat_receiver", "status", "hurt_box", "hit_box", "attack_hit_box", "overhead", "body_root")]
 y_sort_enabled = true
 collision_layer = 256
 collision_mask = 4359
@@ -50,8 +51,8 @@ status = NodePath("Status")
 hurt_box = NodePath("HurtBox")
 hit_box = NodePath("PassiveHitBox")
 attack_hit_box = NodePath("ActiveHitBox")
+overhead = NodePath("Overhead")
 body_root = NodePath("Body")
-health_bar = NodePath("HealthBar")
 
 [node name="StateMachine" parent="." instance=ExtResource("4_ejlud")]
 initial_state_id = &"wander"
@@ -143,13 +144,4 @@ active_on_ready = false
 shape = SubResource("CircleShape2D_a87v6")
 debug_color = Color(0.78031605, 0.4195712, 0.3264042, 0.42000002)
 
-[node name="HealthBar" type="ProgressBar" parent="."]
-modulate = Color(0, 1, 0, 1)
-layout_direction = 1
-offset_left = -64.0
-offset_top = -192.0
-offset_right = 64.0
-offset_bottom = -182.0
-value = 75.0
-show_percentage = false
-metadata/_edit_use_anchors_ = true
+[node name="Overhead" parent="." instance=ExtResource("18_ejlud")]

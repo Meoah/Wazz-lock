@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://b0sfpl2yratdw"]
+[gd_scene load_steps=21 format=3 uid="uid://b0sfpl2yratdw"]
 
 [ext_resource type="Script" uid="uid://bx2tasq4wfcec" path="res://scripts/actors/enemies/ranged_slime.gd" id="1_f1m4c"]
 [ext_resource type="PackedScene" uid="uid://dcjsyog6teaxj" path="res://scenes/actors/enemies/projectiles/ranged_slime_projectile.tscn" id="2_f1m4c"]
@@ -15,6 +15,7 @@
 [ext_resource type="SpriteFrames" uid="uid://bsmuavmvibn7b" path="res://assets/textures/actors/enemies/slime/ranged/ranged_slime_vfx.tres" id="14_dmqtm"]
 [ext_resource type="PackedScene" uid="uid://crmvibm52mj4b" path="res://scenes/components/hurt_box_component.tscn" id="14_o5quy"]
 [ext_resource type="PackedScene" uid="uid://fi4g51qoeha" path="res://scenes/components/hit_box_component.tscn" id="15_sly8l"]
+[ext_resource type="PackedScene" uid="uid://k50he66se3ip" path="res://scenes/components/overhead_component.tscn" id="16_msfar"]
 
 [sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_nh0x5"]
 random_pitch = 1.5
@@ -30,7 +31,7 @@ radius = 35.0
 [sub_resource type="CircleShape2D" id="CircleShape2D_rsbtc"]
 radius = 25.0
 
-[node name="RangedSlime" type="CharacterBody2D" node_paths=PackedStringArray("projectile_spawn", "teleport_vfx", "state_machine", "movement", "combat_receiver", "status", "hurt_box", "hit_box", "body_root", "health_bar")]
+[node name="RangedSlime" type="CharacterBody2D" node_paths=PackedStringArray("projectile_spawn", "teleport_vfx", "state_machine", "movement", "combat_receiver", "status", "hurt_box", "hit_box", "overhead", "body_root")]
 y_sort_enabled = true
 collision_layer = 256
 collision_mask = 4359
@@ -46,8 +47,8 @@ combat_receiver = NodePath("CombatReceiver")
 status = NodePath("Status")
 hurt_box = NodePath("HurtBox")
 hit_box = NodePath("PassiveHitBox")
+overhead = NodePath("Overhead")
 body_root = NodePath("Body")
-health_bar = NodePath("HealthBar")
 
 [node name="StateMachine" parent="." instance=ExtResource("4_tnytw")]
 initial_state_id = &"combat"
@@ -123,13 +124,4 @@ debug_color = Color(0.78163266, 0.4202553, 0.3251648, 0.41960785)
 
 [node name="ProjectileSpawnMarker" type="Marker2D" parent="."]
 
-[node name="HealthBar" type="ProgressBar" parent="."]
-modulate = Color(0, 1, 0, 1)
-layout_direction = 1
-offset_left = -64.0
-offset_top = -192.0
-offset_right = 64.0
-offset_bottom = -182.0
-value = 75.0
-show_percentage = false
-metadata/_edit_use_anchors_ = true
+[node name="Overhead" parent="." instance=ExtResource("16_msfar")]

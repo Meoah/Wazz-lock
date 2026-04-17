@@ -1,4 +1,4 @@
-[gd_scene load_steps=46 format=3 uid="uid://cepaf77ic4q03"]
+[gd_scene load_steps=47 format=3 uid="uid://cepaf77ic4q03"]
 
 [ext_resource type="Script" uid="uid://d4ibmcipy3vnl" path="res://scripts/actors/player/player_clive.gd" id="1_iwdwx"]
 [ext_resource type="AudioStream" uid="uid://cwrbstsb3gjte" path="res://assets/audio/sfx/punches/punch_randomizer.tres" id="2_mnojv"]
@@ -23,6 +23,7 @@
 [ext_resource type="SpriteFrames" uid="uid://bn7n4attqwpwq" path="res://assets/textures/actors/clive/spritesheets/weapons/plunger/plunger.tres" id="18_4j55y"]
 [ext_resource type="PackedScene" uid="uid://crmvibm52mj4b" path="res://scenes/components/hurt_box_component.tscn" id="18_5nm70"]
 [ext_resource type="SpriteFrames" uid="uid://ts0qwfu5wpwj" path="res://assets/textures/actors/clive/spritesheets/weapons/plunger/plunger_vfx.tres" id="20_5mka1"]
+[ext_resource type="PackedScene" uid="uid://k50he66se3ip" path="res://scenes/components/overhead_component.tscn" id="24_l31bh"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_cntgg"]
 size = Vector2(0, 0)
@@ -3269,7 +3270,7 @@ _data = {
 &"rolling": SubResource("Animation_cntgg")
 }
 
-[node name="Clive" type="CharacterBody2D" node_paths=PackedStringArray("state_machine", "movement", "attack", "combat_receiver", "status", "inventory", "aim", "hit_box", "hurt_box", "animation_player", "body_root", "hands", "health_bar", "weapon_sprite", "weapon_vfx") groups=["player"]]
+[node name="Clive" type="CharacterBody2D" node_paths=PackedStringArray("state_machine", "movement", "attack", "combat_receiver", "status", "inventory", "aim", "hit_box", "hurt_box", "overhead", "animation_player", "body_root", "hands", "weapon_sprite", "weapon_vfx") groups=["player"]]
 collision_layer = 16
 collision_mask = 12303
 script = ExtResource("1_iwdwx")
@@ -3282,12 +3283,12 @@ inventory = NodePath("Inventory")
 aim = NodePath("PlayerAim")
 hit_box = NodePath("BodyRoot/Hands/Weapon/HitBox")
 hurt_box = NodePath("HurtBox")
+overhead = NodePath("Overhead")
 punch_sfx = ExtResource("2_mnojv")
 death_sfx = ExtResource("5_ts6xf")
 animation_player = NodePath("AnimationPlayer")
 body_root = NodePath("BodyRoot")
 hands = NodePath("BodyRoot/Hands")
-health_bar = NodePath("HealthBar")
 weapon_sprite = NodePath("BodyRoot/Hands/Weapon")
 weapon_vfx = NodePath("BodyRoot/Hands/VFX")
 
@@ -3399,21 +3400,13 @@ position = Vector2(0, -38)
 shape = SubResource("CapsuleShape2D_5nm70")
 debug_color = Color(0.6313726, 0.5254902, 0.21568628, 0.41960785)
 
+[node name="Overhead" parent="." instance=ExtResource("24_l31bh")]
+head_offset = Vector2(0, -92)
+
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
 &"": SubResource("AnimationLibrary_ntpy2")
 }
-
-[node name="HealthBar" type="ProgressBar" parent="."]
-modulate = Color(0, 1, 0, 1)
-layout_direction = 1
-offset_left = -64.0
-offset_top = -192.0
-offset_right = 64.0
-offset_bottom = -182.0
-value = 75.0
-show_percentage = false
-metadata/_edit_use_anchors_ = true
 
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]
 

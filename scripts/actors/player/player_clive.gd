@@ -16,6 +16,7 @@ signal death_finished
 @export var aim: AimComponent
 @export var hit_box: HitBoxComponent
 @export var hurt_box: HurtBoxComponent
+@export var overhead: OverheadComponent
 
 @export_category("Audio")
 @export var punch_sfx: AudioStream
@@ -25,7 +26,6 @@ signal death_finished
 @export var animation_player: AnimationPlayer
 @export var body_root: Node2D
 @export var hands: Node2D
-@export var health_bar: ProgressBar
 
 @export_category("Weapon Nodes")
 @export var weapon_sprite: AnimatedSprite2D
@@ -73,10 +73,10 @@ var action_token: int = 0
 
 func _ready() -> void:
 	_validate_components()
-	
+
 	if body_root:
 		body_root_origin = body_root.position
-	
+
 	if status:
 		status.setup()
 		status.request_active()
@@ -86,11 +86,15 @@ func _ready() -> void:
 	movement.set_movement_enabled(true)
 	movement.request_stop()
 	movement.clear_impulses()
-	
-	if hit_box: hit_box.end_activation()
-	
+
+	if hit_box:
+		hit_box.end_activation()
+
+	if overhead:
+		overhead.setup(self, status, inventory)
+
 	state_machine.setup(self)
-	
+
 	SignalBus.player_ready.emit(self)
 
 
@@ -246,7 +250,7 @@ func _validate_components() -> void:
 	if aim == null: push_error("Clive missing AimComponent")
 	if weapon_sprite == null: push_error("Clive missing WeaponSprite")
 	if weapon_vfx == null: push_error("Clive missing WeaponVFX")
-
+	if overhead == null: push_error("Clive missing OverheadComponent")
 
 func _sync_movement_speed_from_status() -> void:
 	if movement and status:
@@ -260,15 +264,12 @@ func _update_timers(delta: float) -> void:
 
 
 func _update_status() -> void:
-	health_bar.max_value = status.max_health
-	health_bar.value = status.current_health
-	
 	var invuln_now: bool = invuln_cooldown > 0.0
 	_set_status_flag(STATUS_FLAG.INVULN, invuln_now)
-	
+
 	hurt_box.monitorable = not invuln_now
 	hurt_box.monitoring = not invuln_now
-	
+
 	_invuln_handler()
 
 
@@ -336,6 +337,45 @@ func consume_roll_request(entry_cost: float = 20.0) -> bool:
 	if _should_charge_dodge_mana() and !status.request_mana(entry_cost): return false
 	
 	return true
+
+
+func get_overhead_root_name() -> String:
+	if status == null:
+		return "Clive"
+
+	if status.actor_name == "":
+		return "Clive"
+
+	return status.actor_name
+
+
+func get_overhead_prefix_text() -> String:
+	return ""
+
+
+func get_overhead_suffix_text() -> String:
+	return ""
+
+
+func get_overhead_prefix_color() -> Color:
+	return Color.WHITE
+
+
+func get_overhead_suffix_color() -> Color:
+	return Color.WHITE
+
+
+func should_show_overhead_label() -> bool:
+	return false
+
+
+func get_overhead_status_icon_ids() -> Array[StringName]:
+	var icon_ids: Array[StringName] = []
+
+	if inventory and inventory.is_potion_hot_active():
+		icon_ids.append(&"potion_hot")
+
+	return icon_ids
 
 
 func get_current_room() -> Room:

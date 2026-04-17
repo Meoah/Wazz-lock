@@ -11,10 +11,10 @@ class_name BaseEnemy
 @export var hurt_box: HurtBoxComponent
 @export var hit_box: HitBoxComponent
 @export var attack_hit_box: HitBoxComponent
+@export var overhead: OverheadComponent
 
 @export_category("Nodes")
 @export var body_root: Node2D
-@export var health_bar: ProgressBar
 
 @export_category("Targeting")
 @export var target_group: StringName = &"player"
@@ -40,10 +40,10 @@ func _ready() -> void:
 	add_to_group("enemy")
 	_validate_components()
 	_wire_components()
-	
+
 	if body_root:
 		body_root_origin = body_root.position
-	
+
 	if status:
 		status.setup()
 		status.request_active()
@@ -54,6 +54,9 @@ func _ready() -> void:
 		movement.request_stop()
 		movement.clear_impulses()
 
+	if overhead:
+		overhead.setup(self, status)
+
 	if state_machine and state_machine.initial_state_id != StringName():
 		state_machine.setup(self)
 
@@ -62,8 +65,6 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
-	_update_health_bar()
-
 	if not is_instance_valid(target):
 		target = get_tree().get_first_node_in_group(target_group) as Node2D
 
@@ -85,7 +86,7 @@ func _validate_components() -> void:
 	if movement == null: push_error("BaseEnemy missing MovementComponent")
 	if combat_receiver == null: push_error("BaseEnemy missing CombatReceiverComponent")
 	if hurt_box == null: push_error("BaseEnemy missing HurtBoxComponent")
-	if health_bar == null: push_error("BaseEnemy missing HealthBar")
+	if overhead == null: push_error("BaseEnemy missing OverheadComponent")
 
 
 func _wire_components() -> void:
@@ -120,12 +121,46 @@ func _wire_components() -> void:
 			attack_hit_box.status_component = status
 
 
-func _update_health_bar() -> void:
-	if health_bar == null or status == null:
-		return
+func get_overhead_root_name() -> String:
+	if status == null:
+		return "Enemy"
 
-	health_bar.max_value = status.max_health
-	health_bar.value = status.current_health
+	if status.actor_name == "":
+		return "Enemy"
+
+	return status.actor_name
+
+
+func get_overhead_prefix_text() -> String:
+	return str(get_meta("display_prefix", ""))
+
+
+func get_overhead_suffix_text() -> String:
+	return str(get_meta("display_suffix", ""))
+
+
+func get_overhead_prefix_color() -> Color:
+	var value: Variant = get_meta("display_prefix_color", Color.WHITE)
+	if value is Color:
+		return value
+
+	return Color.WHITE
+
+
+func get_overhead_suffix_color() -> Color:
+	var value: Variant = get_meta("display_suffix_color", Color.WHITE)
+	if value is Color:
+		return value
+
+	return Color.WHITE
+
+
+func should_show_overhead_label() -> bool:
+	return get_overhead_prefix_text() != "" or get_overhead_suffix_text() != ""
+
+
+func get_overhead_status_icon_ids() -> Array[StringName]:
+	return []
 
 
 func get_status_component() -> StatusComponent:
@@ -289,24 +324,23 @@ func apply_spawn_variant_modifiers(config: Dictionary) -> void:
 		var damage_multiplier: float = float(config.get("damage_multiplier", 1.0))
 		var defense_multiplier: float = float(config.get("defense_multiplier", 1.0))
 		var poise_multiplier: float = float(config.get("poise_multiplier", 1.0))
-		
+
 		var previous_max_health: float = max(status.max_health, 1.0)
 		var health_ratio: float = status.current_health / previous_max_health
-		
+
 		status.max_health *= health_multiplier
 		status.current_health = clamp(status.max_health * health_ratio, 0.0, status.max_health)
 		status.damage *= damage_multiplier
 		status.defense *= defense_multiplier
 		status.poise *= poise_multiplier
-	
+
 	if movement:
 		var speed_multiplier: float = float(config.get("speed_multiplier", 1.0))
 		movement.base_speed *= speed_multiplier
-	
+
 	if body_root:
 		var scale_multiplier: float = float(config.get("scale_multiplier", 1.0))
 		body_root.scale *= scale_multiplier
-		body_root.modulate = config.get("modulate", Color.WHITE)
 
 
 func move_toward_point(point: Vector2, stop_distance: float = 0.0, speed_multiplier: float = 1.0) -> void:
