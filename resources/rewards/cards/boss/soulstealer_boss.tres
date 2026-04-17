@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="RewardCardData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/systems/rewards/reward_effect_data_resource.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/systems/rewards/reward_card_data_resource.gd" id="2"]
+
+[resource]
+script = ExtResource("2")
+card_id = "soulstealer_boss"
+display_name = "Soulstealer"
+description = "1% chance to heal 5 when killing enemies"
+rarity = 5
+hidden_difficulty_modifier = 7.0
+effects = Array[ExtResource("1")]([])

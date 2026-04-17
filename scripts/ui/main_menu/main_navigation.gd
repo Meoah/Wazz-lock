@@ -106,17 +106,17 @@ func refresh_for_current_slot() -> void:
 	if has_slot_data:
 		@warning_ignore("integer_division")
 		var play_minutes: int = int(summary.get("play_time_seconds", 0)) / 60
-		var total_gold: int = int(summary.get("total_gold", 0))
+		var total_gold: float = float(summary.get("total_gold", 0.0))
 
 		if has_save:
-			_label_previous_run.text = "[center][b]%s[/b]\nChapter %s\nGold: %d\n%dm played[/center]" % [
+			_label_previous_run.text = "[center][b]%s[/b]\nChapter %s\nGold: %.2f\n%d minutes played[/center]" % [
 				str(summary.get("display_name", "Player")),
 				str(summary.get("chapter", 1)),
 				total_gold,
 				play_minutes
 					]
 		else:
-			_label_previous_run.text = "[center][b]%s[/b]\n%s\nGold: %d\nNo active run[/center]" % [
+			_label_previous_run.text = "[center][b]%s[/b]\n%s\nGold: %.2f\nNo active run[/center]" % [
 				str(summary.get("display_name", "Player")),
 				str(summary.get("chapter", "Run Failed")),
 				total_gold

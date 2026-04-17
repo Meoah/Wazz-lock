@@ -16,8 +16,8 @@ const OPPOSITE_DIRECTION: Dictionary[RoomData.Directions, RoomData.Directions] =
 }
 
 const PLAYABLE_OBJECTIVE_WEIGHTS: Dictionary = {
-	RoomData.ObjectiveType.EXTERMINATE: 80.0,
-	RoomData.ObjectiveType.SURVIVAL: 15.0,
+	RoomData.ObjectiveType.EXTERMINATE: 70.0,
+	RoomData.ObjectiveType.SURVIVAL: 25.0,
 	RoomData.ObjectiveType.SHOP: 5.0,
 }
 

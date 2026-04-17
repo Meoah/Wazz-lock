@@ -15,7 +15,7 @@ var _tile_handler: TileHandler = null
 var _spawning_enabled: bool = true
 
 var _spawn_mode: SpawnMode = SpawnMode.DISABLED
-var _difficulty_percent: float = 0.0
+var _difficulty_modifier: float = 0.0
 var _pending_respawns: Array[Dictionary] = []
 var _boss_spawned_once: bool = false
 var _respawn_delay_seconds: float = 3.0
@@ -70,15 +70,15 @@ func clear_alive_enemies() -> void:
 
 func begin_static_spawn(difficulty_percent: float) -> void:
 	_spawn_mode = SpawnMode.STATIC
-	_difficulty_percent = max(difficulty_percent, 0.0)
+	_difficulty_modifier = max(difficulty_percent, 0.0)
 	_spawning_enabled = true
 	set_process(false)
-	_spawn_static_enemies(_difficulty_percent)
+	_spawn_static_enemies(_difficulty_modifier)
 
 
 func begin_survival_mode(difficulty_percent: float, respawn_delay_seconds: float = 3.0) -> void:
 	_spawn_mode = SpawnMode.SURVIVAL
-	_difficulty_percent = max(difficulty_percent, 0.0)
+	_difficulty_modifier = max(difficulty_percent, 0.0)
 	_respawn_delay_seconds = respawn_delay_seconds
 	_spawning_enabled = true
 	_pending_respawns.clear()
@@ -89,7 +89,7 @@ func begin_survival_mode(difficulty_percent: float, respawn_delay_seconds: float
 
 func begin_boss_mode(difficulty_percent: float, respawn_delay_seconds: float = 3.0) -> void:
 	_spawn_mode = SpawnMode.BOSS
-	_difficulty_percent = max(difficulty_percent, 0.0)
+	_difficulty_modifier = max(difficulty_percent, 0.0)
 	_respawn_delay_seconds = respawn_delay_seconds
 	_spawning_enabled = true
 	_pending_respawns.clear()
@@ -117,18 +117,18 @@ func _get_static_spawn_count_from_difficulty(difficulty_percent: float) -> int:
 
 
 func _get_spawn_cap_from_difficulty() -> int:
-	return max(2, int(ceil(max(_difficulty_percent, 1.0) / 7.5)))
+	return max(2, int(ceil(max(_difficulty_modifier, 1.0) / 7.5)))
 
 
 func _pick_spawn_archetype() -> EnemyLibrary.EnemyArchetype:
 	if _encounter_profile == RoomData.EncounterProfile.SHOP:
 		return EnemyLibrary.EnemyArchetype.MELEE_SLIME
 
-	return EnemyLibrary.pick_weighted_archetype_for_spawn(_encounter_profile, _difficulty_percent, _rng)
+	return EnemyLibrary.pick_weighted_archetype_for_spawn(_encounter_profile, _difficulty_modifier, _rng)
 
 
 func _pick_spawn_variant() -> EnemyLibrary.EnemyVariant:
-	return EnemyLibrary.pick_variant_for_spawn(_encounter_profile, _difficulty_percent, _rng)
+	return EnemyLibrary.pick_variant_for_spawn(_encounter_profile, _difficulty_modifier, _rng)
 
 
 func _get_occupied_enemy_positions() -> Array[Vector2]:
@@ -198,18 +198,18 @@ func _apply_variant_to_enemy(enemy: BaseEnemy, enemy_variant: EnemyLibrary.Enemy
 
 
 func _award_currency_drops(enemy: BaseEnemy) -> void:
-	var drops: Dictionary = EnemyLibrary.roll_currency_drop(enemy, _rng)
-	var silver: int = int(drops.get("silver", 0))
-	var gold: int = int(drops.get("gold", 0))
+	var drops: Dictionary = EnemyLibrary.roll_currency_drop(enemy, _rng, _difficulty_modifier)
+	var silver: float = float(drops.get("silver", 0.0))
+	var gold: float = float(drops.get("gold", 0.0))
 	var drop_position: Vector2 = enemy.global_position
 
 	if silver > 0:
 		RunManager.add_silver(silver)
-		SignalBus.floating_text.emit("[font_size=64][color=#a1a1a1]+%d Silver[/color][/font_size]" % silver, drop_position)
+		SignalBus.floating_text.emit("[font_size=64][color=#a1a1a1]+%.2f Silver[/color][/font_size]" % silver, drop_position)
 
 	if gold > 0:
 		RunManager.add_gold(gold)
-		SignalBus.floating_text.emit("[font_size=64][color=#ffd34d]+%d Gold[/color][/font_size]" % gold, drop_position + Vector2(0, -20))
+		SignalBus.floating_text.emit("[font_size=64][color=#ffd34d]+%.2f Gold[/color][/font_size]" % gold, drop_position + Vector2(0, -20))
 
 
 func _on_enemy_death(_hit_data: HitData, enemy: BaseEnemy) -> void:
@@ -298,7 +298,7 @@ func _spawn_boss_once() -> void:
 
 
 func configure_runtime_mode_from_room(room_clear_condition: int, difficulty_percent: float, respawn_delay_seconds: float = 3.0) -> void:
-	_difficulty_percent = max(difficulty_percent, 0.0)
+	_difficulty_modifier = max(difficulty_percent, 0.0)
 	_respawn_delay_seconds = respawn_delay_seconds
 	_spawning_enabled = true
 	
@@ -443,6 +443,19 @@ func has_alive_enemies() -> bool:
 func get_alive_enemy_count() -> int:
 	_prune_enemy_list()
 	return enemy_list.size()
+
+
+func get_active_boss_enemy() -> BaseEnemy:
+	_prune_enemy_list()
+
+	for enemy in enemy_list:
+		if !is_instance_valid(enemy): continue
+		if enemy.is_dead(): continue
+		if str(enemy.get_meta("spawn_role", "")) != "boss": continue
+
+		return enemy
+
+	return null
 
 
 func has_alive_boss_enemies() -> bool:

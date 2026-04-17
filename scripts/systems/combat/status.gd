@@ -204,10 +204,10 @@ func resolve_damage_after_defense(incoming_damage: float) -> float:
 	return raw_damage * mitigation_scale
 
 
-func apply_permanent_stat_bonus(stat_id: String, amount: float) -> void:
+func apply_permanent_stat_add(stat_id: String, amount: float) -> void:
 	var old_max_health: float = max_health
 	var old_max_mana: float = max_mana
-	
+
 	match stat_id:
 		"max_health": _base_max_health += amount
 		"max_mana": _base_max_mana += amount
@@ -219,13 +219,67 @@ func apply_permanent_stat_bonus(stat_id: String, amount: float) -> void:
 		"mana_regen": _base_mana_regen += amount
 		"move_speed": _base_move_speed += amount
 		_: return
+
+	_update_status()
+
+	if stat_id == "max_health":
+		current_health += max_health - old_max_health
+		current_health = clamp(current_health, 0.0, max_health)
+
+	if stat_id == "max_mana":
+		current_mana += max_mana - old_max_mana
+		current_mana = clamp(current_mana, 0.0, max_mana)
+
+
+func apply_permanent_stat_multiplier(stat_id: String, multiplier: float) -> void:
+	var old_max_health: float = max_health
+	var old_max_mana: float = max_mana
+	
+	match stat_id:
+		"max_health": _base_max_health *= multiplier
+		"max_mana": _base_max_mana *= multiplier
+		"damage": _base_damage *= multiplier
+		"defense": _base_defense *= multiplier
+		"knockback": _base_knockback *= multiplier
+		"poise": _base_poise *= multiplier
+		"health_regen": _base_health_regen *= multiplier
+		"mana_regen": _base_mana_regen *= multiplier
+		"move_speed": _base_move_speed *= multiplier
+		_: return
 	
 	_update_status()
 	
 	if stat_id == "max_health":
-		current_health += max_health - old_max_health
-		current_health = clamp(current_health, 0.0, max_health)
+		current_health = clamp(current_health * multiplier, 0.0, max_health)
 	
 	if stat_id == "max_mana":
-		current_mana += max_mana - old_max_mana
-		current_mana = clamp(current_mana, 0.0, max_mana)
+		current_mana = clamp(current_mana * multiplier, 0.0, max_mana)
+
+
+func modify_current_resource(resource_id: String, amount: float) -> void:
+	match resource_id:
+		"current_health": current_health = clamp(current_health + amount, 0.0, max_health)
+		"current_mana": current_mana = clamp(current_mana + amount, 0.0, max_mana)
+
+
+func multiply_current_resource(resource_id: String, multiplier: float) -> void:
+	match resource_id:
+		"current_health": current_health = clamp(current_health * multiplier, 0.0, max_health)
+		"current_mana": current_mana = clamp(current_mana * multiplier, 0.0, max_mana)
+
+
+func restore_resource_percent_of_max(resource_id: String, fraction: float) -> void:
+	match resource_id:
+		"current_health": modify_current_resource("current_health", max_health * fraction)
+		"current_mana": modify_current_resource("current_mana", max_mana * fraction)
+
+
+func restore_resource_percent_of_missing(resource_id: String, fraction: float) -> void:
+	match resource_id:
+		"current_health":
+			var missing: float = max_health - current_health
+			modify_current_resource("current_health", missing * fraction)
+			
+		"current_mana":
+			var missing: float = max_mana - current_mana
+			modify_current_resource("current_mana", missing * fraction)

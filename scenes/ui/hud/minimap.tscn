@@ -1,7 +1,12 @@
-[gd_scene load_steps=7 format=4 uid="uid://bn4hjjqbutbau"]
+[gd_scene load_steps=12 format=4 uid="uid://bn4hjjqbutbau"]
 
 [ext_resource type="Texture2D" uid="uid://dtd6qy8bpr1hd" path="res://assets/textures/ui/minimap/minimap_tiles.png" id="1_1lug7"]
 [ext_resource type="Script" uid="uid://cqlfdsqrgr61o" path="res://scripts/ui/hud/minimap.gd" id="1_radbx"]
+[ext_resource type="Texture2D" uid="uid://cw0b4wqh3v6t0" path="res://assets/textures/ui/icons/start.png" id="2_hoyg2"]
+[ext_resource type="Texture2D" uid="uid://dv2r87g2wgua0" path="res://assets/textures/ui/icons/exterminate.png" id="3_aov52"]
+[ext_resource type="Texture2D" uid="uid://7audpjsy4pe8" path="res://assets/textures/ui/icons/survive.png" id="4_6fbxy"]
+[ext_resource type="Texture2D" uid="uid://otcww5psdsgg" path="res://assets/textures/ui/icons/boss.png" id="5_1e4aq"]
+[ext_resource type="Texture2D" uid="uid://6t0pnt2cb738" path="res://assets/textures/ui/icons/shop.png" id="6_2vbwu"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_1lug7"]
 texture = ExtResource("1_1lug7")
@@ -58,6 +63,12 @@ animations = [{
 
 [node name="Minimap" type="Node2D" node_paths=PackedStringArray("tilemap", "player_marker", "minimap_camera", "icons_root")]
 script = ExtResource("1_radbx")
+_icon_start = ExtResource("2_hoyg2")
+_icon_exterminate = ExtResource("3_aov52")
+_icon_survive = ExtResource("4_6fbxy")
+_icon_boss = ExtResource("5_1e4aq")
+_icon_shop = ExtResource("6_2vbwu")
+_icon_fallback = ExtResource("2_hoyg2")
 tilemap = NodePath("Map")
 player_marker = NodePath("PlayerMarker")
 minimap_camera = NodePath("Camera2D")

@@ -27,13 +27,12 @@ func update_status(player_node: Clive) -> void:
 		MONEY_TYPE:		text = "%.2f" % RunManager.current_money
 		META_TYPE:		text = "%.2f" % RunManager.current_meta
 		TIMER_TYPE:		_update_timer()
-		POTION_TYPE:	text = "%d" % player_inventory.current_inventory.get(player_inventory.HEALTH_POTION, 0)
+		POTION_TYPE:	text = player_inventory.get_potion_display_text()
 
 
 func _update_timer() -> void:
-	if !RunManager.is_timer_active:
-		get_parent().hide()
-		return
+	var timer_container: Control = get_parent() as Control
+	if !timer_container: return
 	
 	var total_time: float = RunManager.current_run_timer
 	

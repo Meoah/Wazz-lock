@@ -55,10 +55,10 @@ func refresh_summary() -> void:
 	
 	@warning_ignore("integer_division")
 	var play_minutes: int = int(summary.get("play_time_seconds", 0)) / 60
-	var total_gold: int = int(summary.get("total_gold", 0))
+	var total_gold: float = float(summary.get("total_gold", 0.0))
 	
 	if !has_save:
-		_label_save_data.text = "[center][b]%s[/b]\n%s\nGold: %d\n%dm played[/center]" % [
+		_label_save_data.text = "[center][b]%s[/b]\n%s\nGold: %.2f\n%d minutes played[/center]" % [
 			str(summary.get("display_name", "Player")),
 			str(summary.get("chapter", "No Active Run")),
 			total_gold,
@@ -66,7 +66,7 @@ func refresh_summary() -> void:
 				]
 		return
 	
-	_label_save_data.text = "[center][b]%s[/b]\nArea:  %s\nGold: %d\n%dm played[/center]" % [
+	_label_save_data.text = "[center][b]%s[/b]\nArea:  %s\nGold: %.2f\n%d minutes played[/center]" % [
 		str(summary.get("display_name", "Player")),
 		str(summary.get("chapter", 1)),
 		total_gold,

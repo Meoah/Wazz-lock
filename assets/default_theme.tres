@@ -7,4 +7,5 @@ default_font = ExtResource("1_qew4h")
 Label/constants/outline_size = 4
 Label/font_sizes/font_size = 24
 RichTextLabel/constants/outline_size = 4
+RichTextLabel/font_sizes/bold_font_size = 32
 RichTextLabel/font_sizes/normal_font_size = 24

@@ -29,6 +29,7 @@ var target: Node2D
 
 
 func _ready() -> void:
+	add_to_group("enemy")
 	_validate_components()
 	_wire_components()
 
@@ -62,6 +63,10 @@ func _physics_process(delta: float) -> void:
 	_update_awareness(delta)
 	
 	if movement: movement.physics_step(delta)
+
+
+func _exit_tree() -> void:
+	remove_from_group("enemy")
 
 
 func _validate_components() -> void:

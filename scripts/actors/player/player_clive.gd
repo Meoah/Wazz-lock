@@ -107,6 +107,10 @@ func _can_accept_gameplay_input() -> bool:
 	return current_state != null and current_state.state_id == &"play"
 
 
+func _should_charge_dodge_mana() -> bool:
+	return RunManager.is_active_combat_room
+
+
 func _clear_transient_inputs() -> void:
 	input_flags = 0
 	move_direction = Vector2.ZERO
@@ -156,6 +160,9 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_released("move_secondary"):
 		secondary_attack_held = false
 		if attack: attack.on_attack_button_released(PlayerAttackComponent.AttackInputType.SECONDARY)
+	
+	if event.is_action_pressed("use_potion"):
+		potion_requested = true
 	
 	_update_move_direction()
 
@@ -262,16 +269,13 @@ func _update_status() -> void:
 
 func _handle_potion() -> void:
 	if !potion_requested: return
-	
 	potion_requested = false
 	
 	if potion_cooldown > 0.0: return
 	
-	if inventory.request_use_item(inventory.HEALTH_POTION):
-		SignalBus.floating_text.emit("+10", position)
-		status.current_health += 10.0
-		status.health_regen = 2.5
-		potion_cooldown = 1.0
+	if inventory and inventory.try_use_health_potion(status):
+		SignalBus.floating_text.emit("[color=#8cff8c]Potion used![/color]", global_position)
+		potion_cooldown = 0.25
 
 
 func _set_input_flag(flag: int, enabled: bool) -> void:
@@ -317,11 +321,11 @@ func _update_move_direction() -> void:
 
 
 func consume_roll_request(entry_cost: float = 20.0) -> bool:
-	if not roll_requested: return false
+	if !roll_requested: return false
 	roll_requested = false
 	
 	if roll_cooldown > 0.0 or is_dead(): return false
-	if not status.request_mana(entry_cost): return false
+	if _should_charge_dodge_mana() and !status.request_mana(entry_cost): return false
 	
 	return true
 

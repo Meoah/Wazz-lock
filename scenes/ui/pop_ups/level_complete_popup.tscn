@@ -58,6 +58,7 @@ theme_override_styles/panel = SubResource("StyleBoxTexture_k8o74")
 [node name="Title" type="Label" parent="PanelContainer/VBoxContainer/TitleContainer"]
 layout_mode = 2
 size_flags_vertical = 0
+theme_override_font_sizes/font_size = 48
 text = "Level Complete"
 horizontal_alignment = 1
 

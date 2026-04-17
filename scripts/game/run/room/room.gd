@@ -11,7 +11,7 @@ enum ClearConditions{
 }
 
 @export var clear_condition: ClearConditions = ClearConditions.EXTERMINATE
-@export var _shop_npc_scene: PackedScene
+@export var _shop_npc_scene: PackedScene = preload("res://scenes/actors/friendlies/shop_npc.tscn")
 @export_category("Children Nodes")
 @export var _tile_handler: TileHandler
 @export var _enemy_handler: EnemyHandler
@@ -56,6 +56,47 @@ func _resolve_clear_condition_from_data() -> ClearConditions:
 	return ClearConditions.EXTERMINATE
 
 
+func _is_combat_room() -> bool:
+	match clear_condition:
+		ClearConditions.EXTERMINATE, ClearConditions.SURVIVAL, ClearConditions.BOSS:
+			return true
+
+	return false
+
+
+func _refresh_room_runtime_rules() -> void:
+	if !data:
+		RunManager.set_active_combat_room(false)
+		return
+
+	var is_active_room: bool = _is_combat_room() and !data.cleared
+	RunManager.set_active_combat_room(is_active_room)
+
+
+func _refresh_boss_hud_tracking() -> void:
+	RunManager.is_boss_active = false
+	RunManager.boss_node = null
+
+	if clear_condition != ClearConditions.BOSS: return
+	if !data or data.cleared: return
+
+	var boss_node: BaseEnemy = _enemy_handler.get_active_boss_enemy()
+	if !boss_node: return
+
+	RunManager.is_boss_active = true
+	RunManager.boss_node = boss_node
+
+
+func _get_objective_icon_texture() -> Texture2D:
+	match clear_condition:
+		ClearConditions.AUTO_WIN: return preload("res://assets/textures/ui/icons/start.png")
+		ClearConditions.EXTERMINATE: return preload("res://assets/textures/ui/icons/exterminate.png")
+		ClearConditions.SURVIVAL: return preload("res://assets/textures/ui/icons/survive.png")
+		ClearConditions.BOSS: return preload("res://assets/textures/ui/icons/boss.png")
+		ClearConditions.SHOP: return preload("res://assets/textures/ui/icons/shop.png")
+		_: return preload("res://assets/textures/ui/icons/start.png")
+
+
 func _refresh_objective_hud() -> void:
 	var hud: GameHUD = GameManager.root_hud.game_hud
 	if !hud: return
@@ -68,16 +109,23 @@ func _refresh_objective_hud() -> void:
 		hud.set_objective(
 			"Main Objective",
 			"Find the boss to progress deeper into the dungeon.",
-			"Explore the connected rooms."
-		)
+			"Explore the connected rooms.",
+			preload("res://assets/textures/ui/icons/start.png")
+				)
 		return
-
+	
 	if data.cleared:
-		hud.set_objective(
-			"Room Cleared",
-			"Choose a reward to continue.",
-			""
-		)
+		match clear_condition:
+			ClearConditions.SHOP:
+				hud.set_objective(
+					"Safe Room",
+					"Take a moment to prepare before moving on.",
+					"",
+					preload("res://assets/textures/ui/icons/shop.png")
+				)
+			_:
+				hud.clear_objective()
+		
 		return
 	
 	match clear_condition:
@@ -85,44 +133,50 @@ func _refresh_objective_hud() -> void:
 			hud.set_objective(
 				"Clear the Room",
 				"Defeat all enemies in this room.",
-				"Remaining: %d" % _enemy_handler.get_alive_enemy_count()
+				"Remaining: %d" % _enemy_handler.get_alive_enemy_count(),
+				preload("res://assets/textures/ui/icons/exterminate.png")
 			)
-		
+			
 		ClearConditions.SURVIVAL:
 			var required_seconds: float = float(data.metadata.get("survival_duration_seconds", 30.0))
 			var remaining_seconds: float = max(0.0, required_seconds - _survival_elapsed)
 			hud.set_objective(
 				"Survive",
 				"Stay alive until the timer expires.",
-				"%.1fs remaining" % remaining_seconds
+				"%.1fs remaining" % remaining_seconds,
+				preload("res://assets/textures/ui/icons/survive.png")
 			)
-		
+			
 		ClearConditions.BOSS:
 			hud.set_objective(
 				"Boss Room",
 				"Defeat the boss to unlock the exits.",
-				"Bosses remaining: %d" % _enemy_handler.get_alive_boss_enemy_count()
+				"Bosses remaining: %d" % _enemy_handler.get_alive_boss_enemy_count(),
+				preload("res://assets/textures/ui/icons/boss.png")
 			)
-		
+			
 		ClearConditions.PUZZLE:
 			hud.set_objective(
 				"Puzzle Room",
 				"Solve the room objective to proceed.",
-				""
+				"",
+				preload("res://assets/textures/ui/icons/start.png")
 			)
-		
+			
 		ClearConditions.SHOP:
 			hud.set_objective(
 				"Safe Room",
 				"Take a moment to prepare before moving on.",
-				""
+				"",
+				preload("res://assets/textures/ui/icons/shop.png")
 			)
-		
+			
 		ClearConditions.AUTO_WIN:
 			hud.set_objective(
 				"Explore",
 				"Find the boss to progress deeper into the dungeon.",
-				""
+				"",
+				preload("res://assets/textures/ui/icons/start.png")
 			)
 
 
@@ -154,30 +208,40 @@ func _cleared() -> void:
 	_enemy_handler.clear_alive_enemies()
 	_exit_handler.open_all_exits()
 	data.cleared = true
+	_refresh_boss_hud_tracking()
+	_refresh_room_runtime_rules()
 	_refresh_objective_hud()
 	
 	match clear_condition:
 		ClearConditions.BOSS:
-			GameManager.show_popup(
-				BasePopup.POPUP_TYPE.LEVEL_COMPLETE,
-				RunManager.build_level_complete_popup_params()
-					)
-		
+			GameManager.show_popup(BasePopup.POPUP_TYPE.REWARD, {
+					"room_difficulty_modifier": data.difficulty_modifier,
+					"reward_pool_id": "boss",
+					"choice_count": 3,
+					"followup_popup_type": BasePopup.POPUP_TYPE.LEVEL_COMPLETE,
+					"followup_popup_params": RunManager.build_level_complete_popup_params()
+			})
+			
 		ClearConditions.AUTO_WIN, ClearConditions.SHOP:
 			pass
 		
 		_:
 			GameManager.show_popup(BasePopup.POPUP_TYPE.REWARD, {
-			"room_difficulty": data.difficulty,
-			"reward_pool_id": "standard",
-			"choice_count": 3
-				})
+					"room_difficulty_modifier": data.difficulty_modifier,
+					"reward_pool_id": "standard",
+					"choice_count": 3
+			})
 	
 	SignalBus.request_minimap_refresh.emit()
 	SignalBus.request_run_save.emit()
 
 
+func _exit_tree() -> void:
+	remove_from_group("current_room")
+
+
 func setup(room_data: RoomData) -> void:
+	add_to_group("current_room")
 	data = room_data
 	name = "Room_%s_%s" % [data.grid_pos.x, data.grid_pos.y]
 	_survival_elapsed = 0.0
@@ -193,13 +257,15 @@ func setup(room_data: RoomData) -> void:
 		_exit_handler.open_all_exits()
 		_restore_friendly_runtime_state(data.metadata.get("friendly_snapshots", []))
 		_refresh_objective_hud()
+		_refresh_room_runtime_rules()
+		_refresh_boss_hud_tracking()
 		set_process(false)
 		return
 	
 	if runtime_initialized:
 		_enemy_handler.configure_runtime_mode_from_room(
 			clear_condition,
-			float(data.difficulty),
+			float(data.difficulty_modifier),
 			float(data.metadata.get("respawn_delay_seconds", 3.0))
 				)
 		_enemy_handler.restore_runtime_state(data.metadata.get("enemy_snapshots", []))
@@ -210,17 +276,17 @@ func setup(room_data: RoomData) -> void:
 				_enemy_handler.stop_spawning()
 			
 			ClearConditions.EXTERMINATE:
-				_enemy_handler.begin_static_spawn(float(data.difficulty))
+				_enemy_handler.begin_static_spawn(float(data.difficulty_modifier))
 			
 			ClearConditions.SURVIVAL:
 				_enemy_handler.begin_survival_mode(
-					float(data.difficulty),
+					float(data.difficulty_modifier),
 					float(data.metadata.get("respawn_delay_seconds", 3.0))
 				)
 			
 			ClearConditions.BOSS:
 				_enemy_handler.begin_boss_mode(
-					float(data.difficulty),
+					float(data.difficulty_modifier),
 					float(data.metadata.get("respawn_delay_seconds", 3.0))
 				)
 			
@@ -229,9 +295,11 @@ func setup(room_data: RoomData) -> void:
 				_spawn_shop_friendlies()
 			
 			_:
-				_enemy_handler.begin_static_spawn(float(data.difficulty))
+				_enemy_handler.begin_static_spawn(float(data.difficulty_modifier))
 	
 	_refresh_objective_hud()
+	_refresh_room_runtime_rules()
+	_refresh_boss_hud_tracking()
 	set_process(true)
 
 
@@ -271,7 +339,7 @@ func _spawn_shop_friendlies() -> void:
 	rng.randomize()
 	
 	var spawn_position: Variant = _tile_handler.pick_floor_spawn_position(rng)
-	if !spawn_position: return
+	if spawn_position == null: return
 	
 	var npc: Node2D = _shop_npc_scene.instantiate() as Node2D
 	if !npc: return
@@ -306,6 +374,48 @@ func _capture_friendly_runtime_state() -> Array[Dictionary]:
 
 func on_player_death_started() -> void:
 	set_process(false)
+	RunManager.set_active_combat_room(false)
+	RunManager.is_boss_active = false
+	RunManager.boss_node = null
 
 	if _enemy_handler:
 		_enemy_handler.on_player_death_started()
+
+
+func on_room_exited() -> void:
+	set_process(false)
+	RunManager.set_active_combat_room(false)
+	RunManager.is_boss_active = false
+	RunManager.boss_node = null
+
+
+func get_or_create_shop_state() -> Dictionary:
+	if clear_condition != ClearConditions.SHOP: return {}
+	var shop_state: Dictionary = data.metadata.get("shop_state", {})
+
+	if bool(shop_state.get("generated", false)):
+		return shop_state
+
+	shop_state = {
+		"generated": true,
+		"offers": RewardLibrary.generate_shop_offers(3, data.difficulty_modifier)
+	}
+
+	data.metadata["shop_state"] = shop_state
+	return shop_state
+
+
+func mark_shop_offer_purchased(offer_index: int) -> void:
+	var shop_state: Dictionary = data.metadata.get("shop_state", {})
+	var offers: Array = shop_state.get("offers", [])
+
+	if offer_index < 0 or offer_index >= offers.size():
+		return
+
+	var offer: Dictionary = offers[offer_index]
+	offer["purchased"] = true
+	offers[offer_index] = offer
+	shop_state["offers"] = offers
+	data.metadata["shop_state"] = shop_state
+
+	SignalBus.request_run_save.emit()

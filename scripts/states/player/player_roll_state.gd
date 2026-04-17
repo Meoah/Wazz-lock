@@ -16,6 +16,11 @@ var rolling_active: bool = false
 var rolling_time: float = 0.0
 var ending: bool = false
 
+
+func _should_charge_roll_sustain_mana() -> bool:
+	return RunManager.is_active_combat_room
+
+
 func enter(_previous_state: StateComponent, _data: Dictionary = {}) -> void:
 	if parent is not Clive: return
 	
@@ -40,8 +45,9 @@ func enter(_previous_state: StateComponent, _data: Dictionary = {}) -> void:
 	parent.movement.lock_direction(false)
 	parent.begin_roll_sustain()
 	
-	parent.status.set_mana_regen_paused(mana_regen_source_id, pause_mana_regen_while_rolling)
-	parent.status.set_mana_regen_scale(mana_regen_source_id, mana_regen_scale_while_rolling)
+	if _should_charge_roll_sustain_mana():
+		parent.status.set_mana_regen_paused(mana_regen_source_id, pause_mana_regen_while_rolling)
+		parent.status.set_mana_regen_scale(mana_regen_source_id, mana_regen_scale_while_rolling)
 
 
 func physics_update(delta: float) -> void:
@@ -62,11 +68,11 @@ func physics_update(delta: float) -> void:
 	var current_cost_per_second: float = sustain_mana_per_second + (rolling_time * sustain_mana_ramp_per_second)
 	var mana_cost: float = current_cost_per_second * delta
 	
-	if not parent.is_dodge_held():
+	if !parent.is_dodge_held():
 		_begin_postroll()
 		return
 	
-	if not parent.status.request_mana(mana_cost):
+	if _should_charge_roll_sustain_mana() and !parent.status.request_mana(mana_cost):
 		_begin_postroll()
 		return
 	

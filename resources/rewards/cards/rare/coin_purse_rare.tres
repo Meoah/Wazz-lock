@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="RewardCardData" load_steps=6 format=3 uid="uid://c00fbcaut62rx"]
+
+[ext_resource type="Script" uid="uid://dia3qnhck4r1o" path="res://scripts/systems/rewards/reward_effect_data_resource.gd" id="1"]
+[ext_resource type="Script" uid="uid://dq4iblqldg3v0" path="res://scripts/systems/rewards/reward_card_data_resource.gd" id="2"]
+[ext_resource type="Texture2D" uid="uid://6t0pnt2cb738" path="res://assets/textures/ui/icons/shop.png" id="2_ph6kw"]
+
+[sub_resource type="Resource" id="RewardEffect_1"]
+script = ExtResource("1")
+kind = 6
+target_id = "gold"
+amount = 10.0
+
+[sub_resource type="Resource" id="RewardEffect_2"]
+script = ExtResource("1")
+kind = 6
+target_id = "silver"
+amount = 20.0
+
+[resource]
+script = ExtResource("2")
+card_id = "coin_purse_rare"
+display_name = "Coin Purse"
+description = "+10 gold and +20 silver"
+icon = ExtResource("2_ph6kw")
+rarity = 2
+hidden_difficulty_modifier = 2.0
+effects = Array[ExtResource("1")]([SubResource("RewardEffect_1"), SubResource("RewardEffect_2")])

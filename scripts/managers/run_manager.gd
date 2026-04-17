@@ -1,23 +1,14 @@
 extends Node
 
+const WEAPON_ID_PLUNGER: String = "plunger"
+const WEAPON_ID_BARE_HANDS: String = "bare_hands"
+
 enum BootMode {
 	NONE,
 	NEW_RUN,
 	CONTINUE_RUN
 }
-const WEAPON_ID_PLUNGER: String = "plunger"
-const WEAPON_ID_BARE_HANDS: String = "bare_hands"
-const PLAYER_BONUS_DEFAULTS: Dictionary = {
-	"max_health": 0.0,
-	"max_mana": 0.0,
-	"damage": 0.0,
-	"defense": 0.0,
-	"knockback": 0.0,
-	"poise": 0.0,
-	"health_regen": 0.0,
-	"mana_regen": 0.0,
-	"move_speed": 0.0,
-}
+
 enum LevelPhase {
 	FLOOR_1,
 	FLOOR_2,
@@ -25,30 +16,31 @@ enum LevelPhase {
 	ENDLESS
 }
 
-var player_stat_bonuses: Dictionary = PLAYER_BONUS_DEFAULTS.duplicate(true)
-
+# Public Variables
+var applied_reward_effects: Array[Dictionary] = []
 var current_weapon_id: String = WEAPON_ID_PLUNGER
 var boot_mode: BootMode = BootMode.NONE
 var pending_save_data: Dictionary = {}
 var pending_setup_data: Dictionary = {}
 
-# Public Variables
 var current_money: float = 0.0
 var current_meta: float = 0.0
 var is_boss_active: bool = false
 var boss_node: BaseEnemy
 var is_timer_active: bool = true
 var current_run_timer: float = 0.0
+var is_active_combat_room: bool = false
 
 var current_level_phase: LevelPhase = LevelPhase.FLOOR_1
 var endless_depth: int = 0
 
 var current_level_timer: float = 0.0
-var current_level_silver_gained: int = 0
-var current_level_gold_gained: int = 0
+var current_level_silver_gained: float = 0.0
+var current_level_gold_gained: float = 0.0
+var current_level_reward_effects: Array[Dictionary] = []
 
-var total_run_silver_gained: int = 0
-var total_run_gold_gained: int = 0
+var total_run_silver_gained: float = 0.0
+var total_run_gold_gained: float = 0.0
 
 func _process(delta: float) -> void:
 	if is_timer_active:
@@ -63,14 +55,6 @@ func normalize_weapon_id(weapon_id: String) -> String:
 	return WEAPON_ID_PLUNGER
 
 
-func reset_player_stat_bonuses() -> void:
-	player_stat_bonuses = PLAYER_BONUS_DEFAULTS.duplicate(true)
-
-
-func add_player_stat_bonus(stat_id: String, amount: float) -> void:
-	player_stat_bonuses[stat_id] = float(player_stat_bonuses.get(stat_id, 0.0)) + amount
-
-
 func can_afford(amount: float) -> bool:
 	return current_money >= amount
 
@@ -81,6 +65,11 @@ func try_spend_money(amount: float) -> bool:
 	
 	current_money -= amount
 	return true
+
+
+func set_active_combat_room(enabled: bool) -> void:
+	is_active_combat_room = enabled
+	is_timer_active = enabled
 
 
 func get_current_level_room_count() -> int:
@@ -139,13 +128,13 @@ func get_current_level_label() -> String:
 	return "Floor 1"
 
 
-func add_silver(amount: int) -> void:
+func add_silver(amount: float) -> void:
 	current_money += amount
 	current_level_silver_gained += amount
 	total_run_silver_gained += amount
 
 
-func add_gold(amount: int) -> void:
+func add_gold(amount: float) -> void:
 	current_meta += amount
 	current_level_gold_gained += amount
 	total_run_gold_gained += amount
@@ -153,8 +142,9 @@ func add_gold(amount: int) -> void:
 
 func reset_current_level_counters() -> void:
 	current_level_timer = 0.0
-	current_level_silver_gained = 0
-	current_level_gold_gained = 0
+	current_level_silver_gained = 0.0
+	current_level_gold_gained = 0.0
+	current_level_reward_effects = []
 
 
 func advance_to_next_floor() -> void:
@@ -189,14 +179,15 @@ func reset_runtime_state() -> void:
 	endless_depth = 0
 	reset_current_level_counters()
 	
-	total_run_silver_gained = 0
-	total_run_gold_gained = 0
+	total_run_silver_gained = 0.0
+	total_run_gold_gained = 0.0
 	
-	is_timer_active = true
+	is_active_combat_room = false
+	is_timer_active = false
 	current_run_timer = 0.0
 	current_weapon_id = WEAPON_ID_PLUNGER
 	
-	reset_player_stat_bonuses()
+	reset_applied_reward_effects()
 
 
 func queue_new_run(setup_data: Dictionary = {}) -> void:
@@ -232,27 +223,30 @@ func consume_boot_payload() -> Dictionary:
 	return payload
 
 
-func get_run_bonus_summary_lines() -> Array[String]:
-	var lines: Array[String] = []
-	
-	for stat_id in player_stat_bonuses.keys():
-		var amount: float = float(player_stat_bonuses[stat_id])
-		if is_zero_approx(amount):
-			continue
-		
-		lines.append("%s: %+0.2f" % [stat_id, amount])
-	
+func get_current_level_bonus_summary_lines() -> Array[String]:
+	var lines: Array[String] = RewardLibrary.build_effect_summary_lines(current_level_reward_effects)
+
 	if lines.is_empty():
 		lines.append("No bonuses claimed.")
-	
+
 	return lines
 
 
+func reset_applied_reward_effects() -> void:
+	applied_reward_effects = []
+
+
+func record_reward_effect_snapshot(snapshot: Dictionary) -> void:
+	var _snapshot: Dictionary = snapshot.duplicate(true)
+	applied_reward_effects.append(_snapshot)
+	current_level_reward_effects.append(_snapshot.duplicate(true))
+
+
 func build_level_complete_popup_params() -> Dictionary:
-	var bonus_lines: Array[String] = get_run_bonus_summary_lines()
+	var bonus_lines: Array[String] = get_current_level_bonus_summary_lines()
 	var bonus_text: String = "\n".join(bonus_lines)
 
-	var body: String = "[center][b]%s cleared[/b]\n\nSilver gained this level: %d\nGold gained this level: %d\n\nTime this level: %s\nTime total: %s\n\nBonuses this run:\n%s[/center]" % [
+	var body: String = "[center][b]%s cleared[/b]\n\nSilver gained this level: %.2f\nGold gained this level: %.2f\n\nTime this level: %s\nTime total: %s\n\nBonuses this level:\n%s[/center]" % [
 		get_current_level_label(),
 		current_level_silver_gained,
 		current_level_gold_gained,
@@ -303,15 +297,11 @@ func build_level_complete_popup_params() -> Dictionary:
 
 
 func build_game_over_popup_params() -> Dictionary:
-	var bonus_lines: Array[String] = get_run_bonus_summary_lines()
-	var bonus_text: String = "\n".join(bonus_lines)
 
-	var body: String = "[center][b]Run Failed[/b]\n\nSilver gained this level: %d\nGold gained this run: %d\n\nTime this level: %s\nTime total: %s\n\nBonuses this run:\n%s[/center]" % [
-		current_level_silver_gained,
+	var body: String = "[center][b]Run Failed[/b]\n\nGold gained this run: %.2f\n\nTime this level: %s\nTime total: %s[/center]" % [
 		total_run_gold_gained,
 		format_time(current_level_timer),
 		format_time(current_run_timer),
-		bonus_text
 	]
 
 	return {

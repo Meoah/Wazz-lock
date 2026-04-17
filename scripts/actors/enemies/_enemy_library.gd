@@ -92,27 +92,27 @@ static func pick_random_boss_scene_path(rng: RandomNumberGenerator, pool_id: Str
 	return pool[rng.randi_range(0, pool.size() - 1)]
 
 
-static func roll_currency_drop(enemy: BaseEnemy, rng: RandomNumberGenerator) -> Dictionary:
+static func roll_currency_drop(enemy: BaseEnemy, rng: RandomNumberGenerator, difficulty_modifier: float) -> Dictionary:
 	var role: String = str(enemy.get_meta("spawn_role", "normal"))
 	var variant: EnemyVariant = enemy.get_meta("enemy_variant", EnemyVariant.NORMAL)
+	var difficulty_scale: float = max(0.25, 1.0 + (difficulty_modifier / 100.0))
 
 	if role == "boss":
 		return {
-			"silver": rng.randi_range(25, 40),
-			"gold": rng.randi_range(3, 5)
+			"silver": round(rng.randf_range(25.0, 40.0) * difficulty_scale * 100.0) / 100.0,
+			"gold": round(rng.randf_range(1.0, 4.0) * difficulty_scale * 100.0) / 100.0
 		}
 
 	if variant == EnemyVariant.ELITE:
 		return {
-			"silver": rng.randi_range(6, 12),
-			"gold": rng.randi_range(1, 2)
+			"silver": round(rng.randf_range(1.0, 5.0) * difficulty_scale * 100.0) / 100.0,
+			"gold": max(0.01, round(rng.randf_range(0.01, 2.0) * difficulty_scale * 100.0) / 100.0)
 		}
 
 	return {
-		"silver": rng.randi_range(1, 4),
-		"gold": 0
+		"silver": round(rng.randf_range(0.01, 1.0) * difficulty_scale * 100.0) / 100.0,
+		"gold": 0.0
 	}
-
 
 static func get_archetype_weights_for_profile(profile: RoomData.EncounterProfile) -> Dictionary:
 	return PROFILE_ARCHETYPE_WEIGHTS.get(profile, PROFILE_ARCHETYPE_WEIGHTS[RoomData.EncounterProfile.BALANCED])

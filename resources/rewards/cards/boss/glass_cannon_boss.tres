@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="RewardCardData" load_steps=7 format=3 uid="uid://c7a4r3b3wv5iw"]
+
+[ext_resource type="Script" uid="uid://dia3qnhck4r1o" path="res://scripts/systems/rewards/reward_effect_data_resource.gd" id="1"]
+[ext_resource type="Script" uid="uid://dq4iblqldg3v0" path="res://scripts/systems/rewards/reward_card_data_resource.gd" id="2"]
+[ext_resource type="Texture2D" uid="uid://c0bsbro87yhey" path="res://assets/textures/ui/icons/damage.png" id="2_hnnjt"]
+
+[sub_resource type="Resource" id="RewardEffect_1"]
+script = ExtResource("1")
+kind = 1
+amount = 1.15
+
+[sub_resource type="Resource" id="RewardEffect_2"]
+script = ExtResource("1")
+kind = 1
+target_id = "max_health"
+amount = 0.95
+
+[sub_resource type="Resource" id="RewardEffect_3"]
+script = ExtResource("1")
+kind = 1
+target_id = "defense"
+amount = 0.95
+
+[resource]
+script = ExtResource("2")
+card_id = "glass_cannon_boss"
+display_name = "Glass Cannon"
+description = "+15% damage, -5% max health and defense"
+icon = ExtResource("2_hnnjt")
+rarity = 5
+hidden_difficulty_modifier = 7.0
+effects = Array[ExtResource("1")]([SubResource("RewardEffect_1"), SubResource("RewardEffect_2"), SubResource("RewardEffect_3")])

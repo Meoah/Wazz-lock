@@ -40,11 +40,11 @@ func get_slot_meta_value(slot_index: int, key: String, default_value: Variant = 
 	return meta.get(key, default_value)
 
 
-func get_current_slot_total_gold() -> int:
+func get_current_slot_total_gold() -> float:
 	if not has_current_slot():
-		return 0
+		return 0.0
 
-	return int(get_slot_meta_value(current_slot_index, "total_gold", 0))
+	return float(get_slot_meta_value(current_slot_index, "total_gold", 0.0))
 
 
 func slot_file_exists(slot_index: int) -> bool:
@@ -88,7 +88,7 @@ func get_slot_summary(slot_index: int) -> Dictionary:
 		"chapter": "",
 		"play_time_seconds": 0,
 		"last_saved_unix": 0,
-		"total_gold": 0
+		"total_gold": 0.0
 	}
 	
 	if not slot_file_exists(slot_index): return summary
@@ -104,7 +104,7 @@ func get_slot_summary(slot_index: int) -> Dictionary:
 	summary["chapter"] = meta.get("chapter", "")
 	summary["play_time_seconds"] = meta.get("play_time_seconds", 0)
 	summary["last_saved_unix"] = meta.get("last_saved_unix", 0)
-	summary["total_gold"] = meta.get("total_gold", 0)
+	summary["total_gold"] = float(meta.get("total_gold", 0.0))
 	
 	return summary
 
@@ -130,7 +130,7 @@ func save_slot_data(slot_index: int, game_state: Dictionary, meta_overrides: Dic
 			"chapter": meta_overrides.get("chapter", 1),
 			"play_time_seconds": meta_overrides.get("play_time_seconds", 0),
 			"last_saved_unix": Time.get_unix_time_from_system(),
-			"total_gold": meta_overrides.get("total_gold", 0),
+			"total_gold": float(meta_overrides.get("total_gold", 0.0)),
 		},
 		"state": game_state
 	}
@@ -199,7 +199,7 @@ func clear_current_run_but_keep_meta(meta_overrides: Dictionary = {}) -> bool:
 		"player_name": meta_overrides.get("player_name", existing_meta.get("player_name", "Player")),
 		"chapter": meta_overrides.get("chapter", ""),
 		"play_time_seconds": meta_overrides.get("play_time_seconds", existing_meta.get("play_time_seconds", 0)),
-		"total_gold": meta_overrides.get("total_gold", existing_meta.get("total_gold", 0))
+		"total_gold": float(meta_overrides.get("total_gold", existing_meta.get("total_gold", 0.0)))
 	})
 
 

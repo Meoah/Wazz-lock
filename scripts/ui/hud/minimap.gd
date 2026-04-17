@@ -1,23 +1,25 @@
 extends Node2D
 class_name Minimap
 
+@export_category("Objective Icons")
+@export var _icon_start: Texture2D
+@export var _icon_exterminate: Texture2D
+@export var _icon_survive: Texture2D
+@export var _icon_boss: Texture2D
+@export var _icon_shop: Texture2D
+@export var _icon_fallback: Texture2D
+
 @export_category("Children Nodes")
 @export var tilemap: TileMapLayer
 @export var player_marker: Node2D
 @export var minimap_camera: Camera2D
 @export var icons_root: Node2D
 
-const CLEARED_ICON_ALPHA: float = 0.45
+const CLEARED_ICON_ALPHA: float = 0.25
 const UNCLEARED_ICON_ALPHA: float = 1.0
-
-const OBJECTIVE_GLYPHS: Dictionary = {
-	RoomData.ObjectiveType.AUTO_WIN: "!",
-	RoomData.ObjectiveType.EXTERMINATE: "X",
-	RoomData.ObjectiveType.SURVIVAL: "T",
-	RoomData.ObjectiveType.BOSS: "B",
-	RoomData.ObjectiveType.PUZZLE: "?",
-	RoomData.ObjectiveType.SHOP: "$",
-}
+const CLEARED_ICON_SATURATION: float = 0.1
+const UNCLEARED_ICON_SATURATION: float = 1.0
+const OBJECTIVE_ICON_SCALE: Vector2 = Vector2(0.5, 0.5)
 
 const SOURCE_ID: int = 1
 
@@ -80,18 +82,41 @@ func _should_show_objective_icon(room_data: RoomData, _current_room: RoomData) -
 	return false
 
 
+func _get_objective_icon_texture(room_data: RoomData) -> Texture2D:
+	match room_data.objective_type as RoomData.ObjectiveType:
+		RoomData.ObjectiveType.AUTO_WIN: return _icon_start
+		RoomData.ObjectiveType.EXTERMINATE: return _icon_exterminate
+		RoomData.ObjectiveType.SURVIVAL: return _icon_survive
+		RoomData.ObjectiveType.BOSS: return _icon_boss
+		RoomData.ObjectiveType.SHOP: return _icon_shop
+		_: return _icon_fallback
+
+
 func _add_objective_icon(room_data: RoomData) -> void:
-	var glyph: String = OBJECTIVE_GLYPHS.get(room_data.objective_type, "?")
+	var texture: Texture2D = _get_objective_icon_texture(room_data)
+	if !texture: return
 	
-	var label := Label.new()
-	label.text = glyph
-	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	label.size = Vector2(32, 32)
-	label.position = tilemap.map_to_local(room_data.grid_pos) - label.size * 0.5
-	label.modulate.a = CLEARED_ICON_ALPHA if room_data.cleared else UNCLEARED_ICON_ALPHA
-	
-	icons_root.add_child(label)
+	var sprite: Sprite2D = Sprite2D.new()
+	sprite.texture = texture
+	sprite.centered = true
+	sprite.position = tilemap.map_to_local(room_data.grid_pos)
+	sprite.scale = OBJECTIVE_ICON_SCALE
+
+	var shader: Shader = load("res://shaders/minimap_icon.gdshader") as Shader
+	if shader:
+		var _material: ShaderMaterial = ShaderMaterial.new()
+		_material.shader = shader
+		_material.set_shader_parameter(
+				"saturation",
+				CLEARED_ICON_SATURATION if room_data.cleared else UNCLEARED_ICON_SATURATION
+		)
+		_material.set_shader_parameter(
+				"icon_alpha",
+				CLEARED_ICON_ALPHA if room_data.cleared else UNCLEARED_ICON_ALPHA
+		)
+		sprite.material = _material
+
+	icons_root.add_child(sprite)
 
 
 func _get_room_mask(room: RoomData) -> int:
