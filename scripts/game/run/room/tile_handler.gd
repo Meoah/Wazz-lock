@@ -59,15 +59,8 @@ func pick_spawn_position_for_archetype(
 ) -> Variant:
 	match archetype:
 		EnemyLibrary.EnemyArchetype.RANGED_SLIME:
-			# Water-first, floor fallback if the room has no usable water tiles.
-			var water_pick: Variant = _pick_position_from_pool(
-				_water_spawn_positions, rng, avoid_global, min_distance, occupied_positions
-			)
-			if water_pick != null:
-				return water_pick
-
 			return _pick_position_from_pool(
-				_floor_spawn_positions, rng, avoid_global, min_distance, occupied_positions
+				_water_spawn_positions, rng, avoid_global, min_distance, occupied_positions
 			)
 
 		EnemyLibrary.EnemyArchetype.MELEE_SLIME, EnemyLibrary.EnemyArchetype.TANK_SLIME:
@@ -76,6 +69,10 @@ func pick_spawn_position_for_archetype(
 			)
 
 	return _pick_position_from_pool(_floor_spawn_positions, rng, avoid_global, min_distance, occupied_positions)
+
+
+func has_water_spawn_positions() -> bool:
+	return not _water_spawn_positions.is_empty()
 
 
 func _pick_position_from_pool(
@@ -110,3 +107,8 @@ func _pick_position_from_pool(
 		return null
 
 	return candidates[rng.randi_range(0, candidates.size() - 1)]
+
+
+func is_global_position_in_water(global_position: Vector2) -> bool:
+	if water_tiles == null: return false
+	return water_tiles.contains_global_position(global_position)

@@ -1,4 +1,4 @@
-[gd_scene load_steps=31 format=3 uid="uid://dllmwyqxu8cl7"]
+[gd_scene load_steps=36 format=3 uid="uid://dllmwyqxu8cl7"]
 
 [ext_resource type="Script" uid="uid://cil7hs5t70vqq" path="res://scripts/ui/hud/root_hud.gd" id="1_qvnt6"]
 [ext_resource type="Script" uid="uid://clgos0y204p5t" path="res://scripts/ui/hud/floating_text_manager.gd" id="2_50mfl"]
@@ -26,6 +26,8 @@
 [ext_resource type="Texture2D" uid="uid://otcww5psdsgg" path="res://assets/textures/ui/icons/boss.png" id="20_ub46m"]
 [ext_resource type="Texture2D" uid="uid://bdp0prty0sxis" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/minimap_compass_future_n.png" id="22_mkc83"]
 [ext_resource type="Texture2D" uid="uid://b3rpiurnvophj" path="res://assets/textures/ui/icons/potion.png" id="28_85yfw"]
+[ext_resource type="Shader" uid="uid://ba3y0fx6fdbml" path="res://shaders/luminance_mask_transition.gdshader" id="28_jey0l"]
+[ext_resource type="Script" uid="uid://n8hjldwrddtn" path="res://scripts/ui/hud/fade_blocker.gd" id="29_gaun4"]
 [ext_resource type="Texture2D" uid="uid://cw0b4wqh3v6t0" path="res://assets/textures/ui/icons/start.png" id="29_jey0l"]
 
 [sub_resource type="Theme" id="Theme_klb5v"]
@@ -42,6 +44,17 @@ shader_parameter/viewport_tex = SubResource("ViewportTexture_ccasb")
 shader_parameter/center = Vector2(0.5, 0.5)
 shader_parameter/radius = 0.44
 shader_parameter/edge_softness = 0.002
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_ccasb"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_h3g4y"]
+noise = SubResource("FastNoiseLite_ccasb")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_pfwte"]
+shader = ExtResource("28_jey0l")
+shader_parameter/luminance_cutoff = 0.0
+shader_parameter/invert = false
+shader_parameter/mask_texture = SubResource("NoiseTexture2D_h3g4y")
 
 [node name="RootHUD" type="CanvasLayer" node_paths=PackedStringArray("game_hud")]
 script = ExtResource("1_qvnt6")
@@ -601,3 +614,14 @@ fit_content = true
 autowrap_mode = 0
 
 [node name="Indicators" type="Node2D" parent="GameHUD"]
+
+[node name="FadeBlocker" type="ColorRect" parent="."]
+visible = false
+material = SubResource("ShaderMaterial_pfwte")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+script = ExtResource("29_gaun4")

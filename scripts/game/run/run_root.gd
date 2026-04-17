@@ -482,13 +482,21 @@ func enter_room(room_data: RoomData, entrance_direction: int = -1) -> void:
 	current_room_instance.setup(room_data)
 	
 	var player: Clive = get_tree().get_first_node_in_group("player") as Clive
-	var spawn_exit: ExitDrain = current_room_instance.get_spawn_exit(entrance_direction)
-	
+	var is_initial_room_entry: bool = (
+		room_data.grid_pos == Vector2i.ZERO
+		and entrance_direction == -1
+	)
+
 	if player:
-		if spawn_exit:
-			player.global_position = spawn_exit.global_position
+		if is_initial_room_entry:
+			player.global_position = current_room_instance.get_random_floor_spawn_position()
 		else:
-			player.global_position = current_room_instance.global_position
+			var spawn_exit: ExitDrain = current_room_instance.get_spawn_exit(entrance_direction)
+
+			if spawn_exit:
+				player.global_position = spawn_exit.global_position
+			else:
+				player.global_position = current_room_instance.global_position
 	
 	minimap_node.draw_minimap(current_level_data, room_data.grid_pos)
 	minimap_node.move_player_marker_to_room(room_data)

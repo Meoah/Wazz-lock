@@ -1,6 +1,7 @@
 extends StateComponent
 class_name EnemyChaseStateComponent
 
+@export var attack_state_id: StringName = &"attack"
 @export var wander_state_id: StringName = &"wander"
 @export var search_state_id: StringName = &"search"
 @export var stop_distance: float = 0.0
@@ -8,7 +9,16 @@ class_name EnemyChaseStateComponent
 
 func physics_update(_delta: float) -> void:
 	if parent.has_target_in_sight():
-		parent.chase_target(stop_distance)
+		if parent.can_begin_attack():
+			machine.transition_to(attack_state_id)
+			return
+
+		if parent.get_target_distance() > parent.get_chase_stop_distance():
+			parent.play_move_visual()
+		else:
+			parent.play_idle_visual()
+
+		parent.chase_target(parent.get_chase_stop_distance())
 		return
 
 	if parent.has_target_memory():

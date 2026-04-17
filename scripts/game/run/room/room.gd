@@ -64,6 +64,12 @@ func _is_combat_room() -> bool:
 	return false
 
 
+func _clear_enemy_projectiles() -> void:
+	for child: Node in get_children():
+		if child.is_in_group(&"enemy_projectile"):
+			child.queue_free()
+
+
 func _refresh_room_runtime_rules() -> void:
 	if !data:
 		RunManager.set_active_combat_room(false)
@@ -206,12 +212,13 @@ func _is_clear_condition_met() -> bool:
 
 func _cleared() -> void:
 	_enemy_handler.clear_alive_enemies()
+	_clear_enemy_projectiles()
 	_exit_handler.open_all_exits()
 	data.cleared = true
 	_refresh_boss_hud_tracking()
 	_refresh_room_runtime_rules()
 	_refresh_objective_hud()
-	
+
 	match clear_condition:
 		ClearConditions.BOSS:
 			GameManager.show_popup(BasePopup.POPUP_TYPE.REWARD, {
@@ -221,17 +228,17 @@ func _cleared() -> void:
 					"followup_popup_type": BasePopup.POPUP_TYPE.LEVEL_COMPLETE,
 					"followup_popup_params": RunManager.build_level_complete_popup_params()
 			})
-			
+
 		ClearConditions.AUTO_WIN, ClearConditions.SHOP:
 			pass
-		
+
 		_:
 			GameManager.show_popup(BasePopup.POPUP_TYPE.REWARD, {
 					"room_difficulty_modifier": data.difficulty_modifier,
 					"reward_pool_id": "standard",
 					"choice_count": 3
 			})
-	
+
 	SignalBus.request_minimap_refresh.emit()
 	SignalBus.request_run_save.emit()
 
@@ -332,6 +339,20 @@ func get_spawn_position(entrance_direction: int = -1) -> Vector2:
 	return _exit_handler.get_spawn_position(entrance_direction)
 
 
+func get_random_floor_spawn_position() -> Vector2:
+	if _tile_handler == null:
+		return global_position
+
+	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
+	rng.randomize()
+
+	var spawn_position: Variant = _tile_handler.pick_floor_spawn_position(rng)
+	if spawn_position == null:
+		return global_position
+
+	return spawn_position
+
+
 func _spawn_shop_friendlies() -> void:
 	if !_shop_npc_scene or !_tile_handler: return
 	
@@ -384,6 +405,7 @@ func on_player_death_started() -> void:
 
 func on_room_exited() -> void:
 	set_process(false)
+	_clear_enemy_projectiles()
 	RunManager.set_active_combat_room(false)
 	RunManager.is_boss_active = false
 	RunManager.boss_node = null
@@ -419,3 +441,14 @@ func mark_shop_offer_purchased(offer_index: int) -> void:
 	data.metadata["shop_state"] = shop_state
 
 	SignalBus.request_run_save.emit()
+
+
+func is_global_position_in_water(global_position: Vector2) -> bool:
+	if _tile_handler == null: return false
+	return _tile_handler.is_global_position_in_water(global_position)
+
+
+func get_water_spawn_positions() -> Array[Vector2]:
+	if _tile_handler == null: return []
+
+	return _tile_handler.get_water_spawn_positions()

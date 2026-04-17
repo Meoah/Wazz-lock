@@ -1,0 +1,86 @@
+[gd_resource type="SpriteFrames" load_steps=12 format=3 uid="uid://bsmuavmvibn7b"]
+
+[ext_resource type="Texture2D" uid="uid://daibv376igqjy" path="res://assets/textures/actors/enemies/slime/ranged/Sewer_SpriteSheet.png" id="1_ds345"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0s6x8"]
+atlas = ExtResource("1_ds345")
+region = Rect2(0, 768, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1jl7h"]
+atlas = ExtResource("1_ds345")
+region = Rect2(256, 768, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_yty3h"]
+atlas = ExtResource("1_ds345")
+region = Rect2(512, 768, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_r345u"]
+atlas = ExtResource("1_ds345")
+region = Rect2(768, 768, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_e3b5o"]
+atlas = ExtResource("1_ds345")
+region = Rect2(0, 1024, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_c5ml4"]
+atlas = ExtResource("1_ds345")
+region = Rect2(256, 1024, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1oky7"]
+atlas = ExtResource("1_ds345")
+region = Rect2(512, 1024, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bb8b3"]
+atlas = ExtResource("1_ds345")
+region = Rect2(768, 1024, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hap71"]
+atlas = ExtResource("1_ds345")
+region = Rect2(1024, 1024, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ardmk"]
+atlas = ExtResource("1_ds345")
+region = Rect2(1280, 1024, 256, 256)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0s6x8")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1jl7h")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_yty3h")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_r345u")
+}],
+"loop": false,
+"name": &"teleport_in",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_e3b5o")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_c5ml4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1oky7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bb8b3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hap71")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ardmk")
+}],
+"loop": false,
+"name": &"teleport_out",
+"speed": 8.0
+}]

@@ -1,13 +1,14 @@
-[gd_resource type="Resource" script_class="RewardCardData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="RewardCardData" load_steps=4 format=3 uid="uid://dchr315iqy54b"]
 
-[ext_resource type="Script" path="res://scripts/systems/rewards/reward_effect_data_resource.gd" id="1"]
-[ext_resource type="Script" path="res://scripts/systems/rewards/reward_card_data_resource.gd" id="2"]
+[ext_resource type="Script" uid="uid://dia3qnhck4r1o" path="res://scripts/systems/rewards/reward_effect_data_resource.gd" id="1"]
+[ext_resource type="Script" uid="uid://dq4iblqldg3v0" path="res://scripts/systems/rewards/reward_card_data_resource.gd" id="2"]
+[ext_resource type="Texture2D" uid="uid://ddumf1g3ga6i2" path="res://assets/textures/ui/icons/health_regen.png" id="2_a36ln"]
 
 [resource]
 script = ExtResource("2")
 card_id = "soulstealer_boss"
 display_name = "Soulstealer"
 description = "1% chance to heal 5 when killing enemies"
+icon = ExtResource("2_a36ln")
 rarity = 5
 hidden_difficulty_modifier = 7.0
-effects = Array[ExtResource("1")]([])

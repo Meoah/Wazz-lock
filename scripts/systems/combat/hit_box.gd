@@ -16,6 +16,12 @@ signal hit_rejected(target_hurt_box: HurtBoxComponent, hit_data: HitData)
 @export var base_knockback_force: float = 1.0
 @export var base_poise_damage: float = 0.0
 
+@export_category("Hurt")
+@export var hurt_type: HitData.HurtType = HitData.HurtType.NORMAL
+@export var stun_duration: float = 0.0
+@export var knockup_height: float = 24.0
+@export var knockup_duration: float = 0.2
+
 @export_category("Activation")
 @export var active_on_ready: bool = true
 @export var one_hit_per_activation: bool = true
@@ -104,7 +110,12 @@ func _build_hit_data(target_hurt_box: HurtBoxComponent) -> HitData:
 		hit_data.damage *= attacker_status.damage
 		hit_data.knockback_force *= attacker_status.knockback
 		hit_data.poise_damage *= attacker_status.knockback
-
+	
+	hit_data.hurt_type = hurt_type
+	hit_data.stun_duration = stun_duration
+	hit_data.knockup_height = knockup_height
+	hit_data.knockup_duration = knockup_duration
+	
 	return hit_data
 
 

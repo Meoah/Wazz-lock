@@ -52,6 +52,8 @@ var secondary_attack_held: bool = false
 
 var flash_tween: Tween
 var invuln_tween: Tween
+var reaction_tween: Tween
+var body_root_origin: Vector2 = Vector2.ZERO
 
 var roll_cooldown: float = 0.0
 var invuln_cooldown: float = 0.0
@@ -71,6 +73,9 @@ var action_token: int = 0
 
 func _ready() -> void:
 	_validate_components()
+	
+	if body_root:
+		body_root_origin = body_root.position
 	
 	if status:
 		status.setup()
@@ -299,6 +304,8 @@ func on_hurt_received(_hit_data: HitData) -> void:
 
 
 func on_death_received(_hit_data: HitData) -> void:
+	_stop_reaction_tween()
+	body_root.position = body_root_origin
 	input_flags = 0
 	roll_requested = false
 	potion_requested = false
@@ -375,10 +382,50 @@ func stop_attack_mode() -> void:
 func begin_hurt(animation_name: StringName = &"hurt") -> void:
 	if is_dead(): return
 
+	_stop_reaction_tween()
+	body_root.position = body_root_origin
+
 	_cancel_active_action()
 	animation_player.speed_scale = 1.0
 	animation_player.play(animation_name)
 	invuln_cooldown = 1.0
+
+
+func hold_hurt_last_frame(duration: float) -> void:
+	if animation_player == null:
+		await get_tree().create_timer(duration).timeout
+		return
+
+	var animation_length: float = animation_player.current_animation_length
+	if animation_length > 0.0:
+		animation_player.seek(max(animation_length - 0.001, 0.0), true)
+		animation_player.pause()
+
+	await get_tree().create_timer(duration).timeout
+	animation_player.play()
+
+
+func play_knockup(height: float, duration: float) -> void:
+	if body_root == null:
+		await get_tree().create_timer(duration).timeout
+		return
+
+	_stop_reaction_tween()
+	body_root.position = body_root_origin
+
+	var half_duration: float = max(duration * 0.5, 0.01)
+	reaction_tween = create_tween()
+	reaction_tween.tween_property(body_root, "position:y", body_root_origin.y - height, half_duration)
+	reaction_tween.tween_property(body_root, "position:y", body_root_origin.y, half_duration)
+
+	await reaction_tween.finished
+
+
+func _stop_reaction_tween() -> void:
+	if reaction_tween and reaction_tween.is_running():
+		reaction_tween.kill()
+
+	reaction_tween = null
 
 
 func begin_death() -> void:

@@ -1,10 +1,8 @@
-[gd_resource type="TileSet" load_steps=8 format=3 uid="uid://d0ha6r7frwc6h"]
+[gd_resource type="TileSet" load_steps=7 format=3 uid="uid://d0ha6r7frwc6h"]
 
 [ext_resource type="Texture2D" uid="uid://ej0vd2tgmtyf" path="res://assets/textures/enviornment/BathroomTiles_Tilemap.png" id="1_f8q4c"]
 [ext_resource type="Texture2D" uid="uid://ojo7wd1g0ngu" path="res://assets/textures/enviornment/SewerWater_Tilemap.png" id="2_potcr"]
 [ext_resource type="Texture2D" uid="uid://bwo743mtq3urx" path="res://assets/textures/enviornment/BathroomTiles_Walls.png" id="3_rknwd"]
-
-[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_potcr"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_8j277"]
 texture = ExtResource("1_f8q4c")
@@ -369,9 +367,8 @@ texture_region_size = Vector2i(64, 64)
 tile_size = Vector2i(64, 64)
 physics_layer_0/collision_layer = 1
 physics_layer_0/collision_mask = 0
-physics_layer_0/physics_material = SubResource("PhysicsMaterial_potcr")
-physics_layer_1/collision_layer = 4
-physics_layer_1/collision_mask = 4
+physics_layer_1/collision_layer = 8
+physics_layer_1/collision_mask = 0
 sources/1 = SubResource("TileSetAtlasSource_8j277")
 sources/3 = SubResource("TileSetAtlasSource_1i1dw")
 sources/4 = SubResource("TileSetAtlasSource_e4810")

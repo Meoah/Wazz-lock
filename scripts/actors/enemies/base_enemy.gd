@@ -1,6 +1,8 @@
 extends CharacterBody2D
 class_name BaseEnemy
 
+@export_range(0.0, 1.0, 0.01) var water_move_multiplier: float = 0.4
+
 @export_category("Components")
 @export var state_machine: StateMachineComponent
 @export var movement: MovementComponent
@@ -8,6 +10,7 @@ class_name BaseEnemy
 @export var status: StatusComponent
 @export var hurt_box: HurtBoxComponent
 @export var hit_box: HitBoxComponent
+@export var attack_hit_box: HitBoxComponent
 
 @export_category("Nodes")
 @export var body_root: Node2D
@@ -21,6 +24,11 @@ class_name BaseEnemy
 @export var search_reach_radius: float = 12.0
 @export var global_aggro_enabled: bool = false
 
+signal attack_finished
+
+var body_root_origin: Vector2 = Vector2.ZERO
+var reaction_tween: Tween
+
 var target_in_sight: bool = false
 var last_known_target_position: Vector2 = Vector2.ZERO
 var time_since_target_seen: float = INF
@@ -32,7 +40,10 @@ func _ready() -> void:
 	add_to_group("enemy")
 	_validate_components()
 	_wire_components()
-
+	
+	if body_root:
+		body_root_origin = body_root.position
+	
 	if status:
 		status.setup()
 		status.request_active()
@@ -101,6 +112,12 @@ func _wire_components() -> void:
 			hit_box.owner_actor = self
 		if hit_box.status_component == null:
 			hit_box.status_component = status
+	
+	if attack_hit_box:
+		if attack_hit_box.owner_actor == null:
+			attack_hit_box.owner_actor = self
+		if attack_hit_box.status_component == null:
+			attack_hit_box.status_component = status
 
 
 func _update_health_bar() -> void:
@@ -139,20 +156,20 @@ func get_target_direction() -> Vector2:
 
 
 func chase_target(stop_distance: float = 0.0, speed_multiplier: float = 1.0) -> void:
-	if movement == null:
-		return
+	if movement == null: return
 
 	if not is_instance_valid(target):
 		movement.request_stop()
 		return
 
-	var to_target := target.global_position - global_position
+	var to_target: Vector2 = target.global_position - global_position
 	if stop_distance > 0.0 and to_target.length() <= stop_distance:
 		movement.request_stop()
 		return
 
-	var dir := to_target.normalized()
-	movement.request_move(dir, speed_multiplier)
+	var direction_to_target: Vector2 = to_target.normalized()
+	var resolved_speed_multiplier: float = speed_multiplier * get_environment_speed_multiplier()
+	movement.request_move(direction_to_target, resolved_speed_multiplier)
 
 
 func on_hit_received(_hit_data: HitData) -> void:
@@ -168,10 +185,15 @@ func on_death_received(_hit_data: HitData) -> void:
 		movement.request_stop()
 		movement.clear_impulses()
 		movement.set_movement_enabled(false)
-	
+
+	end_reaction_visuals()
+
 	if hit_box:
 		hit_box.end_activation()
-	
+
+	if attack_hit_box:
+		attack_hit_box.end_activation()
+
 	if hurt_box:
 		hurt_box.hurtable = false
 		hurt_box.monitoring = false
@@ -204,7 +226,13 @@ func _update_awareness(delta: float) -> void:
 		return
 
 	var to_target: Vector2 = target.global_position - global_position
-	if to_target.length() <= detection_radius:
+	var distance_to_target: float = to_target.length()
+	var awareness_radius: float = get_detection_radius()
+
+	if time_since_target_seen < INF:
+		awareness_radius = get_chase_detection_radius()
+
+	if distance_to_target <= awareness_radius:
 		target_in_sight = true
 		last_known_target_position = target.global_position
 		time_since_target_seen = 0.0
@@ -230,13 +258,18 @@ func on_player_death_started() -> void:
 	last_known_target_position = global_position
 	time_since_target_seen = INF
 	global_aggro_enabled = false
-	
+
 	if movement:
 		movement.request_stop()
 		movement.clear_impulses()
-	
+
+	end_reaction_visuals()
+
 	if hit_box:
 		hit_box.end_activation()
+
+	if attack_hit_box:
+		attack_hit_box.end_activation()
 
 
 func apply_spawn_variant_modifiers(config: Dictionary) -> void:
@@ -266,16 +299,16 @@ func apply_spawn_variant_modifiers(config: Dictionary) -> void:
 
 
 func move_toward_point(point: Vector2, stop_distance: float = 0.0, speed_multiplier: float = 1.0) -> void:
-	if movement == null:
-		return
+	if movement == null: return
 
-	var offset := point - global_position
+	var offset: Vector2 = point - global_position
 	if stop_distance > 0.0 and offset.length() <= stop_distance:
 		movement.request_stop()
 		return
 
-	var dir := offset.normalized() if offset != Vector2.ZERO else Vector2.ZERO
-	movement.request_move(dir, speed_multiplier)
+	var direction_to_point: Vector2 = offset.normalized() if offset != Vector2.ZERO else Vector2.ZERO
+	var resolved_speed_multiplier: float = speed_multiplier * get_environment_speed_multiplier()
+	movement.request_move(direction_to_point, resolved_speed_multiplier)
 
 
 func reached_point(point: Vector2, radius: float = -1.0) -> bool:
@@ -291,3 +324,165 @@ func apply_collision_push(impulse: Vector2, _source: Node = null) -> void:
 		return
 
 	movement.add_collision_push(impulse)
+
+
+func get_current_room() -> Room:
+	return get_tree().get_first_node_in_group("current_room") as Room
+
+
+func is_in_water() -> bool:
+	var current_room: Room = get_current_room()
+	if current_room == null: return false
+	return current_room.is_global_position_in_water(global_position)
+
+
+func get_environment_speed_multiplier() -> float:
+	if is_in_water(): return water_move_multiplier
+	return 1.0
+
+
+func get_target_distance() -> float:
+	if not is_instance_valid(target): return INF
+	return global_position.distance_to(target.global_position)
+
+
+func get_detection_radius() -> float:
+	return detection_radius
+
+
+func get_chase_detection_radius() -> float:
+	return detection_radius
+
+
+func get_chase_stop_distance() -> float:
+	return 0.0
+
+
+func can_begin_attack() -> bool:
+	return false
+
+
+func get_attack_lock_direction() -> Vector2:
+	return get_target_direction()
+
+
+func begin_attack_commit(_locked_direction: Vector2) -> void:
+	attack_finished.emit()
+
+
+func get_post_attack_stall_duration() -> float:
+	return 0.0
+
+
+func begin_hurt(animation_name: StringName = &"hurt") -> void:
+	if body_root is not AnimatedSprite2D: return
+
+	var sprite: AnimatedSprite2D = body_root as AnimatedSprite2D
+	if sprite.sprite_frames == null: return
+	if not sprite.sprite_frames.has_animation(animation_name): return
+
+	_stop_reaction_tween()
+	body_root.position = body_root_origin
+	sprite.play(animation_name)
+
+
+func hold_hurt_last_frame(duration: float) -> void:
+	if body_root is not AnimatedSprite2D:
+		await get_tree().create_timer(duration).timeout
+		return
+
+	var sprite: AnimatedSprite2D = body_root as AnimatedSprite2D
+	if sprite.sprite_frames == null:
+		await get_tree().create_timer(duration).timeout
+		return
+
+	var animation_name: StringName = sprite.animation
+	if not sprite.sprite_frames.has_animation(animation_name):
+		await get_tree().create_timer(duration).timeout
+		return
+
+	var frame_count: int = sprite.sprite_frames.get_frame_count(animation_name)
+	if frame_count > 0:
+		sprite.stop()
+		sprite.frame = frame_count - 1
+
+	await get_tree().create_timer(duration).timeout
+
+
+func play_knockup(height: float, duration: float) -> void:
+	if body_root == null:
+		await get_tree().create_timer(duration).timeout
+		return
+
+	_stop_reaction_tween()
+	body_root.position = body_root_origin
+
+	var half_duration: float = max(duration * 0.5, 0.01)
+	reaction_tween = create_tween()
+	reaction_tween.tween_property(body_root, "position:y", body_root_origin.y - height, half_duration)
+	reaction_tween.tween_property(body_root, "position:y", body_root_origin.y, half_duration)
+
+	await reaction_tween.finished
+
+
+func end_reaction_visuals() -> void:
+	_stop_reaction_tween()
+
+	if body_root:
+		body_root.position = body_root_origin
+
+
+func _stop_reaction_tween() -> void:
+	if reaction_tween and reaction_tween.is_running():
+		reaction_tween.kill()
+
+	reaction_tween = null
+
+
+func _get_body_sprite() -> AnimatedSprite2D:
+	if body_root is not AnimatedSprite2D:
+		return null
+
+	return body_root as AnimatedSprite2D
+
+
+func get_animation_duration(animation_name: StringName) -> float:
+	var sprite: AnimatedSprite2D = _get_body_sprite()
+	if sprite == null: return 0.0
+	if sprite.sprite_frames == null: return 0.0
+	if not sprite.sprite_frames.has_animation(animation_name): return 0.0
+
+	var fps: float = sprite.sprite_frames.get_animation_speed(animation_name)
+	if fps <= 0.0:
+		fps = 1.0
+
+	var frame_count: int = sprite.sprite_frames.get_frame_count(animation_name)
+	var total_duration: float = 0.0
+
+	for frame_index in range(frame_count):
+		total_duration += sprite.sprite_frames.get_frame_duration(animation_name, frame_index) / fps
+
+	return total_duration
+
+
+func play_idle_visual() -> void:
+	var sprite: AnimatedSprite2D = _get_body_sprite()
+	if sprite == null: return
+	if sprite.sprite_frames == null: return
+	if not sprite.sprite_frames.has_animation(&"idle"): return
+
+	if sprite.animation != &"idle" or not sprite.is_playing():
+		sprite.play(&"idle")
+
+
+func play_move_visual() -> void:
+	var sprite: AnimatedSprite2D = _get_body_sprite()
+	if sprite == null: return
+	if sprite.sprite_frames == null: return
+
+	if sprite.sprite_frames.has_animation(&"walk"):
+		if sprite.animation != &"walk" or not sprite.is_playing():
+			sprite.play(&"walk")
+		return
+
+	play_idle_visual()

@@ -25,8 +25,10 @@ func physics_update(delta: float) -> void:
 	phase_timer -= delta
 
 	if moving:
+		parent.play_move_visual()
 		parent.movement.request_move(move_direction, roam_speed_multiplier)
 	else:
+		parent.play_idle_visual()
 		parent.movement.request_stop()
 
 	if phase_timer <= 0.0:
