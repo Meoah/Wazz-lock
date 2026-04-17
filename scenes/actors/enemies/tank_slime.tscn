@@ -92,7 +92,6 @@ animation = &"attack"
 autoplay = "idle"
 
 [node name="VFX" type="AnimatedSprite2D" parent="."]
-visible = false
 sprite_frames = ExtResource("15_ejlud")
 animation = &"attack"
 frame = 11

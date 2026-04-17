@@ -68,8 +68,22 @@ func try_spend_money(amount: float) -> bool:
 
 
 func set_active_combat_room(enabled: bool) -> void:
+	var was_active_combat_room: bool = is_active_combat_room
+
 	is_active_combat_room = enabled
 	is_timer_active = enabled
+
+	if enabled:
+		return
+
+	if not was_active_combat_room and not is_active_combat_room:
+		return
+
+	var player: Clive = get_tree().get_first_node_in_group("player") as Clive
+	if player == null: return
+	if player.status == null: return
+
+	player.status.current_mana = player.status.max_mana
 
 
 func get_current_level_room_count() -> int:

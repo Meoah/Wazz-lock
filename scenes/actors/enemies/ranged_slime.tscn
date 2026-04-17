@@ -80,7 +80,7 @@ _base_knockback = 2.0
 _base_poise = 0.0
 
 [node name="Body" type="AnimatedSprite2D" parent="."]
-self_modulate = Color(1, 1, 1, 0.75000006)
+self_modulate = Color(1, 1, 1, 0.90000004)
 scale = Vector2(0.5, 0.5)
 sprite_frames = ExtResource("13_msfar")
 animation = &"idle"
@@ -122,7 +122,6 @@ shape = SubResource("CircleShape2D_rsbtc")
 debug_color = Color(0.78163266, 0.4202553, 0.3251648, 0.41960785)
 
 [node name="ProjectileSpawnMarker" type="Marker2D" parent="."]
-position = Vector2(32, 0)
 
 [node name="HealthBar" type="ProgressBar" parent="."]
 modulate = Color(0, 1, 0, 1)

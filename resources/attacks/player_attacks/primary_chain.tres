@@ -1,13 +1,14 @@
-[gd_resource type="Resource" script_class="AttackChain" load_steps=7 format=3 uid="uid://c8ljx5prvjbdc"]
+[gd_resource type="Resource" script_class="AttackChain" load_steps=8 format=3 uid="uid://c8ljx5prvjbdc"]
 
 [ext_resource type="Script" uid="uid://bcb72e44wqhkh" path="res://scripts/systems/combat/attacks/attack_chain_resource.gd" id="1_hnreg"]
 [ext_resource type="Script" uid="uid://ce7k5u25qaxdt" path="res://scripts/systems/combat/attacks/attack_stage_resource.gd" id="2_vq4bo"]
-[ext_resource type="Resource" uid="uid://euxvecpcp812" path="res://resources/attacks/player_attacks/primary_start.tres" id="3_yc2pr"]
-[ext_resource type="Resource" uid="uid://d0303etaborlo" path="res://resources/attacks/player_attacks/primary_tap_1.tres" id="4_jnm1f"]
-[ext_resource type="Resource" uid="uid://b5om7e2j44nrt" path="res://resources/attacks/player_attacks/primary_tap_2.tres" id="5_6oob1"]
-[ext_resource type="Resource" uid="uid://mq4qvyalwvdf" path="res://resources/attacks/player_attacks/primary_tap_3.tres" id="6_pbgjh"]
+[ext_resource type="Resource" uid="uid://euxvecpcp812" path="res://resources/attacks/player_attacks/primary/primary_start.tres" id="3_tlcv6"]
+[ext_resource type="Resource" uid="uid://d0303etaborlo" path="res://resources/attacks/player_attacks/primary/primary_tap_1.tres" id="4_1xn4a"]
+[ext_resource type="Resource" uid="uid://b5om7e2j44nrt" path="res://resources/attacks/player_attacks/primary/primary_tap_2.tres" id="5_2hylr"]
+[ext_resource type="Resource" uid="uid://d0n4bhc6ipuma" path="res://resources/attacks/player_attacks/primary/primary_tap_2.5.tres" id="6_3xjv0"]
+[ext_resource type="Resource" uid="uid://mq4qvyalwvdf" path="res://resources/attacks/player_attacks/primary/primary_tap_3.tres" id="7_w6poy"]
 
 [resource]
 script = ExtResource("1_hnreg")
-stages = Array[ExtResource("2_vq4bo")]([ExtResource("3_yc2pr"), ExtResource("4_jnm1f"), ExtResource("5_6oob1"), ExtResource("6_pbgjh")])
+stages = Array[ExtResource("2_vq4bo")]([ExtResource("3_tlcv6"), ExtResource("4_1xn4a"), ExtResource("5_2hylr"), ExtResource("6_3xjv0"), ExtResource("7_w6poy")])
 metadata/_custom_type_script = "uid://bcb72e44wqhkh"

@@ -4,11 +4,12 @@ class_name PlayerRollStateComponent
 @export var mana_regen_source_id: StringName = &"roll"
 @export var pause_mana_regen_while_rolling: bool = false
 @export var mana_regen_scale_while_rolling: float = 0.5
-@export var entry_mana_cost: float = 20.0
+@export var entry_mana_cost: float = 5.0
+@export var mana_drain_delay: float = 2.0
 @export var sustain_mana_per_second: float = 8.0
 @export var sustain_mana_ramp_per_second: float = 12.0
-@export var preroll_speed_multiplier: float = 2.0
-@export var rolling_speed_multiplier: float = 1.5
+@export var preroll_speed_multiplier: float = 3.0
+@export var rolling_speed_multiplier: float = 2.0
 @export var postroll_speed_multiplier: float = 1.0
 
 var startup_direction: Vector2 = Vector2.RIGHT
@@ -65,16 +66,19 @@ func physics_update(delta: float) -> void:
 	
 	parent.movement.request_move(direction, rolling_speed_multiplier)
 	
-	var current_cost_per_second: float = sustain_mana_per_second + (rolling_time * sustain_mana_ramp_per_second)
-	var mana_cost: float = current_cost_per_second * delta
-	
 	if !parent.is_dodge_held():
 		_begin_postroll()
 		return
 	
-	if _should_charge_roll_sustain_mana() and !parent.status.request_mana(mana_cost):
-		_begin_postroll()
-		return
+	var should_charge_mana: bool = _should_charge_roll_sustain_mana() and rolling_time >= mana_drain_delay
+	if should_charge_mana:
+		var charged_roll_time: float = max(rolling_time - mana_drain_delay, 0.0)
+		var current_cost_per_second: float = sustain_mana_per_second + (charged_roll_time * sustain_mana_ramp_per_second)
+		var mana_cost: float = current_cost_per_second * delta
+		
+		if !parent.status.request_mana(mana_cost):
+			_begin_postroll()
+			return
 	
 	rolling_time += delta
 

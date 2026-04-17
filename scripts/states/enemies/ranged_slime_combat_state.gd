@@ -17,6 +17,10 @@ func physics_update(_delta: float) -> void:
 
 	if not parent.has_target_in_sight(): return
 
+	var target_direction: Vector2 = parent.get_target_direction()
+	if target_direction != Vector2.ZERO:
+		parent.movement.face_direction(target_direction)
+
 	if parent.should_teleport():
 		parent.begin_teleport_sequence()
 		return

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="AttackStage" load_steps=3 format=3 uid="uid://b5om7e2j44nrt"]
+
+[ext_resource type="Script" uid="uid://cbjn2t2y5w37x" path="res://scripts/systems/combat/attacks/attack_charge_tier_resource.gd" id="1_sxwlw"]
+[ext_resource type="Script" uid="uid://ce7k5u25qaxdt" path="res://scripts/systems/combat/attacks/attack_stage_resource.gd" id="2_qqx4c"]
+
+[resource]
+script = ExtResource("2_qqx4c")
+stage_id = &"primary_tap_2"
+animation_name = &"attack_primary_2"
+allow_live_aim_updates = true
+lock_facing_during_stage = false
+damage_multiplier = 0.75
+knockback_multiplier = 0.75
+next_on_any_attack_press = &"primary_tap_2.5"
+skip_on_primary_press = Array[StringName]([&"primary_tap_3"])
+metadata/_custom_type_script = "uid://ce7k5u25qaxdt"

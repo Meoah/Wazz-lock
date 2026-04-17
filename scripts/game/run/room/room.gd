@@ -448,6 +448,12 @@ func is_global_position_in_water(global_position: Vector2) -> bool:
 	return _tile_handler.is_global_position_in_water(global_position)
 
 
+func get_floor_spawn_positions() -> Array[Vector2]:
+	if _tile_handler == null: return []
+
+	return _tile_handler.get_floor_spawn_positions()
+
+
 func get_water_spawn_positions() -> Array[Vector2]:
 	if _tile_handler == null: return []
 

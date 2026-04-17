@@ -64,12 +64,13 @@ func _refresh_reroll_button() -> void:
 
 
 func _finish_reward_popup() -> void:
+	var followup_popup_type: int = _followup_popup_type
+	var followup_popup_params: Dictionary = _followup_popup_params.duplicate(true)
+
+	if followup_popup_type >= 0:
+		GameManager.call_deferred("show_popup", followup_popup_type, followup_popup_params)
+
 	GameManager.dismiss_popup()
-
-	if _followup_popup_type < 0: return
-
-	await get_tree().process_frame
-	GameManager.show_popup(_followup_popup_type, _followup_popup_params)
 
 
 func _on_card_selected(card: RewardCardData) -> void:
@@ -77,7 +78,7 @@ func _on_card_selected(card: RewardCardData) -> void:
 	if run_root:
 		run_root.apply_reward_card_choice(card)
 
-	await _finish_reward_popup()
+	_finish_reward_popup()
 
 
 func _on_pressed_reroll() -> void:
@@ -94,4 +95,4 @@ func _on_pressed_skip() -> void:
 	if run_root:
 		run_root.apply_reward_skip()
 
-	await _finish_reward_popup()
+	_finish_reward_popup()

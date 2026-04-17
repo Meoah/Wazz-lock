@@ -31,8 +31,14 @@ enum StageMode {
 @export var poise_multiplier: float = 1.0
 
 @export_category("Normal Stage Branches")
+@export var default_next_stage_id: StringName
+@export var next_on_any_attack_press: StringName
 @export var next_on_primary_press: Array[StringName] = []
 @export var next_on_secondary_press: Array[StringName] = []
+
+@export_category("Skip Window Branches")
+@export var skip_on_primary_press: Array[StringName] = []
+@export var skip_on_secondary_press: Array[StringName] = []
 
 @export_category("Decision Stage Branches")
 @export var hold_threshold_override: float = 0.0

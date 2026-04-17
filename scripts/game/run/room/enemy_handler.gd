@@ -279,14 +279,20 @@ func _on_enemy_death(_hit_data: HitData, enemy: BaseEnemy) -> void:
 
 func get_alive_normal_enemy_count() -> int:
 	_prune_enemy_list()
-	
+
 	var count: int = 0
 	for enemy in enemy_list:
 		if !is_instance_valid(enemy):
 			continue
-		if str(enemy.get_meta("spawn_role", "normal")) == "normal":
-			count += 1
-	
+
+		if enemy.is_dead():
+			continue
+
+		if str(enemy.get_meta("spawn_role", "normal")) != "normal":
+			continue
+
+		count += 1
+
 	return count
 
 
@@ -497,7 +503,18 @@ func has_alive_enemies() -> bool:
 
 func get_alive_enemy_count() -> int:
 	_prune_enemy_list()
-	return enemy_list.size()
+
+	var count: int = 0
+	for enemy in enemy_list:
+		if !is_instance_valid(enemy):
+			continue
+
+		if enemy.is_dead():
+			continue
+
+		count += 1
+
+	return count
 
 
 func get_active_boss_enemy() -> BaseEnemy:
@@ -525,18 +542,29 @@ func get_alive_boss_enemy_count() -> int:
 		if !is_instance_valid(enemy):
 			continue
 
-		if str(enemy.get_meta("spawn_role", "")) == "boss":
-			count += 1
+		if enemy.is_dead():
+			continue
+
+		if str(enemy.get_meta("spawn_role", "")) != "boss":
+			continue
+
+		count += 1
 
 	return count
 
+
 func _prune_enemy_list() -> void:
 	var alive_enemies: Array[BaseEnemy] = []
-	
+
 	for enemy in enemy_list:
-		if is_instance_valid(enemy):
-			alive_enemies.append(enemy)
-	
+		if !is_instance_valid(enemy):
+			continue
+
+		if enemy.is_queued_for_deletion():
+			continue
+
+		alive_enemies.append(enemy)
+
 	enemy_list = alive_enemies
 
 

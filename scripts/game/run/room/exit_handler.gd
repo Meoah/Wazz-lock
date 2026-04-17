@@ -26,8 +26,8 @@ func setup_exits(room_data: RoomData) -> void:
 		)
 
 		if block_boss_backtrack:
-			exit_drain.hide()
-			exit_drain.set_destination(null)
+			exit_drain.show()
+			exit_drain.set_destination(destination)
 			exit_drain.is_opened = false
 			exit_drain.setup()
 			continue

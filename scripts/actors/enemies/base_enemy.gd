@@ -248,6 +248,17 @@ func has_target_memory() -> bool:
 	return time_since_target_seen < INF
 
 
+func aggro_on_hurt() -> void:
+	global_aggro_enabled = true
+
+	if not is_instance_valid(target):
+		return
+
+	target_in_sight = true
+	last_known_target_position = target.global_position
+	time_since_target_seen = 0.0
+
+
 func set_global_aggro_enabled(enabled: bool) -> void:
 	global_aggro_enabled = enabled
 

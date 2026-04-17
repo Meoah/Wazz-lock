@@ -1,13 +1,14 @@
 [gd_resource type="Resource" script_class="AttackStage" load_steps=3 format=3 uid="uid://dgn4d5n2iavs5"]
 
-[ext_resource type="Script" uid="uid://cbjn2t2y5w37x" path="res://scripts/systems/combat/attacks/attack_charge_tier_resource.gd" id="1_ph6wj"]
-[ext_resource type="Script" uid="uid://ce7k5u25qaxdt" path="res://scripts/systems/combat/attacks/attack_stage_resource.gd" id="2_a08g1"]
+[ext_resource type="Script" uid="uid://cbjn2t2y5w37x" path="res://scripts/systems/combat/attacks/attack_charge_tier_resource.gd" id="1_nb3ru"]
+[ext_resource type="Script" uid="uid://ce7k5u25qaxdt" path="res://scripts/systems/combat/attacks/attack_stage_resource.gd" id="2_6epqa"]
 
 [resource]
-script = ExtResource("2_a08g1")
+script = ExtResource("2_6epqa")
 stage_id = &"secondary_start"
 stage_mode = 1
 animation_name = &"attack_secondary_start"
+flat_mana_cost = 30.0
 apply_aim_to_hands_on_start = false
 tap_branch_stage_id = &"secondary_tap_1"
 hold_branch_stage_id = &"secondary_hold"

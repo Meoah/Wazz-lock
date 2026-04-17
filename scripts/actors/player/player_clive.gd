@@ -331,10 +331,15 @@ func consume_roll_request(entry_cost: float = 20.0) -> bool:
 	if !roll_requested: return false
 	roll_requested = false
 	
-	if roll_cooldown > 0.0 or is_dead(): return false
+	if is_dead(): return false
+	if _should_charge_dodge_mana() and roll_cooldown > 0.0: return false
 	if _should_charge_dodge_mana() and !status.request_mana(entry_cost): return false
 	
 	return true
+
+
+func get_current_room() -> Room:
+	return get_tree().get_first_node_in_group("current_room") as Room
 
 
 func play_idle() -> void:
@@ -361,8 +366,31 @@ func begin_roll_sustain() -> void:
 
 
 func begin_roll_end() -> void:
+	snap_to_nearest_floor_if_in_water()
 	animation_player.speed_scale = 1.0
 	animation_player.play("postroll")
+
+
+func snap_to_nearest_floor_if_in_water() -> void:
+	var current_room: Room = get_current_room()
+	if current_room == null: return
+	if not current_room.is_global_position_in_water(global_position): return
+
+	var floor_positions: Array[Vector2] = current_room.get_floor_spawn_positions()
+	if floor_positions.is_empty(): return
+
+	var closest_floor_position: Vector2 = floor_positions[0]
+	var closest_distance_squared: float = global_position.distance_squared_to(closest_floor_position)
+
+	for floor_position: Vector2 in floor_positions:
+		var distance_squared: float = global_position.distance_squared_to(floor_position)
+		if distance_squared >= closest_distance_squared:
+			continue
+
+		closest_floor_position = floor_position
+		closest_distance_squared = distance_squared
+
+	global_position = closest_floor_position
 
 
 func start_attack_mode() -> void:
@@ -488,7 +516,7 @@ func _on_animation_player_animation_finished(anim_name: StringName) -> void:
 			roll_startup_finished.emit()
 
 		&"postroll":
-			roll_cooldown = 0.56
+			roll_cooldown = 0.56 if _should_charge_dodge_mana() else 0.0
 			_set_status_flag(STATUS_FLAG.ROLLING, false)
 			roll_finished.emit()
 

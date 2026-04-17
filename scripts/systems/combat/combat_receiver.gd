@@ -157,7 +157,11 @@ func _handle_hurt(hit_data: HitData, reaction_animation: StringName = &"hurt") -
 			"reaction_animation": reaction_animation
 		})
 
-	var resolved_actor := _get_actor()
+	var resolved_actor: Node = _get_actor()
+
+	if resolved_actor and resolved_actor.has_method("aggro_on_hurt"):
+		resolved_actor.aggro_on_hurt()
+
 	if resolved_actor and resolved_actor.has_method("on_hurt_received"):
 		resolved_actor.on_hurt_received(hit_data)
 
