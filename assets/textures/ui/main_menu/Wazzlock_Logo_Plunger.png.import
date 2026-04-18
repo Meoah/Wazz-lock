@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d2vrp360jkha"
-path="res://.godot/imported/Intro.png-2cfd4f966141be05999bedfa07a82290.ctex"
+uid="uid://c5ebebir7jadp"
+path="res://.godot/imported/Wazzlock_Logo_Plunger.png-7dcc962787568a01cb8792560a7a9328.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/textures/ui/screens/Intro.png"
-dest_files=["res://.godot/imported/Intro.png-2cfd4f966141be05999bedfa07a82290.ctex"]
+source_file="res://assets/textures/ui/main_menu/Wazzlock_Logo_Plunger.png"
+dest_files=["res://.godot/imported/Wazzlock_Logo_Plunger.png-7dcc962787568a01cb8792560a7a9328.ctex"]
 
 [params]
 

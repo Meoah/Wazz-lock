@@ -220,7 +220,16 @@ func on_hurt_received(_hit_data: HitData) -> void:
 
 
 func on_death_received(_hit_data: HitData) -> void:
-	_interrupt_ranged_actions()
+	action_serial += 1
+	action_locked = false
+
+	if teleport_vfx:
+		teleport_vfx.stop()
+		teleport_vfx.visible = false
+
+	if hit_box:
+		hit_box.end_activation()
+
 	super.on_death_received(_hit_data)
 
 

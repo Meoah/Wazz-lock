@@ -71,3 +71,8 @@ func request_open_exit(exit_direction: RoomData.Directions) -> bool:
 			exit_drain.open()
 			return true
 	return false
+
+
+func refresh_exit_interaction_states() -> void:
+	for exit_drain in exit_list:
+		exit_drain.call_deferred("_refresh_player_proximity_state")

@@ -1,7 +1,7 @@
 extends BasePopup
 class_name ShopPopup
 
-const COST_COLOR_DEFAULT: String = "#FFFFFF"
+const COST_COLOR_DEFAULT: String = "#a1a1a1"
 const COST_COLOR_CANNOT_AFFORD: String = "#D05050"
 const COST_COLOR_PURCHASED: String = "#65C96B"
 
