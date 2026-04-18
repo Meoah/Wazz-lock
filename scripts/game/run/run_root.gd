@@ -14,10 +14,11 @@ var current_room_instance: Room = null
 var is_changing_room: bool = false
 var current_room_grid_pos: Vector2i = Vector2i.ZERO
 var is_player_death_sequence_running: bool = false
+var drain_interaction_locked_until_release: bool = false
 
 
 func _ready() -> void:
-	set_process(false)
+	set_process(true)
 	add_to_group("run_root")
 	
 	AudioManager.play_bgm_path(GAMEPLAY_BGM_PATH, false, 0.25)
@@ -55,6 +56,15 @@ func _ready() -> void:
 
 			if boot_mode == RunManager.BootMode.NEW_RUN:
 				call_deferred("_run_new_run_intro_sequence")
+
+
+func _process(_delta: float) -> void:
+	if drain_interaction_locked_until_release and not Input.is_action_pressed("interact"):
+		drain_interaction_locked_until_release = false
+
+
+func is_drain_interaction_locked() -> bool:
+	return is_changing_room or drain_interaction_locked_until_release
 
 
 func _load_room_scene_paths() -> Array[String]:
@@ -543,12 +553,14 @@ func enter_room(room_data: RoomData, entrance_direction: int = -1) -> void:
 	
 	minimap_node.draw_minimap(current_level_data, room_data.grid_pos)
 	minimap_node.move_player_marker_to_room(room_data)
+	current_room_instance.refresh_exit_interaction_states()
 
 func _on_change_room(room_data: RoomData, entrance_direction: int) -> void:
 	if is_changing_room:
 		return
 
 	is_changing_room = true
+	drain_interaction_locked_until_release = true
 	call_deferred("_run_room_transition", room_data, entrance_direction)
 
 

@@ -5,7 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://bib7um0qpf24g" path="res://assets/textures/ui/nine_slice/Button_-_Red.png" id="2_yt3lu"]
 [ext_resource type="Texture2D" uid="uid://dgd5gyuxkj01h" path="res://assets/textures/ui/screens/weapons.png" id="3_lbb0v"]
 [ext_resource type="Texture2D" uid="uid://bvmbkxr530w7l" path="res://assets/textures/ui/screens/enemies.png" id="4_nkmn3"]
-[ext_resource type="Texture2D" uid="uid://bk6tw527kogr5" path="res://assets/textures/ui/screens/envoirnment.png" id="5_iuaci"]
+[ext_resource type="Texture2D" uid="uid://bk6tw527kogr5" path="res://assets/textures/ui/screens/enviornment.png" id="5_iuaci"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_2vhs1"]
 texture = ExtResource("2_yt3lu")
@@ -30,6 +30,7 @@ _button_resume = NodePath("PanelContainer/VBoxContainer/Resume")
 _button_codex = NodePath("PanelContainer/VBoxContainer/Codex")
 _button_settings = NodePath("PanelContainer/VBoxContainer/Settings")
 _button_return_to_main_menu = NodePath("PanelContainer/VBoxContainer/ReturnToMainMenu")
+_codex_titles = ["Clive", "Weapons", "Enemies", "Enviornment"]
 _codex_textures = Array[Texture2D]([ExtResource("2_kbel7"), ExtResource("3_lbb0v"), ExtResource("4_nkmn3"), ExtResource("5_iuaci")])
 
 [node name="PanelContainer" type="PanelContainer" parent="."]

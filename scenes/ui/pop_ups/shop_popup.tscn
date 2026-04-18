@@ -68,6 +68,7 @@ layout_mode = 2
 
 [node name="CostA" type="RichTextLabel" parent="PanelContainer/VBoxContainer/CardsRow/OfferA"]
 layout_mode = 2
+theme_override_colors/default_color = Color(0, 0, 0, 1)
 bbcode_enabled = true
 fit_content = true
 horizontal_alignment = 1
@@ -80,6 +81,7 @@ layout_mode = 2
 
 [node name="CostB" type="RichTextLabel" parent="PanelContainer/VBoxContainer/CardsRow/OfferB"]
 layout_mode = 2
+theme_override_colors/default_color = Color(0, 0, 0, 1)
 bbcode_enabled = true
 fit_content = true
 horizontal_alignment = 1
@@ -92,6 +94,7 @@ layout_mode = 2
 
 [node name="CostC" type="RichTextLabel" parent="PanelContainer/VBoxContainer/CardsRow/OfferC"]
 layout_mode = 2
+theme_override_colors/default_color = Color(0, 0, 0, 1)
 bbcode_enabled = true
 fit_content = true
 horizontal_alignment = 1

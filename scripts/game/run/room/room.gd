@@ -296,9 +296,13 @@ func setup(room_data: RoomData) -> void:
 	name = "Room_%s_%s" % [data.grid_pos.x, data.grid_pos.y]
 	_survival_elapsed = 0.0
 	clear_condition = _resolve_clear_condition_from_data()
+
+	_apply_or_generate_floor_damage_snapshot()
+
 	_enemy_handler.set_encounter_profile(data.encounter_profile)
 	_enemy_handler.setup_spawn_context(_tile_handler)
 	_exit_handler.setup_exits(data)
+	
 	_survival_elapsed = float(data.metadata.get("survival_elapsed", 0.0))
 	var runtime_initialized: bool = bool(data.metadata.get("runtime_initialized", false))
 	
@@ -351,6 +355,40 @@ func setup(room_data: RoomData) -> void:
 	_refresh_room_runtime_rules()
 	_refresh_boss_hud_tracking()
 	set_process(true)
+
+
+func _apply_or_generate_floor_damage_snapshot() -> void:
+	if data == null:
+		return
+
+	if _tile_handler == null or _tile_handler.floor_tiles == null:
+		return
+
+	var floor_snapshot: Array = []
+	var should_regenerate_snapshot: bool = true
+	var current_damage_version: int = FloorTiles.FLOOR_DAMAGE_VERSION
+	var saved_damage_version: int = int(data.metadata.get("floor_damage_version", -1))
+
+	if data.metadata.has("floor_damage_snapshot") and saved_damage_version == current_damage_version:
+		var saved_snapshot: Variant = data.metadata.get("floor_damage_snapshot", [])
+		if saved_snapshot is Array:
+			floor_snapshot = saved_snapshot
+			should_regenerate_snapshot = false
+
+	if should_regenerate_snapshot:
+		var rng: RandomNumberGenerator = RandomNumberGenerator.new()
+		rng.seed = hash("%s:%s:%s:%s" % [
+			data.grid_pos.x,
+			data.grid_pos.y,
+			int(round(data.difficulty_modifier * 100.0)),
+			current_damage_version
+		])
+
+		floor_snapshot = _tile_handler.floor_tiles.build_damage_snapshot(float(data.difficulty_modifier), rng)
+		data.metadata["floor_damage_snapshot"] = floor_snapshot
+		data.metadata["floor_damage_version"] = current_damage_version
+
+	_tile_handler.floor_tiles.apply_damage_snapshot(floor_snapshot)
 
 
 func _restore_friendly_runtime_state(snapshots: Array) -> void:
@@ -453,6 +491,11 @@ func on_room_exited() -> void:
 	RunManager.set_active_combat_room(false)
 	RunManager.is_boss_active = false
 	RunManager.boss_node = null
+
+
+func refresh_exit_interaction_states() -> void:
+	if _exit_handler:
+		_exit_handler.refresh_exit_interaction_states()
 
 
 func get_or_create_shop_state() -> Dictionary:
