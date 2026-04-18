@@ -321,17 +321,31 @@ func on_player_death_started() -> void:
 func apply_spawn_variant_modifiers(config: Dictionary) -> void:
 	if status:
 		var health_multiplier: float = float(config.get("health_multiplier", 1.0))
+		var health_regen_multiplier: float = float(config.get("health_regen_multiplier", 1.0))
+		var max_mana_multiplier: float = float(config.get("max_mana_multiplier", 1.0))
+		var mana_regen_multiplier: float = float(config.get("mana_regen_multiplier", 1.0))
 		var damage_multiplier: float = float(config.get("damage_multiplier", 1.0))
 		var defense_multiplier: float = float(config.get("defense_multiplier", 1.0))
+		var knockback_multiplier: float = float(config.get("knockback_multiplier", 1.0))
 		var poise_multiplier: float = float(config.get("poise_multiplier", 1.0))
 
 		var previous_max_health: float = max(status.max_health, 1.0)
+		var previous_max_mana: float = max(status.max_mana, 1.0)
+
 		var health_ratio: float = status.current_health / previous_max_health
+		var mana_ratio: float = status.current_mana / previous_max_mana
 
 		status.max_health *= health_multiplier
 		status.current_health = clamp(status.max_health * health_ratio, 0.0, status.max_health)
+		status.health_regen *= health_regen_multiplier
+
+		status.max_mana *= max_mana_multiplier
+		status.current_mana = clamp(status.max_mana * mana_ratio, 0.0, status.max_mana)
+		status.mana_regen *= mana_regen_multiplier
+
 		status.damage *= damage_multiplier
 		status.defense *= defense_multiplier
+		status.knockback *= knockback_multiplier
 		status.poise *= poise_multiplier
 
 	if movement:
@@ -429,6 +443,24 @@ func begin_hurt(animation_name: StringName = &"hurt") -> void:
 	_stop_reaction_tween()
 	body_root.position = body_root_origin
 	sprite.play(animation_name)
+
+
+func begin_death(animation_name: StringName = &"dead") -> float:
+	if body_root is not AnimatedSprite2D:
+		return 0.0
+
+	var sprite: AnimatedSprite2D = body_root as AnimatedSprite2D
+	if sprite.sprite_frames == null:
+		return 0.0
+
+	if not sprite.sprite_frames.has_animation(animation_name):
+		return 0.0
+
+	_stop_reaction_tween()
+	body_root.position = body_root_origin
+	sprite.play(animation_name)
+
+	return get_animation_duration(animation_name)
 
 
 func hold_hurt_last_frame(duration: float) -> void:

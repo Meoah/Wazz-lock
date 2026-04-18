@@ -60,11 +60,30 @@ func stop_spawning() -> void:
 func clear_alive_enemies() -> void:
 	stop_spawning()
 	_prune_enemy_list()
-	
+
+	var remaining_enemies: Array[BaseEnemy] = []
+
+	for enemy in enemy_list:
+		if !is_instance_valid(enemy):
+			continue
+
+		if enemy.is_dead():
+			remaining_enemies.append(enemy)
+			continue
+
+		enemy.queue_free()
+
+	enemy_list = remaining_enemies
+
+
+func clear_all_enemies() -> void:
+	stop_spawning()
+	_prune_enemy_list()
+
 	for enemy in enemy_list:
 		if is_instance_valid(enemy):
 			enemy.queue_free()
-	
+
 	enemy_list.clear()
 
 
@@ -238,6 +257,7 @@ func _spawn_enemy(
 
 	_apply_enemy_display_name(enemy_child, resolved_enemy_archetype)
 	_apply_variant_to_enemy(enemy_child, enemy_variant)
+	_apply_difficulty_modifiers(enemy_child)
 
 	if enemy_child.has_method("set_global_aggro_enabled"):
 		enemy_child.set_global_aggro_enabled(use_global_aggro)
@@ -306,6 +326,15 @@ func _apply_variant_to_enemy(enemy: BaseEnemy, enemy_variant: EnemyLibrary.Enemy
 				"speed_multiplier": boss_affix.speed_multiplier,
 				"scale_multiplier": 2.0
 			})
+
+
+func _apply_difficulty_modifiers(enemy: BaseEnemy) -> void:
+	if enemy == null:
+		return
+
+	var difficulty_modifiers: Dictionary = EnemyLibrary.get_difficulty_stat_multipliers(_difficulty_modifier)
+	enemy.apply_spawn_variant_modifiers(difficulty_modifiers)
+
 
 func _apply_enemy_display_name(enemy: BaseEnemy, enemy_archetype: EnemyLibrary.EnemyArchetype) -> void:
 	if enemy == null:
@@ -430,6 +459,7 @@ func _spawn_boss_once() -> void:
 
 	_apply_enemy_display_name(boss_child, boss_archetype)
 	_apply_variant_to_enemy(boss_child, EnemyLibrary.EnemyVariant.BOSS)
+	_apply_difficulty_modifiers(boss_child)
 
 	if boss_child.has_method("set_global_aggro_enabled"):
 		boss_child.set_global_aggro_enabled(true)
@@ -491,7 +521,7 @@ func capture_runtime_state() -> Array[Dictionary]:
 
 
 func restore_runtime_state(snapshots: Array) -> void:
-	clear_alive_enemies()
+	clear_all_enemies()
 	
 	for snapshot in snapshots:
 		_restore_enemy_snapshot(snapshot)
@@ -525,6 +555,7 @@ func _restore_enemy_snapshot(snapshot: Dictionary) -> void:
 	
 	if spawn_role != "boss" and int(enemy_variant) >= 0:
 		_apply_variant_to_enemy(enemy_child, enemy_variant)
+		_apply_difficulty_modifiers(enemy_child)
 		
 	if enemy_child.status:
 		enemy_child.status.current_health = clamp(

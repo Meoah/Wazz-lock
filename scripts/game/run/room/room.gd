@@ -21,6 +21,7 @@ enum ClearConditions{
 var data: RoomData
 var enemies: Node2D
 var _survival_elapsed: float = 0.0
+var _clear_sequence_running: bool = false
 
 
 func _ready() -> void:
@@ -38,8 +39,14 @@ func _process(delta: float) -> void:
 
 
 func _check_clear_condition() -> void:
-	if !data or data.cleared: return
-	if _is_clear_condition_met(): _cleared()
+	if !data or data.cleared:
+		return
+
+	if _clear_sequence_running:
+		return
+
+	if _is_clear_condition_met():
+		_begin_clear_sequence()
 
 
 func _resolve_clear_condition_from_data() -> ClearConditions:
@@ -210,23 +217,44 @@ func _is_clear_condition_met() -> bool:
 	return false
 
 
-func _cleared() -> void:
+func _begin_clear_sequence() -> void:
+	if _clear_sequence_running:
+		return
+
+	_clear_sequence_running = true
+	data.cleared = true
+
 	_enemy_handler.clear_alive_enemies()
 	_clear_enemy_projectiles()
 	_exit_handler.open_all_exits()
-	data.cleared = true
 	_refresh_boss_hud_tracking()
 	_refresh_room_runtime_rules()
 	_refresh_objective_hud()
 
+	SignalBus.request_minimap_refresh.emit()
+	SignalBus.request_run_save.emit()
+
+	call_deferred("_run_clear_sequence")
+
+
+func _run_clear_sequence() -> void:
+	if _should_play_clear_slowdown():
+		await _play_clear_slowdown()
+		await get_tree().create_timer(0.5, true, false, true).timeout
+
+	_present_clear_popup()
+	_clear_sequence_running = false
+
+
+func _present_clear_popup() -> void:
 	match clear_condition:
 		ClearConditions.BOSS:
 			GameManager.show_popup(BasePopup.POPUP_TYPE.REWARD, {
-					"room_difficulty_modifier": data.difficulty_modifier,
-					"reward_pool_id": "boss",
-					"choice_count": 3,
-					"followup_popup_type": BasePopup.POPUP_TYPE.LEVEL_COMPLETE,
-					"followup_popup_params": RunManager.build_level_complete_popup_params()
+				"room_difficulty_modifier": data.difficulty_modifier,
+				"reward_pool_id": "boss",
+				"choice_count": 3,
+				"followup_popup_type": BasePopup.POPUP_TYPE.LEVEL_COMPLETE,
+				"followup_popup_params": RunManager.build_level_complete_popup_params()
 			})
 
 		ClearConditions.AUTO_WIN, ClearConditions.SHOP:
@@ -234,13 +262,28 @@ func _cleared() -> void:
 
 		_:
 			GameManager.show_popup(BasePopup.POPUP_TYPE.REWARD, {
-					"room_difficulty_modifier": data.difficulty_modifier,
-					"reward_pool_id": "standard",
-					"choice_count": 3
+				"room_difficulty_modifier": data.difficulty_modifier,
+				"reward_pool_id": "standard",
+				"choice_count": 3
 			})
 
-	SignalBus.request_minimap_refresh.emit()
-	SignalBus.request_run_save.emit()
+
+func _should_play_clear_slowdown() -> bool:
+	match clear_condition:
+		ClearConditions.EXTERMINATE, ClearConditions.SURVIVAL, ClearConditions.BOSS:
+			return true
+
+	return false
+
+
+func _play_clear_slowdown() -> void:
+	Engine.time_scale = 0.15
+	await get_tree().create_timer(0.5, true, false, true).timeout
+
+	Engine.time_scale = 0.45
+	await get_tree().create_timer(0.5, true, false, true).timeout
+
+	Engine.time_scale = 1.0
 
 
 func _exit_tree() -> void:
@@ -405,6 +448,7 @@ func on_player_death_started() -> void:
 
 func on_room_exited() -> void:
 	set_process(false)
+	Engine.time_scale = 1.0
 	_clear_enemy_projectiles()
 	RunManager.set_active_combat_room(false)
 	RunManager.is_boss_active = false
@@ -443,9 +487,9 @@ func mark_shop_offer_purchased(offer_index: int) -> void:
 	SignalBus.request_run_save.emit()
 
 
-func is_global_position_in_water(global_position: Vector2) -> bool:
+func is_global_position_in_water(_global_position: Vector2) -> bool:
 	if _tile_handler == null: return false
-	return _tile_handler.is_global_position_in_water(global_position)
+	return _tile_handler.is_global_position_in_water(_global_position)
 
 
 func get_floor_spawn_positions() -> Array[Vector2]:

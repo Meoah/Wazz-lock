@@ -74,7 +74,9 @@ apply_knockback = false
 
 [node name="Status" parent="." instance=ExtResource("12_kis68")]
 type = 1
-_base_max_health = 10.0
+_base_max_health = 5.0
+_base_max_mana = 0.0
+_base_mana_regen = 0.0
 _base_damage = 2.0
 _base_defense = 0.0
 _base_knockback = 2.0

@@ -1267,7 +1267,7 @@ tracks/13/keys = {
 
 [sub_resource type="Animation" id="Animation_y6aog"]
 resource_name = "attack_secondary_hold"
-length = 0.37500313
+length = 0.43750313
 step = 0.03125
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -1288,10 +1288,10 @@ tracks/1/path = NodePath("BodyRoot/Hands/Weapon:frame")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.0625, 0.125, 0.1875, 0.25, 0.3125),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"times": PackedFloat32Array(0, 0.0625, 0.125, 0.1875, 0.25, 0.3125, 0.375),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
 "update": 1,
-"values": [2, 3, 4, 5, 6, 7]
+"values": [1, 2, 3, 4, 5, 6, 7]
 }
 tracks/2/type = "value"
 tracks/2/imported = false
@@ -1396,7 +1396,7 @@ tracks/10/path = NodePath("BodyRoot/Hands/VFX:animation")
 tracks/10/interp = 1
 tracks/10/loop_wrap = true
 tracks/10/keys = {
-"times": PackedFloat32Array(0, 0.125),
+"times": PackedFloat32Array(0, 0.1875),
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
 "values": [&"empty", &"plunger_charge_vfx"]
@@ -1408,7 +1408,7 @@ tracks/11/path = NodePath("BodyRoot/Hands/VFX:frame")
 tracks/11/interp = 1
 tracks/11/loop_wrap = true
 tracks/11/keys = {
-"times": PackedFloat32Array(0.125, 0.1875, 0.25, 0.3125),
+"times": PackedFloat32Array(0.1875, 0.25, 0.3125, 0.375),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 1,
 "values": [0, 1, 2, 3]
@@ -1480,7 +1480,7 @@ tracks/17/path = NodePath("BodyRoot/Hands/VFX:self_modulate")
 tracks/17/interp = 1
 tracks/17/loop_wrap = true
 tracks/17/keys = {
-"times": PackedFloat32Array(0, 0.3125),
+"times": PackedFloat32Array(0, 0.375),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
@@ -2101,10 +2101,10 @@ tracks/1/path = NodePath("BodyRoot/Hands/Weapon:frame")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.0625),
-"transitions": PackedFloat32Array(1, 1),
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [0, 1]
+"values": [0]
 }
 tracks/2/type = "value"
 tracks/2/imported = false
@@ -3332,7 +3332,11 @@ floating_text_origin = NodePath("..")
 
 [node name="Status" parent="." instance=ExtResource("6_rugy7")]
 actor_name = "Clive"
-_base_knockback = 5.0
+_base_max_mana = 50.0
+_base_mana_regen = 2.0
+_base_defense = 5.0
+_base_knockback = 4.5
+_base_poise = 2.0
 
 [node name="Inventory" parent="." instance=ExtResource("7_rugy7")]
 

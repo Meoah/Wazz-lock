@@ -57,6 +57,9 @@ var decision_classified_as_hold: bool = false
 var charging: bool = false
 var charge_time: float = 0.0
 
+var refundable_charge_mana_cost: float = 0.0
+var refundable_charge_active: bool = false
+
 
 func on_attack_button_pressed(input_type: int) -> void:
 	if not stage_in_progress:
@@ -124,6 +127,8 @@ func is_sequence_finished() -> bool:
 
 
 func end_sequence_cleanup() -> void:
+	_refund_charge_mana_if_needed()
+
 	stage_in_progress = false
 	sequence_finished = false
 	active_stage = null
@@ -139,6 +144,7 @@ func end_sequence_cleanup() -> void:
 
 	_clear_queue()
 	_clear_runtime_attack_flags()
+	_clear_charge_refund_tracking()
 
 	if hit_box:
 		hit_box.end_activation()
@@ -149,7 +155,7 @@ func end_sequence_cleanup() -> void:
 
 	if actor:
 		actor.stop_attack_mode()
-	
+
 	if movement:
 		movement.lock_facing(false)
 
@@ -173,6 +179,9 @@ func on_attack_animation_finished(anim_name: StringName) -> bool:
 
 		if anim_name == active_stage.charge_loop_animation_name:
 			return true
+
+	if _is_finishing_refundable_charge_release(anim_name):
+		_consume_charge_refund()
 
 	if queued_next_stage_id != StringName():
 		var next_stage: AttackStage = _get_stage_by_id(queued_next_stage_id)
@@ -278,12 +287,17 @@ func _resolve_decision_stage() -> void:
 		_finish_sequence()
 		return
 
-	var next_stage_id := active_stage.tap_branch_stage_id
-	if decision_classified_as_hold:
-		next_stage_id = active_stage.hold_branch_stage_id
+	var decision_stage: AttackStage = active_stage
+	var next_stage_id: StringName = decision_stage.tap_branch_stage_id
 
-	var next_stage := _get_stage_by_id(next_stage_id)
+	if decision_classified_as_hold:
+		next_stage_id = decision_stage.hold_branch_stage_id
+
+	var next_stage: AttackStage = _get_stage_by_id(next_stage_id)
 	if next_stage:
+		if decision_classified_as_hold and next_stage.can_charge and decision_stage.flat_mana_cost > 0.0:
+			_arm_charge_refund(decision_stage.flat_mana_cost)
+
 		_start_stage(next_stage, active_input_type)
 	else:
 		_finish_sequence()
@@ -469,13 +483,14 @@ func _finish_sequence() -> void:
 
 	_clear_queue()
 	_clear_runtime_attack_flags()
+	_clear_charge_refund_tracking()
 
 	if hit_box:
 		hit_box.clear_runtime_modifiers()
 
 	if status:
 		status.clear_mana_regen_control(mana_regen_source_id)
-	
+
 	if movement:
 		movement.lock_facing(false)
 
@@ -488,6 +503,53 @@ func _clear_runtime_attack_flags() -> void:
 	attack_motion_uses_attack_direction = true
 	allow_live_aim_updates = false
 	hands_follow_live_aim = false
+
+
+func _arm_charge_refund(mana_cost: float) -> void:
+	refundable_charge_mana_cost = max(mana_cost, 0.0)
+	refundable_charge_active = refundable_charge_mana_cost > 0.0
+
+
+func _consume_charge_refund() -> void:
+	refundable_charge_mana_cost = 0.0
+	refundable_charge_active = false
+
+
+func _refund_charge_mana_if_needed() -> void:
+	if not refundable_charge_active:
+		return
+
+	if status == null:
+		_clear_charge_refund_tracking()
+		return
+
+	status.modify_current_resource("current_mana", refundable_charge_mana_cost)
+	_clear_charge_refund_tracking()
+
+
+func _clear_charge_refund_tracking() -> void:
+	refundable_charge_mana_cost = 0.0
+	refundable_charge_active = false
+
+
+func _is_finishing_refundable_charge_release(anim_name: StringName) -> bool:
+	if not refundable_charge_active:
+		return false
+
+	if active_stage == null:
+		return false
+
+	if not active_stage.can_charge:
+		return false
+
+	for tier: AttackChargeTier in active_stage.charge_tiers:
+		if tier == null:
+			continue
+
+		if tier.release_animation_name == anim_name:
+			return true
+
+	return false
 
 
 func _clear_queue() -> void:

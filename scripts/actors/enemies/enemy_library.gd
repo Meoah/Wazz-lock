@@ -72,11 +72,25 @@ const PROFILE_ARCHETYPE_WEIGHTS: Dictionary = {
 }
 
 const PROFILE_BASE_ELITE_CHANCE_PERCENT: Dictionary = {
-	RoomData.EncounterProfile.BALANCED: 0.0,
-	RoomData.EncounterProfile.SWARM: 0.0,
-	RoomData.EncounterProfile.BRUISER: 5.0,
-	RoomData.EncounterProfile.BOSS_ADDS: 10.0,
+	RoomData.EncounterProfile.BALANCED: 5.0,
+	RoomData.EncounterProfile.SWARM: 4.0,
+	RoomData.EncounterProfile.BRUISER: 10.0,
+	RoomData.EncounterProfile.BOSS_ADDS: 15.0,
 	RoomData.EncounterProfile.SHOP: 0.0
+}
+
+const DIFFICULTY_BASELINE: float = 10.0
+
+const DIFFICULTY_GROWTH_PER_100: Dictionary = {
+	"health_multiplier": 0.60,
+	"health_regen_multiplier": 0.35,
+	"max_mana_multiplier": 0.25,
+	"mana_regen_multiplier": 0.25,
+	"damage_multiplier": 0.35,
+	"defense_multiplier": 0.50,
+	"knockback_multiplier": 0.0,
+	"poise_multiplier": 0.0,
+	"speed_multiplier": 0.0
 }
 
 
@@ -193,10 +207,14 @@ static func pick_weighted_archetype_for_spawn(profile: RoomData.EncounterProfile
 	return EnemyArchetype.MELEE_SLIME
 
 
-static func pick_variant_for_spawn(profile: RoomData.EncounterProfile, difficulty_percent: float, rng: RandomNumberGenerator) -> EnemyVariant:
+static func pick_variant_for_spawn(
+	profile: RoomData.EncounterProfile,
+	difficulty_percent: float,
+	rng: RandomNumberGenerator
+) -> EnemyVariant:
 	var base_chance: float = float(PROFILE_BASE_ELITE_CHANCE_PERCENT.get(profile, 0.0))
-	var difficulty_bonus: float = max(0.0, difficulty_percent - 100.0) * 0.05
-	var final_chance: float = min(base_chance + difficulty_bonus, 35.0)
+	var difficulty_bonus: float = max(0.0, difficulty_percent - 100.0) * 0.2
+	var final_chance: float = min(base_chance + difficulty_bonus, 50.0)
 
 	if rng.randf_range(0.0, 100.0) < final_chance:
 		return EnemyVariant.ELITE
@@ -218,3 +236,19 @@ static func pick_random_affix_for_archetype(archetype: EnemyArchetype, rng: Rand
 		return null
 
 	return pool[rng.randi_range(0, pool.size() - 1)]
+
+
+static func get_difficulty_stat_multipliers(difficulty_percent: float) -> Dictionary:
+	var difficulty_steps: float = max(difficulty_percent - DIFFICULTY_BASELINE, 0.0) / 100.0
+
+	return {
+		"health_multiplier": 1.0 + (float(DIFFICULTY_GROWTH_PER_100["health_multiplier"]) * difficulty_steps),
+		"health_regen_multiplier": 1.0 + (float(DIFFICULTY_GROWTH_PER_100["health_regen_multiplier"]) * difficulty_steps),
+		"max_mana_multiplier": 1.0 + (float(DIFFICULTY_GROWTH_PER_100["max_mana_multiplier"]) * difficulty_steps),
+		"mana_regen_multiplier": 1.0 + (float(DIFFICULTY_GROWTH_PER_100["mana_regen_multiplier"]) * difficulty_steps),
+		"damage_multiplier": 1.0 + (float(DIFFICULTY_GROWTH_PER_100["damage_multiplier"]) * difficulty_steps),
+		"defense_multiplier": 1.0 + (float(DIFFICULTY_GROWTH_PER_100["defense_multiplier"]) * difficulty_steps),
+		"knockback_multiplier": 1.0 + (float(DIFFICULTY_GROWTH_PER_100["knockback_multiplier"]) * difficulty_steps),
+		"poise_multiplier": 1.0 + (float(DIFFICULTY_GROWTH_PER_100["poise_multiplier"]) * difficulty_steps),
+		"speed_multiplier": 1.0 + (float(DIFFICULTY_GROWTH_PER_100["speed_multiplier"]) * difficulty_steps)
+	}

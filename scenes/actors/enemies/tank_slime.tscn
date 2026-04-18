@@ -71,7 +71,7 @@ allowed_transitions = Array[StringName]([&"attack", &"search", &"hurt", &"dead"]
 [node name="EnemyAttackState" parent="StateMachine" instance=ExtResource("10_t8vda")]
 
 [node name="Movement" parent="." node_paths=PackedStringArray("body_root") instance=ExtResource("10_j7xak")]
-base_speed = 80.0
+base_speed = 65.0
 body_root = NodePath("../Body")
 transfer_impulse_on_body_collision = true
 collision_push_ratio = 0.45
@@ -80,11 +80,13 @@ collision_push_ratio = 0.45
 
 [node name="Status" parent="." instance=ExtResource("12_a4x87")]
 type = 1
-_base_max_health = 10.0
+_base_max_health = 125.0
+_base_max_mana = 0.0
+_base_mana_regen = 0.0
 _base_damage = 2.0
-_base_defense = 0.0
-_base_knockback = 2.0
+_base_knockback = 4.5
 _base_poise = 0.0
+_base_move_speed = 65.0
 
 [node name="Body" type="AnimatedSprite2D" parent="."]
 scale = Vector2(1.5, 1.5)

@@ -109,7 +109,7 @@ func refresh_for_current_slot() -> void:
 		var total_gold: float = float(summary.get("total_gold", 0.0))
 
 		if has_save:
-			_label_previous_run.text = "[center][b]%s[/b]\nChapter %s\nGold: %.2f\n%d minutes played[/center]" % [
+			_label_previous_run.text = "[center][b]%s[/b]\nArea: %s\nGold: %.2f\n%d minutes played[/center]" % [
 				str(summary.get("display_name", "Player")),
 				str(summary.get("chapter", 1)),
 				total_gold,

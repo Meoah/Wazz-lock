@@ -8,6 +8,7 @@
 script = ExtResource("3_t2eyo")
 stage_id = &"secondary_hold"
 animation_name = &"attack_secondary_hold"
+flat_mana_cost = 15.0
 mana_regen_scale_while_active = 0.25
 apply_aim_to_hands_on_start = false
 poise_multiplier = 2.0

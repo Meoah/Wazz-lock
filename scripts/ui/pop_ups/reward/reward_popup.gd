@@ -67,6 +67,9 @@ func _finish_reward_popup() -> void:
 	var followup_popup_type: int = _followup_popup_type
 	var followup_popup_params: Dictionary = _followup_popup_params.duplicate(true)
 
+	if followup_popup_type == BasePopup.POPUP_TYPE.LEVEL_COMPLETE:
+		followup_popup_params = RunManager.build_level_complete_popup_params()
+
 	if followup_popup_type >= 0:
 		GameManager.call_deferred("show_popup", followup_popup_type, followup_popup_params)
 

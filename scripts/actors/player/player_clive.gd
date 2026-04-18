@@ -328,14 +328,14 @@ func _update_move_direction() -> void:
 	if move_direction != Vector2.ZERO: move_direction = move_direction.normalized()
 
 
-func consume_roll_request(entry_cost: float = 20.0) -> bool:
+func consume_roll_request(entry_cost: float = 5.0) -> bool:
 	if !roll_requested: return false
 	roll_requested = false
-	
+
 	if is_dead(): return false
 	if _should_charge_dodge_mana() and roll_cooldown > 0.0: return false
 	if _should_charge_dodge_mana() and !status.request_mana(entry_cost): return false
-	
+
 	return true
 
 

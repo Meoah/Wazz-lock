@@ -46,6 +46,9 @@ func _on_ready() -> void:
 	if attack_hit_box:
 		attack_hit_box.hit_confirmed.connect(_on_attack_hit_confirmed)
 
+	if combat_receiver:
+		combat_receiver.hit_received.connect(_on_hit_received_sfx)
+
 	if body_root is AnimatedSprite2D:
 		var sprite_node: AnimatedSprite2D = body_root as AnimatedSprite2D
 		sprite_node.frame_changed.connect(_on_body_root_frame_changed)

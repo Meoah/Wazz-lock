@@ -179,10 +179,10 @@ func _run_player_death_sequence(player: Clive) -> void:
 
 func _play_player_death_slowmo(_player: Clive) -> void:
 	Engine.time_scale = 0.15
-	await get_tree().create_timer(0.22, true, false, true).timeout
+	await get_tree().create_timer(0.5, true, false, true).timeout
 	
 	Engine.time_scale = 0.45
-	await get_tree().create_timer(0.18, true, false, true).timeout
+	await get_tree().create_timer(0.5, true, false, true).timeout
 	
 	Engine.time_scale = 1.0
 
