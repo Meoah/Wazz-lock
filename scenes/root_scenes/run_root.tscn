@@ -1,7 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://bixe33bv0wwac"]
+[gd_scene load_steps=6 format=3 uid="uid://bixe33bv0wwac"]
 
 [ext_resource type="Script" uid="uid://3hjn0ntw0fqn" path="res://scripts/game/run/run_root.gd" id="1_tkdip"]
 [ext_resource type="PackedScene" uid="uid://cepaf77ic4q03" path="res://scenes/actors/clive.tscn" id="2_3xhcx"]
+[ext_resource type="Texture2D" uid="uid://scgwj31rjfv" path="res://assets/textures/ui/screens/tutorial.png" id="2_tkdip"]
+[ext_resource type="Texture2D" uid="uid://d2vrp360jkha" path="res://assets/textures/ui/screens/intro.png" id="3_3xhcx"]
 [ext_resource type="Script" uid="uid://c3ojf6momifc7" path="res://scripts/game/player_cam.gd" id="3_kyfy7"]
 
 [node name="RunRoot" type="Control"]
@@ -12,6 +14,8 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_tkdip")
+tutorial_texture = ExtResource("2_tkdip")
+run_intro_texture = ExtResource("3_3xhcx")
 
 [node name="Clive" parent="." instance=ExtResource("2_3xhcx")]
 y_sort_enabled = true

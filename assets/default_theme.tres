@@ -1,11 +1,50 @@
-[gd_resource type="Theme" load_steps=2 format=3 uid="uid://c4g3yq28mqnlo"]
+[gd_resource type="Theme" load_steps=7 format=3 uid="uid://c4g3yq28mqnlo"]
 
+[ext_resource type="Texture2D" uid="uid://ignda6maobc8" path="res://assets/textures/ui/nine_slice/Button_-_Selection.png" id="1_81pgw"]
 [ext_resource type="FontFile" uid="uid://basakr0emtm3v" path="res://assets/fonts/AlegreyaSansSC-Regular.ttf" id="1_qew4h"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_cs2sx"]
+texture = ExtResource("1_81pgw")
+texture_margin_left = 8.0
+texture_margin_top = 8.0
+texture_margin_right = 8.0
+texture_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_vkpim"]
+texture = ExtResource("1_81pgw")
+texture_margin_left = 8.0
+texture_margin_top = 8.0
+texture_margin_right = 8.0
+texture_margin_bottom = 8.0
+modulate_color = Color(0.921875, 0.921875, 0.921875, 1)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_203bq"]
+texture = ExtResource("1_81pgw")
+texture_margin_left = 8.0
+texture_margin_top = 8.0
+texture_margin_right = 8.0
+texture_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_oal56"]
+texture = ExtResource("1_81pgw")
+texture_margin_left = 8.0
+texture_margin_top = 8.0
+texture_margin_right = 8.0
+texture_margin_bottom = 8.0
 
 [resource]
 default_font = ExtResource("1_qew4h")
-Label/constants/outline_size = 4
+Button/colors/font_color = Color(0, 0, 0, 1)
+Button/colors/font_disabled_color = Color(0.38671875, 0.38671875, 0.38671875, 0.5019608)
+Button/colors/font_focus_color = Color(0, 0, 0, 1)
+Button/colors/font_hover_color = Color(0, 0, 0, 1)
+Button/colors/font_pressed_color = Color(0.5078125, 0.5078125, 0.5078125, 1)
+Button/styles/disabled = SubResource("StyleBoxTexture_cs2sx")
+Button/styles/hover = SubResource("StyleBoxTexture_vkpim")
+Button/styles/normal = SubResource("StyleBoxTexture_203bq")
+Button/styles/pressed = SubResource("StyleBoxTexture_oal56")
+Label/colors/font_color = Color(0, 0, 0, 1)
 Label/font_sizes/font_size = 24
-RichTextLabel/constants/outline_size = 4
+RichTextLabel/colors/default_color = Color(0, 0, 0, 1)
 RichTextLabel/font_sizes/bold_font_size = 32
 RichTextLabel/font_sizes/normal_font_size = 24

@@ -27,8 +27,10 @@
 [ext_resource type="Texture2D" uid="uid://bdp0prty0sxis" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/minimap_compass_future_n.png" id="22_mkc83"]
 [ext_resource type="Texture2D" uid="uid://b3rpiurnvophj" path="res://assets/textures/ui/icons/potion.png" id="28_85yfw"]
 [ext_resource type="Shader" uid="uid://ba3y0fx6fdbml" path="res://shaders/luminance_mask_transition.gdshader" id="28_jey0l"]
+[ext_resource type="Texture2D" uid="uid://dvh7p3548iydn" path="res://assets/textures/util/jj_fractal_8.png" id="29_ccasb"]
 [ext_resource type="Script" uid="uid://n8hjldwrddtn" path="res://scripts/ui/hud/fade_blocker.gd" id="29_gaun4"]
 [ext_resource type="Texture2D" uid="uid://cw0b4wqh3v6t0" path="res://assets/textures/ui/icons/start.png" id="29_jey0l"]
+[ext_resource type="Texture2D" uid="uid://d2vrp360jkha" path="res://assets/textures/ui/screens/intro.png" id="31_h3g4y"]
 
 [sub_resource type="Theme" id="Theme_klb5v"]
 RichTextLabel/constants/outline_size = 4
@@ -45,20 +47,19 @@ shader_parameter/center = Vector2(0.5, 0.5)
 shader_parameter/radius = 0.44
 shader_parameter/edge_softness = 0.002
 
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_ccasb"]
-
-[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_h3g4y"]
-noise = SubResource("FastNoiseLite_ccasb")
-
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_pfwte"]
 shader = ExtResource("28_jey0l")
-shader_parameter/luminance_cutoff = 0.0
-shader_parameter/invert = false
-shader_parameter/mask_texture = SubResource("NoiseTexture2D_h3g4y")
+shader_parameter/progress = 0.0
+shader_parameter/reverse = false
+shader_parameter/mask_texture = ExtResource("29_ccasb")
+shader_parameter/fill_color = Color(0, 0, 0, 1)
 
-[node name="RootHUD" type="CanvasLayer" node_paths=PackedStringArray("game_hud")]
+[node name="RootHUD" type="CanvasLayer" node_paths=PackedStringArray("game_hud", "fade_blocker", "intro_overlay", "intro_texture_rect")]
 script = ExtResource("1_qvnt6")
 game_hud = NodePath("GameHUD")
+fade_blocker = NodePath("FadeBlocker")
+intro_overlay = NodePath("IntroOverlay")
+intro_texture_rect = NodePath("IntroOverlay/IntroTexture")
 
 [node name="FloatingTextManager" type="Node" parent="."]
 script = ExtResource("2_50mfl")
@@ -145,6 +146,7 @@ _regen_label = NodePath("Regen")
 layout_mode = 2
 size_flags_horizontal = 2
 mouse_filter = 2
+theme_override_constants/outline_size = 0
 theme_override_font_sizes/normal_font_size = 28
 bbcode_enabled = true
 text = "100/100
@@ -159,6 +161,7 @@ vertical_alignment = 1
 layout_mode = 2
 size_flags_horizontal = 8
 mouse_filter = 2
+theme_override_constants/outline_size = 0
 theme_override_font_sizes/normal_font_size = 28
 bbcode_enabled = true
 text = "+0/s"
@@ -216,6 +219,7 @@ _regen_label = NodePath("Regen")
 layout_mode = 2
 size_flags_horizontal = 2
 mouse_filter = 2
+theme_override_constants/outline_size = 0
 theme_override_font_sizes/normal_font_size = 28
 bbcode_enabled = true
 text = "100/100
@@ -230,6 +234,7 @@ vertical_alignment = 1
 layout_mode = 2
 size_flags_horizontal = 8
 mouse_filter = 2
+theme_override_constants/outline_size = 0
 theme_override_font_sizes/normal_font_size = 28
 bbcode_enabled = true
 text = "+0/s"
@@ -266,6 +271,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
 mouse_filter = 2
+theme_override_constants/outline_size = 0
 theme_override_font_sizes/normal_font_size = 28
 bbcode_enabled = true
 text = "555"
@@ -288,6 +294,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
 mouse_filter = 2
+theme_override_constants/outline_size = 0
 theme_override_font_sizes/normal_font_size = 28
 bbcode_enabled = true
 text = "555"
@@ -321,6 +328,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
 mouse_filter = 2
+theme_override_constants/outline_size = 0
 theme_override_font_sizes/normal_font_size = 28
 bbcode_enabled = true
 text = "555"
@@ -343,6 +351,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
 mouse_filter = 2
+theme_override_constants/outline_size = 0
 theme_override_font_sizes/normal_font_size = 28
 bbcode_enabled = true
 text = "555"
@@ -365,6 +374,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
 mouse_filter = 2
+theme_override_constants/outline_size = 0
 theme_override_font_sizes/normal_font_size = 28
 bbcode_enabled = true
 text = "555"
@@ -387,6 +397,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
 mouse_filter = 2
+theme_override_constants/outline_size = 0
 theme_override_font_sizes/normal_font_size = 28
 bbcode_enabled = true
 text = "555"
@@ -421,6 +432,7 @@ custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 size_flags_horizontal = 0
 mouse_filter = 2
+theme_override_constants/outline_size = 0
 theme_override_font_sizes/normal_font_size = 28
 bbcode_enabled = true
 text = "00:00:00:000"
@@ -473,6 +485,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_vertical = 3
+theme_override_constants/outline_size = 0
 theme_override_font_sizes/normal_font_size = 28
 text = "Boss Name"
 horizontal_alignment = 1
@@ -553,6 +566,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
 mouse_filter = 2
+theme_override_constants/outline_size = 0
 theme_override_font_sizes/normal_font_size = 28
 bbcode_enabled = true
 text = "555"
@@ -585,6 +599,7 @@ expand_mode = 3
 
 [node name="ObjectiveType" type="Label" parent="GameHUD/Objective/Objective/ObjectiveTypeRow"]
 layout_mode = 2
+theme_override_constants/outline_size = 0
 theme_override_font_sizes/font_size = 48
 text = "Room Type"
 
@@ -594,6 +609,7 @@ theme_override_constants/margin_left = 10
 
 [node name="ObjectiveDescription" type="RichTextLabel" parent="GameHUD/Objective/Objective/DescriptionMargin"]
 layout_mode = 2
+theme_override_constants/outline_size = 0
 theme_override_font_sizes/normal_font_size = 28
 bbcode_enabled = true
 text = "Description of room clear requirements
@@ -607,6 +623,7 @@ theme_override_constants/margin_left = 30
 
 [node name="ObjectiveProgress" type="RichTextLabel" parent="GameHUD/Objective/Objective/ProgressMargin"]
 layout_mode = 2
+theme_override_constants/outline_size = 0
 theme_override_font_sizes/normal_font_size = 28
 bbcode_enabled = true
 text = "Progress: 0/0"
@@ -625,3 +642,28 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 1)
 script = ExtResource("29_gaun4")
+
+[node name="IntroOverlay" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="IntroTexture" type="TextureRect" parent="IntroOverlay"]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -500.0
+offset_top = -300.0
+offset_right = 500.0
+offset_bottom = 300.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("31_h3g4y")

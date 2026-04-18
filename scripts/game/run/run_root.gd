@@ -1,6 +1,9 @@
 extends Control
 class_name RunRoot
 
+@export_category("Popup Content")
+@export var tutorial_texture: Texture2D
+@export var run_intro_texture: Texture2D
 
 var minimap_node: Minimap
 var room_scene_paths: Array[String] = []
@@ -35,16 +38,19 @@ func _ready() -> void:
 	var saved_state: Dictionary = save_blob.get("state", {})
 	
 	if boot_mode == RunManager.BootMode.CONTINUE_RUN and saved_state.get("mode", "") == "run":
-		_apply_saved_run_state(saved_state)
+		call_deferred("_run_continue_transition", saved_state)
 	else:
 		current_level_data = _generate_and_build_level()
 		minimap_node.draw_minimap(current_level_data, current_room_grid_pos)
-		
+
 		var first_room: RoomData = current_level_data.get(Vector2i.ZERO)
 		if first_room:
 			enter_room(first_room)
 			_apply_current_weapon_to_player()
 			save_run()
+
+			if boot_mode == RunManager.BootMode.NEW_RUN:
+				call_deferred("_run_new_run_intro_sequence")
 
 
 func _load_room_scene_paths() -> Array[String]:
@@ -449,6 +455,39 @@ func _apply_saved_run_state(saved_state: Dictionary) -> void:
 		_apply_saved_player_inventory_state(saved_state)
 
 
+func _run_continue_transition(saved_state: Dictionary) -> void:
+	if GameManager.root_hud == null or GameManager.root_hud.fade_blocker == null:
+		_apply_saved_run_state(saved_state)
+		return
+
+	GameManager.root_hud.fade_blocker.hold_black()
+	_apply_saved_run_state(saved_state)
+	await get_tree().process_frame
+	await GameManager.root_hud.fade_blocker.swirl_in(0.35)
+
+
+func _run_new_run_intro_sequence() -> void:
+	if GameManager.root_hud == null:
+		_show_tutorial_popup()
+		return
+
+	await GameManager.root_hud.play_new_run_intro_sequence(
+		run_intro_texture,
+		Callable()
+	)
+
+	_show_tutorial_popup()
+
+
+func _show_tutorial_popup() -> void:
+	GameManager.show_popup(BasePopup.POPUP_TYPE.IMAGE, {
+		"title": "Tutorial",
+		"texture": tutorial_texture,
+		"button_text": "Start",
+		"flags": BasePopup.POPUP_FLAG.WILL_PAUSE
+	})
+
+
 func finalize_game_over_to_main_menu() -> void:
 	Engine.time_scale = 1.0
 	RunManager.is_timer_active = false
@@ -502,10 +541,23 @@ func enter_room(room_data: RoomData, entrance_direction: int = -1) -> void:
 	minimap_node.move_player_marker_to_room(room_data)
 
 func _on_change_room(room_data: RoomData, entrance_direction: int) -> void:
-	if is_changing_room: return
-	
+	if is_changing_room:
+		return
+
 	is_changing_room = true
-	call_deferred("_finish_change_room", room_data, entrance_direction)
+	call_deferred("_run_room_transition", room_data, entrance_direction)
+
+
+func _run_room_transition(room_data: RoomData, entrance_direction: int) -> void:
+	if GameManager.root_hud == null:
+		await _finish_change_room(room_data, entrance_direction)
+		return
+
+	await GameManager.root_hud.play_room_transition(
+		Callable(self, "_finish_change_room").bind(room_data, entrance_direction),
+		0.35,
+		0.2
+	)
 
 
 func _finish_change_room(room_data: RoomData, entrance_direction: int) -> void:

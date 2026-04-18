@@ -121,6 +121,7 @@ debug_color = Color(0.78031605, 0.4195712, 0.3264042, 0.42000002)
 [node name="ActiveHitBox" parent="." instance=ExtResource("15_s2ijn")]
 collision_layer = 1024
 collision_mask = 32
+use_owner_actor_as_source_position = true
 faction = &"enemy"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ActiveHitBox"]

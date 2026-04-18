@@ -22,6 +22,7 @@ texture = ExtResource("2_lh7xr")
 shape = SubResource("RectangleShape2D_vibox")
 
 [node name="InteractIcon" type="Sprite2D" parent="."]
+self_modulate = Color(0.359375, 0.359375, 0.359375, 1)
 position = Vector2(0, -100)
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]

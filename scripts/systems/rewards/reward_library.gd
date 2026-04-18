@@ -231,7 +231,14 @@ static func apply_effect_snapshot_to_player(effect_snapshot: Dictionary, player:
 			if player.status: player.status.modify_current_resource(target_id, amount)
 			
 		RewardEffectData.EffectKind.CURRENT_RESOURCE_MULTIPLY:
-			if player.status: player.status.multiply_current_resource(target_id, amount)
+			match target_id:
+				"silver":
+					RunManager.current_money *= amount
+				"gold":
+					RunManager.current_meta *= amount
+				_:
+					if player.status:
+						player.status.multiply_current_resource(target_id, amount)
 		
 		RewardEffectData.EffectKind.CURRENT_RESOURCE_RESTORE_PERCENT_MAX:
 			if player.status: player.status.restore_resource_percent_of_max(target_id, amount)

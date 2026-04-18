@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://8tuhcv1n24er"
-path="res://.godot/imported/Clive_bestiary.png-f7067ade893f3af19ee07fd9c2249733.ctex"
+uid="uid://bvmbkxr530w7l"
+path="res://.godot/imported/enemies.png-7245339529992ae4e740b19c1a053079.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/textures/ui/screens/Clive_bestiary.png"
-dest_files=["res://.godot/imported/Clive_bestiary.png-f7067ade893f3af19ee07fd9c2249733.ctex"]
+source_file="res://assets/textures/ui/screens/enemies.png"
+dest_files=["res://.godot/imported/enemies.png-7245339529992ae4e740b19c1a053079.ctex"]
 
 [params]
 

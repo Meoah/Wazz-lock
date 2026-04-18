@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d2vrp360jkha"
-path="res://.godot/imported/intro.png-1484e6f7bdc7b5fcb820be75c8fd981d.ctex"
+uid="uid://bai26f36ihk8b"
+path="res://.godot/imported/alphas41.png-5d50eff50431cb374c17f45ec3cd9888.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/textures/ui/screens/intro.png"
-dest_files=["res://.godot/imported/intro.png-1484e6f7bdc7b5fcb820be75c8fd981d.ctex"]
+source_file="res://assets/textures/util/alphas41.png"
+dest_files=["res://.godot/imported/alphas41.png-5d50eff50431cb374c17f45ec3cd9888.ctex"]
 
 [params]
 

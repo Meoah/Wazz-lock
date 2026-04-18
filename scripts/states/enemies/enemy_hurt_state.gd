@@ -25,19 +25,25 @@ func enter(_previous_state: StateComponent, data: Dictionary = {}) -> void:
 	match hurt_type:
 		HitData.HurtType.STUN:
 			await parent.get_tree().create_timer(resolved_duration).timeout
-			if machine.current_state != self: return
+			if machine.current_state != self:
+				return
+
 			await parent.hold_hurt_last_frame(hit_data.stun_duration)
 
 		HitData.HurtType.KNOCKUP:
-			await parent.get_tree().create_timer(resolved_duration).timeout
-			if machine.current_state != self: return
-			await parent.play_knockup(hit_data.knockup_height, hit_data.knockup_duration)
+			parent.begin_knockup(hit_data.knockup_height, hit_data.knockup_duration)
+
+			var total_wait_duration: float = max(resolved_duration, hit_data.knockup_duration)
+			await parent.get_tree().create_timer(total_wait_duration).timeout
 
 		_:
 			await parent.get_tree().create_timer(resolved_duration).timeout
 
-	if machine.current_state != self: return
-	if parent.is_dead(): return
+	if machine.current_state != self:
+		return
+
+	if parent.is_dead():
+		return
 
 	if parent.has_target_in_sight():
 		machine.transition_to(chase_state_id)

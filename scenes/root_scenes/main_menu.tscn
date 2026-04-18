@@ -1,29 +1,35 @@
-[gd_scene load_steps=36 format=4 uid="uid://d1l0qt8blrdqy"]
+[gd_scene load_steps=43 format=4 uid="uid://d1l0qt8blrdqy"]
 
 [ext_resource type="Script" uid="uid://fq2ju0bv20vr" path="res://scripts/ui/main_menu/main_menu.gd" id="1_ahahd"]
 [ext_resource type="AudioStream" uid="uid://c75gq4yspqqvu" path="res://assets/audio/sfx/electro_bubbles_ui.ogg" id="2_j7oqw"]
 [ext_resource type="Texture2D" uid="uid://d3eyg8h2g7mjv" path="res://assets/textures/ui/main_menu/title.png" id="3_7spkn"]
 [ext_resource type="TileSet" uid="uid://d0ha6r7frwc6h" path="res://assets/textures/enviornment/tile_set.tres" id="3_j7oqw"]
 [ext_resource type="PackedScene" uid="uid://c5d81avm06wq6" path="res://scenes/ui/main_menu/save_slot.tscn" id="4_w2ig7"]
-[ext_resource type="Texture2D" uid="uid://biemr0gjj7aga" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/panel_grey_red.png" id="5_h4d8d"]
 [ext_resource type="Script" uid="uid://bvswxi17l368t" path="res://scripts/ui/main_menu/main_navigation.gd" id="6_a2lvx"]
-[ext_resource type="Texture2D" uid="uid://bakvtes34qef5" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/panel_brown_corners_b.png" id="6_xq20w"]
+[ext_resource type="Texture2D" uid="uid://dyvjy4tmkdote" path="res://assets/textures/ui/nine_slice/Message_03_1.png" id="6_nkj75"]
+[ext_resource type="Texture2D" uid="uid://e7tis4vj7gdo" path="res://assets/textures/ui/screens/credits.png" id="8_opa5e"]
 [ext_resource type="Script" uid="uid://c76d4qxc3uow7" path="res://scripts/ui/main_menu/run_setup.gd" id="8_ouvix"]
+[ext_resource type="Texture2D" uid="uid://ignda6maobc8" path="res://assets/textures/ui/nine_slice/Button_-_Selection.png" id="8_ucisa"]
 [ext_resource type="Script" uid="uid://d4hi81a5j4123" path="res://scripts/ui/main_menu/settings.gd" id="8_w2ig7"]
 [ext_resource type="Texture2D" uid="uid://7fsmt0vbck58" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/arrow_basic_w.png" id="8_xvl0y"]
+[ext_resource type="Texture2D" uid="uid://dmup3qiu08kh2" path="res://assets/textures/ui/screens/clive.png" id="9_08pb0"]
 [ext_resource type="Texture2D" uid="uid://d1gsuht1v2n4a" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/arrow_basic_w_small.png" id="9_ty8fd"]
 [ext_resource type="Texture2D" uid="uid://dv2ha8y2i0muo" path="res://assets/textures/actors/clive/Clive_Portrait.png" id="9_xwx60"]
 [ext_resource type="Texture2D" uid="uid://dj0lbdjoqgnj4" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/arrow_basic_e.png" id="10_7k12g"]
-[ext_resource type="Texture2D" uid="uid://42ei7qig066p" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/panel_brown_damaged.png" id="10_bqd1f"]
 [ext_resource type="SpriteFrames" uid="uid://b2lbfcge0jl88" path="res://assets/textures/actors/clive/spritesheets/clive_main_body.tres" id="10_njll3"]
+[ext_resource type="Texture2D" uid="uid://dgd5gyuxkj01h" path="res://assets/textures/ui/screens/weapons.png" id="10_o4s6e"]
 [ext_resource type="Texture2D" uid="uid://0aol0wqa26hr" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/arrow_basic_e_small.png" id="11_bqd1f"]
+[ext_resource type="Texture2D" uid="uid://bvmbkxr530w7l" path="res://assets/textures/ui/screens/enemies.png" id="11_xj3w1"]
 [ext_resource type="SpriteFrames" uid="uid://bn7n4attqwpwq" path="res://assets/textures/actors/clive/spritesheets/weapons/plunger/plunger.tres" id="11_xwx60"]
+[ext_resource type="Texture2D" uid="uid://bk6tw527kogr5" path="res://assets/textures/ui/screens/envoirnment.png" id="12_iit0b"]
 [ext_resource type="SpriteFrames" uid="uid://df6yfqich2rj5" path="res://assets/textures/actors/clive/spritesheets/weapons/bare_hands.tres" id="12_njll3"]
 [ext_resource type="Texture2D" uid="uid://bbv2qsiavk038" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/banner_classic_curtain.png" id="14_5tapv"]
-[ext_resource type="Texture2D" uid="uid://bwndnjjrninfg" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/panel_grey.png" id="15_5tapv"]
 [ext_resource type="Script" uid="uid://d15t5xhkfybn7" path="res://scripts/ui/main_menu/cancel.gd" id="16_fcmcp"]
-[ext_resource type="Texture2D" uid="uid://tt564ob82wj5" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/panel_grey_green.png" id="16_ouvix"]
+[ext_resource type="Texture2D" uid="uid://dacwqdq6hqt8b" path="res://assets/textures/ui/nine_slice/Transparent.png" id="16_ls2hl"]
 [ext_resource type="Script" uid="uid://codr5djum6iuo" path="res://scripts/ui/main_menu/proceed.gd" id="19_7spkn"]
+[ext_resource type="Texture2D" uid="uid://dyfe66i20mlrh" path="res://assets/textures/ui/nine_slice/Message_02_1.png" id="20_ovsjx"]
+[ext_resource type="Texture2D" uid="uid://bib7um0qpf24g" path="res://assets/textures/ui/nine_slice/Button_-_Red.png" id="21_7oaj7"]
+[ext_resource type="Texture2D" uid="uid://d2v0q6gm213al" path="res://assets/textures/ui/nine_slice/Button_-_Green.png" id="23_opa5e"]
 
 [sub_resource type="SystemFont" id="SystemFont_a2lvx"]
 subpixel_positioning = 0
@@ -71,42 +77,49 @@ _data = {
 }
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_vp5vp"]
-texture = ExtResource("5_h4d8d")
-texture_margin_left = 16.0
-texture_margin_top = 16.0
-texture_margin_right = 16.0
-texture_margin_bottom = 16.0
+texture = ExtResource("6_nkj75")
+texture_margin_left = 8.0
+texture_margin_top = 8.0
+texture_margin_right = 8.0
+texture_margin_bottom = 8.0
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_h4d8d"]
-texture = ExtResource("6_xq20w")
-texture_margin_left = 16.0
-texture_margin_top = 16.0
-texture_margin_right = 16.0
-texture_margin_bottom = 16.0
+texture = ExtResource("6_nkj75")
+texture_margin_left = 8.0
+texture_margin_top = 8.0
+texture_margin_right = 8.0
+texture_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_08pb0"]
+texture = ExtResource("8_ucisa")
+texture_margin_left = 8.0
+texture_margin_top = 8.0
+texture_margin_right = 8.0
+texture_margin_bottom = 8.0
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_ouvix"]
-texture = ExtResource("10_bqd1f")
+texture = ExtResource("16_ls2hl")
 texture_margin_left = 16.0
 texture_margin_top = 16.0
 texture_margin_right = 16.0
 texture_margin_bottom = 16.0
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_7spkn"]
-texture = ExtResource("15_5tapv")
+texture = ExtResource("20_ovsjx")
 texture_margin_left = 16.0
 texture_margin_top = 16.0
 texture_margin_right = 16.0
 texture_margin_bottom = 16.0
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_fcmcp"]
-texture = ExtResource("5_h4d8d")
+texture = ExtResource("21_7oaj7")
 texture_margin_left = 16.0
 texture_margin_top = 16.0
 texture_margin_right = 16.0
 texture_margin_bottom = 16.0
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_j7oqw"]
-texture = ExtResource("16_ouvix")
+texture = ExtResource("23_opa5e")
 texture_margin_left = 16.0
 texture_margin_top = 16.0
 texture_margin_right = 16.0
@@ -233,12 +246,11 @@ size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxTexture_vp5vp")
 
 [node name="CheckBox" type="CheckBox" parent="SaveSlots/MarginContainer/VBoxContainer/Delete"]
-modulate = Color(1, 0, 0, 1)
 layout_mode = 2
 focus_mode = 0
 text = "DELETE TOGGLE"
 
-[node name="MainNavigation" type="Control" parent="." node_paths=PackedStringArray("_main_menu_parent", "_panel_previous_run", "_label_previous_run", "_label_tooltip", "_button_new_run", "_button_continue", "_button_hub", "_button_settings", "_button_back")]
+[node name="MainNavigation" type="Control" parent="." node_paths=PackedStringArray("_main_menu_parent", "_panel_previous_run", "_label_previous_run", "_label_tooltip", "_button_new_run", "_button_continue", "_button_hub", "_button_settings", "_button_credits", "_button_codex", "_button_back")]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -256,7 +268,11 @@ _button_new_run = NodePath("MarginContainer/HBoxContainer/Selection/PanelContain
 _button_continue = NodePath("MarginContainer/HBoxContainer/Selection/PanelContainer/MarginContainer/VBoxContainer/Continue")
 _button_hub = NodePath("MarginContainer/HBoxContainer/Selection/PanelContainer/MarginContainer/VBoxContainer/Hub")
 _button_settings = NodePath("MarginContainer/HBoxContainer/Selection/PanelContainer/MarginContainer/VBoxContainer/Settings")
+_button_credits = NodePath("MarginContainer/HBoxContainer/Selection/PanelContainer/MarginContainer/VBoxContainer/Credits")
+_button_codex = NodePath("MarginContainer/HBoxContainer/Selection/PanelContainer/MarginContainer/VBoxContainer/Codex")
 _button_back = NodePath("MarginContainer/HBoxContainer/Selection/PanelContainer/MarginContainer/VBoxContainer/Back")
+_credits_texture = ExtResource("8_opa5e")
+_codex_textures = Array[Texture2D]([ExtResource("9_08pb0"), ExtResource("10_o4s6e"), ExtResource("11_xj3w1"), ExtResource("12_iit0b")])
 
 [node name="MarginContainer" type="MarginContainer" parent="MainNavigation"]
 layout_mode = 1
@@ -343,27 +359,44 @@ mouse_filter = 2
 [node name="NewRun" type="Button" parent="MainNavigation/MarginContainer/HBoxContainer/Selection/PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
+theme_override_styles/normal = SubResource("StyleBoxTexture_08pb0")
 text = "NEW RUN"
 
 [node name="Continue" type="Button" parent="MainNavigation/MarginContainer/HBoxContainer/Selection/PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
+theme_override_styles/normal = SubResource("StyleBoxTexture_08pb0")
 disabled = true
 text = "CONTINUE"
 
 [node name="Hub" type="Button" parent="MainNavigation/MarginContainer/HBoxContainer/Selection/PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
+theme_override_styles/normal = SubResource("StyleBoxTexture_08pb0")
 text = "HUB"
 
 [node name="Settings" type="Button" parent="MainNavigation/MarginContainer/HBoxContainer/Selection/PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
+theme_override_styles/normal = SubResource("StyleBoxTexture_08pb0")
 text = "SETTINGS"
+
+[node name="Codex" type="Button" parent="MainNavigation/MarginContainer/HBoxContainer/Selection/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/normal = SubResource("StyleBoxTexture_08pb0")
+text = "CODEX"
+
+[node name="Credits" type="Button" parent="MainNavigation/MarginContainer/HBoxContainer/Selection/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/normal = SubResource("StyleBoxTexture_08pb0")
+text = "CREDITS"
 
 [node name="Back" type="Button" parent="MainNavigation/MarginContainer/HBoxContainer/Selection/PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
+theme_override_styles/normal = SubResource("StyleBoxTexture_08pb0")
 text = "BACK"
 
 [node name="Tooltip" type="Control" parent="MainNavigation/MarginContainer/HBoxContainer"]
@@ -874,6 +907,7 @@ size_flags_horizontal = 2
 [node name="Back" type="Button" parent="Settings/MarginContainer/HBoxContainer/Selection/PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 10
+theme_override_styles/normal = SubResource("StyleBoxTexture_08pb0")
 text = "BACK"
 
 [node name="Tooltip" type="Control" parent="Settings/MarginContainer/HBoxContainer"]

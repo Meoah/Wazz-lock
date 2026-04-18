@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b6glhx2l7spv0"
-path="res://.godot/imported/Wazz-lock_Tutorial.png-ec63eb1a95c0b32ae661e6f56b1414d7.ctex"
+uid="uid://dgd5gyuxkj01h"
+path="res://.godot/imported/weapons.png-eb3c6cb8467b1b82ae864c8565846459.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/textures/ui/screens/Wazz-lock_Tutorial.png"
-dest_files=["res://.godot/imported/Wazz-lock_Tutorial.png-ec63eb1a95c0b32ae661e6f56b1414d7.ctex"]
+source_file="res://assets/textures/ui/screens/weapons.png"
+dest_files=["res://.godot/imported/weapons.png-eb3c6cb8467b1b82ae864c8565846459.ctex"]
 
 [params]
 

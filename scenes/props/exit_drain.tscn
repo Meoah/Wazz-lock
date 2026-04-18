@@ -95,6 +95,7 @@ animation = &"unopened"
 shape = SubResource("RectangleShape2D_j4tbw")
 
 [node name="InteractIcon" type="Sprite2D" parent="."]
+self_modulate = Color(0.359375, 0.359375, 0.359375, 1)
 z_index = 10
 position = Vector2(0, -90)
 

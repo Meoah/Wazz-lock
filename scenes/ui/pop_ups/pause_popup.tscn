@@ -1,7 +1,11 @@
-[gd_scene load_steps=4 format=3 uid="uid://dlavphbdpxnvr"]
+[gd_scene load_steps=8 format=3 uid="uid://dlavphbdpxnvr"]
 
 [ext_resource type="Script" uid="uid://dqsdjnunkuge3" path="res://scripts/ui/pop_ups/pause_popup.gd" id="1_5crv1"]
+[ext_resource type="Texture2D" uid="uid://dmup3qiu08kh2" path="res://assets/textures/ui/screens/clive.png" id="2_kbel7"]
 [ext_resource type="Texture2D" uid="uid://bib7um0qpf24g" path="res://assets/textures/ui/nine_slice/Button_-_Red.png" id="2_yt3lu"]
+[ext_resource type="Texture2D" uid="uid://dgd5gyuxkj01h" path="res://assets/textures/ui/screens/weapons.png" id="3_lbb0v"]
+[ext_resource type="Texture2D" uid="uid://bvmbkxr530w7l" path="res://assets/textures/ui/screens/enemies.png" id="4_nkmn3"]
+[ext_resource type="Texture2D" uid="uid://bk6tw527kogr5" path="res://assets/textures/ui/screens/envoirnment.png" id="5_iuaci"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_2vhs1"]
 texture = ExtResource("2_yt3lu")
@@ -13,7 +17,7 @@ axis_stretch_horizontal = 2
 axis_stretch_vertical = 2
 region_rect = Rect2(0, 0, 64, 64)
 
-[node name="PausePopup" type="Control" node_paths=PackedStringArray("_pause_label", "_button_resume", "_button_return_to_main_menu")]
+[node name="PausePopup" type="Control" node_paths=PackedStringArray("_pause_label", "_button_resume", "_button_codex", "_button_return_to_main_menu")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -23,10 +27,13 @@ grow_vertical = 2
 script = ExtResource("1_5crv1")
 _pause_label = NodePath("PanelContainer/VBoxContainer/Pause")
 _button_resume = NodePath("PanelContainer/VBoxContainer/Resume")
+_button_codex = NodePath("PanelContainer/VBoxContainer/Codex")
 _button_return_to_main_menu = NodePath("PanelContainer/VBoxContainer/ReturnToMainMenu")
+_codex_titles = ["Clive", "Weapons", "Enemies", "Enviornment"]
+_codex_textures = Array[Texture2D]([ExtResource("2_kbel7"), ExtResource("3_lbb0v"), ExtResource("4_nkmn3"), ExtResource("5_iuaci")])
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
-custom_minimum_size = Vector2(420, 220)
+custom_minimum_size = Vector2(420, 280)
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -47,11 +54,19 @@ layout_mode = 2
 [node name="Pause" type="Label" parent="PanelContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
+text = "PAUSE"
 
 [node name="Resume" type="Button" parent="PanelContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
+text = "Resume"
+
+[node name="Codex" type="Button" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Codex"
 
 [node name="ReturnToMainMenu" type="Button" parent="PanelContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
+text = "Return to Main Menu"

@@ -191,6 +191,7 @@ func get_status_component() -> StatusComponent: return status
 func is_dead() -> bool: return (status_flags & STATUS_FLAG.DEAD) != 0
 func is_invulnerable() -> bool: return (status_flags & STATUS_FLAG.INVULN) != 0
 func is_attacking() -> bool: return (status_flags & STATUS_FLAG.ATTACKING) != 0
+func is_rolling() -> bool: return (status_flags & STATUS_FLAG.ROLLING) != 0
 
 func has_move_input() -> bool: return move_direction != Vector2.ZERO
 func get_move_direction() -> Vector2: return move_direction
@@ -328,7 +329,7 @@ func _update_move_direction() -> void:
 	if move_direction != Vector2.ZERO: move_direction = move_direction.normalized()
 
 
-func consume_roll_request(entry_cost: float = 5.0) -> bool:
+func consume_roll_request(entry_cost: float = 15.0) -> bool:
 	if !roll_requested: return false
 	roll_requested = false
 
@@ -473,9 +474,8 @@ func hold_hurt_last_frame(duration: float) -> void:
 	animation_player.play()
 
 
-func play_knockup(height: float, duration: float) -> void:
+func begin_knockup(height: float, duration: float) -> void:
 	if body_root == null:
-		await get_tree().create_timer(duration).timeout
 		return
 
 	_stop_reaction_tween()
@@ -486,7 +486,23 @@ func play_knockup(height: float, duration: float) -> void:
 	reaction_tween.tween_property(body_root, "position:y", body_root_origin.y - height, half_duration)
 	reaction_tween.tween_property(body_root, "position:y", body_root_origin.y, half_duration)
 
-	await reaction_tween.finished
+
+func play_knockup(height: float, duration: float) -> void:
+	if body_root == null:
+		await get_tree().create_timer(duration).timeout
+		return
+
+	begin_knockup(height, duration)
+
+	if reaction_tween:
+		await reaction_tween.finished
+
+
+func get_current_animation_duration() -> float:
+	if animation_player == null:
+		return 0.0
+
+	return animation_player.current_animation_length
 
 
 func _stop_reaction_tween() -> void:

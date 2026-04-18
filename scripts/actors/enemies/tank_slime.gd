@@ -212,6 +212,7 @@ func _apply_attack_pull(delta: float) -> void:
 
 	var player_target: Clive = target as Clive
 	if player_target.is_dead(): return
+	if player_target.is_rolling(): return
 	if player_target.movement == null: return
 
 	var offset: Vector2 = global_position - player_target.global_position

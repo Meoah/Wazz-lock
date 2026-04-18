@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cd7rkk5uxescj"
-path="res://.godot/imported/Weapon_1.png-fdfe2bf4ec3beb146448c11995c50e89.ctex"
+uid="uid://biklw50v0fm4j"
+path="res://.godot/imported/Poop_SpriteSheet_Big.png-5005a150520ee4e05ba156ec36812d15.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/textures/ui/screens/Weapon_1.png"
-dest_files=["res://.godot/imported/Weapon_1.png-fdfe2bf4ec3beb146448c11995c50e89.ctex"]
+source_file="res://assets/textures/actors/enemies/slime/tank/Poop_SpriteSheet_Big.png"
+dest_files=["res://.godot/imported/Poop_SpriteSheet_Big.png-5005a150520ee4e05ba156ec36812d15.ctex"]
 
 [params]
 

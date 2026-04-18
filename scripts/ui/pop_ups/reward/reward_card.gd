@@ -69,7 +69,7 @@ func _on_mouse_entered() -> void:
 	if tooltip_layer:
 		tooltip_layer.show_tooltip(
 			get_global_mouse_position(),
-			"[center][color=#d9d9d9]%s[/color][/center]" % [_card.description]
+			"[center][color=##0a0a0a]%s[/color][/center]" % [_card.description]
 		)
 
 

@@ -83,7 +83,7 @@ _base_knockback = 2.0
 _base_poise = 0.0
 
 [node name="Body" type="AnimatedSprite2D" parent="."]
-self_modulate = Color(1, 1, 1, 0.90000004)
+self_modulate = Color(1, 1, 1, 0.95000005)
 scale = Vector2(0.5, 0.5)
 sprite_frames = ExtResource("13_msfar")
 animation = &"idle"

@@ -8,7 +8,9 @@ enum POPUP_TYPE{
 	LEVEL_COMPLETE,
 	GAME_OVER,
 	DIALOGUE,
-	SHOP
+	SHOP,
+	IMAGE,
+	CODEX
 }
 
 #Bit Flags

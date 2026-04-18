@@ -319,6 +319,8 @@ func on_player_death_started() -> void:
 
 
 func apply_spawn_variant_modifiers(config: Dictionary) -> void:
+	var scale_multiplier: float = float(config.get("scale_multiplier", 1.0))
+
 	if status:
 		var health_multiplier: float = float(config.get("health_multiplier", 1.0))
 		var health_regen_multiplier: float = float(config.get("health_regen_multiplier", 1.0))
@@ -353,8 +355,28 @@ func apply_spawn_variant_modifiers(config: Dictionary) -> void:
 		movement.base_speed *= speed_multiplier
 
 	if body_root:
-		var scale_multiplier: float = float(config.get("scale_multiplier", 1.0))
 		body_root.scale *= scale_multiplier
+
+	_apply_collision_scale(scale_multiplier)
+
+
+func _apply_collision_scale(scale_multiplier: float) -> void:
+	if is_equal_approx(scale_multiplier, 1.0):
+		return
+
+	for child: Node in get_children():
+		if child == body_root:
+			continue
+
+		if child == overhead:
+			continue
+
+		if child is CollisionShape2D:
+			(child as CollisionShape2D).scale *= scale_multiplier
+			continue
+
+		if child == hurt_box or child == hit_box or child == attack_hit_box:
+			(child as Node2D).scale *= scale_multiplier
 
 
 func move_toward_point(point: Vector2, stop_distance: float = 0.0, speed_multiplier: float = 1.0) -> void:
@@ -486,9 +508,8 @@ func hold_hurt_last_frame(duration: float) -> void:
 	await get_tree().create_timer(duration).timeout
 
 
-func play_knockup(height: float, duration: float) -> void:
+func begin_knockup(height: float, duration: float) -> void:
 	if body_root == null:
-		await get_tree().create_timer(duration).timeout
 		return
 
 	_stop_reaction_tween()
@@ -499,7 +520,16 @@ func play_knockup(height: float, duration: float) -> void:
 	reaction_tween.tween_property(body_root, "position:y", body_root_origin.y - height, half_duration)
 	reaction_tween.tween_property(body_root, "position:y", body_root_origin.y, half_duration)
 
-	await reaction_tween.finished
+
+func play_knockup(height: float, duration: float) -> void:
+	if body_root == null:
+		await get_tree().create_timer(duration).timeout
+		return
+
+	begin_knockup(height, duration)
+
+	if reaction_tween:
+		await reaction_tween.finished
 
 
 func end_reaction_visuals() -> void:

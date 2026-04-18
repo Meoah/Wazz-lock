@@ -8,6 +8,7 @@ signal hit_rejected(target_hurt_box: HurtBoxComponent, hit_data: HitData)
 @export_category("Ownership")
 @export var owner_actor: Node
 @export var status_component: StatusComponent
+@export var use_owner_actor_as_source_position: bool = false
 
 @export_category("Hit")
 @export var faction: StringName = &"neutral"
@@ -91,31 +92,37 @@ func _on_area_entered(area: Area2D) -> void:
 
 func _build_hit_data(target_hurt_box: HurtBoxComponent) -> HitData:
 	var hit_data: HitData = HitData.new()
-	var offset: Vector2 = target_hurt_box.global_position - global_position
+	var instigator_actor: Node = _get_owner_actor()
+	var source_position: Vector2 = global_position
+
+	if use_owner_actor_as_source_position and instigator_actor is Node2D:
+		source_position = (instigator_actor as Node2D).global_position
+
+	var offset: Vector2 = target_hurt_box.global_position - source_position
 
 	hit_data.source = self
-	hit_data.instigator = _get_owner_actor()
-	hit_data.source_position = global_position
+	hit_data.instigator = instigator_actor
+	hit_data.source_position = source_position
 	hit_data.direction = offset.normalized() if offset != Vector2.ZERO else Vector2.ZERO
 
 	hit_data.damage = _roll_damage() * runtime_damage_multiplier
 	hit_data.knockback_force = base_knockback_force * runtime_knockback_multiplier
-	var base_poise := base_poise_damage if base_poise_damage > 0.0 else base_knockback_force
+	var base_poise: float = base_poise_damage if base_poise_damage > 0.0 else base_knockback_force
 	hit_data.poise_damage = base_poise * runtime_poise_multiplier
-	
+
 	hit_data.faction = faction
-	
+
 	var attacker_status: StatusComponent = _get_attacker_status()
 	if attacker_status:
 		hit_data.damage *= attacker_status.damage
 		hit_data.knockback_force *= attacker_status.knockback
 		hit_data.poise_damage *= attacker_status.knockback
-	
+
 	hit_data.hurt_type = hurt_type
 	hit_data.stun_duration = stun_duration
 	hit_data.knockup_height = knockup_height
 	hit_data.knockup_duration = knockup_duration
-	
+
 	return hit_data
 
 

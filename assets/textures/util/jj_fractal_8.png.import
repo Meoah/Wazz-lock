@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dq5spowk7vye3"
-path="res://.godot/imported/Waz-lock_Credits_01.png-dc4d746903e34406ff110ec0dbd3c110.ctex"
+uid="uid://dvh7p3548iydn"
+path="res://.godot/imported/jj_fractal_8.png-13e3a0ca51f5751c4317f515a93f9243.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/textures/ui/screens/Waz-lock_Credits_01.png"
-dest_files=["res://.godot/imported/Waz-lock_Credits_01.png-dc4d746903e34406ff110ec0dbd3c110.ctex"]
+source_file="res://assets/textures/util/jj_fractal_8.png"
+dest_files=["res://.godot/imported/jj_fractal_8.png-13e3a0ca51f5751c4317f515a93f9243.ctex"]
 
 [params]
 

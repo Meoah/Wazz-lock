@@ -74,12 +74,37 @@ func _has_cleared_neighbor(room_data: RoomData) -> bool:
 	return false
 
 
+func _is_shop_fully_purchased(room_data: RoomData) -> bool:
+	var shop_state: Dictionary = room_data.metadata.get("shop_state", {})
+	var offers: Array = shop_state.get("offers", [])
+
+	if offers.is_empty():
+		return false
+
+	for offer_value: Variant in offers:
+		if offer_value is not Dictionary:
+			return false
+
+		var offer: Dictionary = offer_value
+		if not bool(offer.get("purchased", false)):
+			return false
+
+	return true
+
+
 func _should_show_objective_icon(room_data: RoomData, _current_room: RoomData) -> bool:
 	if int(room_data.objective_type) == int(RoomData.ObjectiveType.BOSS): return true
 	if room_data.discovered: return true
 	if _has_cleared_neighbor(room_data): return true
 	
 	return false
+
+
+func _should_dim_objective_icon(room_data: RoomData) -> bool:
+	if room_data.objective_type == RoomData.ObjectiveType.SHOP:
+		return _is_shop_fully_purchased(room_data)
+
+	return room_data.cleared
 
 
 func _get_objective_icon_texture(room_data: RoomData) -> Texture2D:
@@ -94,25 +119,28 @@ func _get_objective_icon_texture(room_data: RoomData) -> Texture2D:
 
 func _add_objective_icon(room_data: RoomData) -> void:
 	var texture: Texture2D = _get_objective_icon_texture(room_data)
-	if !texture: return
-	
+	if !texture:
+		return
+
 	var sprite: Sprite2D = Sprite2D.new()
 	sprite.texture = texture
 	sprite.centered = true
 	sprite.position = tilemap.map_to_local(room_data.grid_pos)
 	sprite.scale = OBJECTIVE_ICON_SCALE
 
+	var should_dim: bool = _should_dim_objective_icon(room_data)
+
 	var shader: Shader = load("res://shaders/minimap_icon.gdshader") as Shader
 	if shader:
 		var _material: ShaderMaterial = ShaderMaterial.new()
 		_material.shader = shader
 		_material.set_shader_parameter(
-				"saturation",
-				CLEARED_ICON_SATURATION if room_data.cleared else UNCLEARED_ICON_SATURATION
+			"saturation",
+			CLEARED_ICON_SATURATION if should_dim else UNCLEARED_ICON_SATURATION
 		)
 		_material.set_shader_parameter(
-				"icon_alpha",
-				CLEARED_ICON_ALPHA if room_data.cleared else UNCLEARED_ICON_ALPHA
+			"icon_alpha",
+			CLEARED_ICON_ALPHA if should_dim else UNCLEARED_ICON_ALPHA
 		)
 		sprite.material = _material
 

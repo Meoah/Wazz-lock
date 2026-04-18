@@ -89,7 +89,6 @@ _base_poise = 0.0
 _base_move_speed = 65.0
 
 [node name="Body" type="AnimatedSprite2D" parent="."]
-scale = Vector2(1.5, 1.5)
 sprite_frames = ExtResource("14_t8vda")
 animation = &"attack"
 autoplay = "idle"
