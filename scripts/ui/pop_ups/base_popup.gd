@@ -10,7 +10,8 @@ enum POPUP_TYPE{
 	DIALOGUE,
 	SHOP,
 	IMAGE,
-	CODEX
+	CODEX,
+	SETTINGS
 }
 
 #Bit Flags

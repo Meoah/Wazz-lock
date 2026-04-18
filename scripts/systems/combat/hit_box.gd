@@ -51,11 +51,10 @@ func end_activation() -> void:
 
 func set_active(enabled: bool) -> void:
 	is_active = enabled
-	monitoring = enabled
+	set_deferred("monitoring", enabled)
 
 	if not enabled:
 		_hit_registry.clear()
-
 
 func _on_area_entered(area: Area2D) -> void:
 	if not is_active:

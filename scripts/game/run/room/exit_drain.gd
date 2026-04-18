@@ -10,6 +10,7 @@ const OUTLINE_COLOR_DEFAULT: Color = Color.WHITE
 @export var _outline_mask: Sprite2D
 @export var _interact_icon: Sprite2D
 @export var _interact_icon_texture: Texture2D
+@export var flush_sfx: AudioStream
 
 var destination_room_data: RoomData = null
 var is_opened: bool = false
@@ -52,10 +53,13 @@ func open() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if !event.is_action_pressed("interact"): return
 	if !_can_interact(): return
-	
+
 	var current_state: StateComponent = GameManager.get_current_state()
 	if !current_state or current_state.state_id != &"play": return
-	
+
+	if flush_sfx:
+		AudioManager.play_sfx(flush_sfx, "drain_flush", 1.0, 2, 0.0, 0.0)
+
 	_trigger_interaction_cooldown()
 	SignalBus.change_room.emit(destination_room_data, _get_opposite_direction())
 	get_viewport().set_input_as_handled()

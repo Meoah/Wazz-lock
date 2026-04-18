@@ -1,7 +1,8 @@
-[gd_scene load_steps=24 format=3 uid="uid://cudrre38qqi53"]
+[gd_scene load_steps=25 format=3 uid="uid://cudrre38qqi53"]
 
 [ext_resource type="Script" uid="uid://jean8knuvya7" path="res://scripts/actors/enemies/tank_slime.gd" id="1_7em7h"]
 [ext_resource type="AudioStream" uid="uid://bqmahajqmcyiv" path="res://assets/audio/sfx/slime_hit.ogg" id="2_14d2g"]
+[ext_resource type="AudioStream" uid="uid://d3gv5l4nmvfng" path="res://assets/audio/sfx/poop_slime_aoe.ogg" id="2_y5kui"]
 [ext_resource type="AudioStream" uid="uid://cxmbyf5i8fqk0" path="res://assets/audio/sfx/slime_death.ogg" id="3_t8vda"]
 [ext_resource type="PackedScene" uid="uid://bhfb1e2r30ya6" path="res://scenes/components/states/state_machine_component.tscn" id="4_ejlud"]
 [ext_resource type="PackedScene" uid="uid://cgqo1wcg5puou" path="res://scenes/components/states/enemy/enemy_chase_state_component.tscn" id="5_y5kui"]
@@ -41,6 +42,7 @@ y_sort_enabled = true
 collision_layer = 256
 collision_mask = 4359
 script = ExtResource("1_7em7h")
+aoe_sfx = ExtResource("2_y5kui")
 attack_vfx_sprite = NodePath("VFX")
 damage_sfx = SubResource("AudioStreamRandomizer_nh0x5")
 death_sfx = ExtResource("3_t8vda")

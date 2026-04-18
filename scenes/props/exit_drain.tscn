@@ -1,7 +1,8 @@
-[gd_scene load_steps=14 format=3 uid="uid://bq3b20odg2d4j"]
+[gd_scene load_steps=15 format=3 uid="uid://bq3b20odg2d4j"]
 
 [ext_resource type="Script" uid="uid://cbugcfpqrsaoa" path="res://scripts/game/run/room/exit_drain.gd" id="1_n4mvd"]
 [ext_resource type="Texture2D" uid="uid://lhtq6au2cwts" path="res://assets/textures/props/FloorDrain_Tileset.png" id="2_1d33w"]
+[ext_resource type="AudioStream" uid="uid://tbksha647vk3" path="res://assets/audio/sfx/flush.ogg" id="3_acrlt"]
 [ext_resource type="Texture2D" uid="uid://c4amnypo1jc11" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/keyboard_e.png" id="3_bxoru"]
 [ext_resource type="Texture2D" uid="uid://bg0y6d6qmqh2a" path="res://assets/textures/util/square.png" id="3_gq71u"]
 
@@ -83,6 +84,7 @@ _drain_animated_sprite = NodePath("AnimatedSprite2D")
 _outline_mask = NodePath("OutlineMask")
 _interact_icon = NodePath("InteractIcon")
 _interact_icon_texture = ExtResource("3_bxoru")
+flush_sfx = ExtResource("3_acrlt")
 
 [node name="OutlineMask" type="Sprite2D" parent="."]
 texture = ExtResource("3_gq71u")

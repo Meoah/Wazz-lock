@@ -17,6 +17,7 @@ class_name TankSlime
 @export var pull_end_frame: int = 10
 @export var pull_radius: float = 320.0
 @export var pull_strength: float = 2200.0
+@export var aoe_sfx: AudioStream
 
 @export_category("Defense")
 @export_range(0.0, 1.0, 0.01) var attack_super_armor_damage_scale: float = 0.5
@@ -31,6 +32,7 @@ var attack_committed: bool = false
 var attack_window_open: bool = false
 var attack_cooldown_remaining: float = 0.0
 var pull_window_open: bool = false
+var aoe_sfx_played_this_attack: bool = false
 
 
 func _physics_process(delta: float) -> void:
@@ -43,11 +45,10 @@ func _physics_process(delta: float) -> void:
 
 
 func _on_ready() -> void:
+	super._on_ready()
+	
 	if attack_hit_box:
 		attack_hit_box.hit_confirmed.connect(_on_attack_hit_confirmed)
-
-	if combat_receiver:
-		combat_receiver.hit_received.connect(_on_hit_received_sfx)
 
 	if body_root is AnimatedSprite2D:
 		var sprite_node: AnimatedSprite2D = body_root as AnimatedSprite2D
@@ -95,6 +96,7 @@ func begin_attack_commit(locked_direction: Vector2) -> void:
 	attack_committed = true
 	attack_connected = false
 	attack_window_open = false
+	aoe_sfx_played_this_attack = false
 	attack_locked_direction = locked_direction.normalized()
 
 	if attack_locked_direction == Vector2.ZERO:
@@ -154,6 +156,11 @@ func _on_body_root_frame_changed() -> void:
 
 	var sprite_node: AnimatedSprite2D = body_root as AnimatedSprite2D
 	if sprite_node.animation != attack_animation_name: return
+
+	if sprite_node.frame == attack_active_start_frame and not aoe_sfx_played_this_attack:
+		aoe_sfx_played_this_attack = true
+		if aoe_sfx:
+			AudioManager.play_sfx(aoe_sfx, "tank_aoe", 1.0, 2, 0.0, 0.0)
 
 	_update_attack_hit_box_transform()
 

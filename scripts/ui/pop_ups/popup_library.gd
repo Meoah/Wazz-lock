@@ -12,6 +12,7 @@ const _LEVEL_COMPLETE = preload("res://scenes/ui/pop_ups/level_complete_popup.ts
 const _GAME_OVER = preload("res://scenes/ui/pop_ups/game_over_popup.tscn")
 const _IMAGE = preload("res://scenes/ui/pop_ups/image_popup.tscn")
 const _CODEX = preload("res://scenes/ui/pop_ups/codex_popup.tscn")
+const _SETTINGS = preload("res://scenes/ui/pop_ups/settings_popup.tscn")
 
 # Returns a popup with desired parameters if requested.
 static func create_popup(popup_type: int, params: Dictionary = {}) -> BasePopup:
@@ -36,6 +37,8 @@ static func create_popup(popup_type: int, params: Dictionary = {}) -> BasePopup:
 			popup = _IMAGE.instantiate()
 		BasePopup.POPUP_TYPE.CODEX:
 			popup = _CODEX.instantiate()
+		BasePopup.POPUP_TYPE.SETTINGS:
+			popup = _SETTINGS.instantiate()
 		_:
 			popup = _GENERIC.instantiate()
 	

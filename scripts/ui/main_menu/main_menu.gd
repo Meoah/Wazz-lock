@@ -1,6 +1,7 @@
 extends Control
 class_name MainMenu
 
+const MENU_BGM_PATH: String = "res://assets/audio/bgm/menu_track.ogg"
 
 @export_category("Children Nodes")
 @export var _camera: Camera2D
@@ -24,6 +25,8 @@ enum MenuState {
 var _state : MenuState = MenuState.TITLE
 
 func _ready() -> void:
+	AudioManager.play_bgm_path(MENU_BGM_PATH, false, 0.25)
+
 	SignalBus.main_menu_save_slot_selected.connect(_load_save_data)
 	SignalBus.main_menu_save_slot_delete_requested.connect(_delete_save_slot)
 	SignalBus.button_pressed.connect(_play_confirm_sfx)

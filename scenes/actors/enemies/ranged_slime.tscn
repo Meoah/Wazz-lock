@@ -86,7 +86,7 @@ _base_poise = 0.0
 self_modulate = Color(1, 1, 1, 0.95000005)
 scale = Vector2(0.5, 0.5)
 sprite_frames = ExtResource("13_msfar")
-animation = &"idle"
+animation = &"dead"
 autoplay = "idle"
 
 [node name="VFX" type="AnimatedSprite2D" parent="."]

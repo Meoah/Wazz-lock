@@ -17,7 +17,7 @@ axis_stretch_horizontal = 2
 axis_stretch_vertical = 2
 region_rect = Rect2(0, 0, 64, 64)
 
-[node name="PausePopup" type="Control" node_paths=PackedStringArray("_pause_label", "_button_resume", "_button_codex", "_button_return_to_main_menu")]
+[node name="PausePopup" type="Control" node_paths=PackedStringArray("_pause_label", "_button_resume", "_button_codex", "_button_settings", "_button_return_to_main_menu")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -28,12 +28,12 @@ script = ExtResource("1_5crv1")
 _pause_label = NodePath("PanelContainer/VBoxContainer/Pause")
 _button_resume = NodePath("PanelContainer/VBoxContainer/Resume")
 _button_codex = NodePath("PanelContainer/VBoxContainer/Codex")
+_button_settings = NodePath("PanelContainer/VBoxContainer/Settings")
 _button_return_to_main_menu = NodePath("PanelContainer/VBoxContainer/ReturnToMainMenu")
-_codex_titles = ["Clive", "Weapons", "Enemies", "Enviornment"]
 _codex_textures = Array[Texture2D]([ExtResource("2_kbel7"), ExtResource("3_lbb0v"), ExtResource("4_nkmn3"), ExtResource("5_iuaci")])
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
-custom_minimum_size = Vector2(420, 280)
+custom_minimum_size = Vector2(420, 350)
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -65,6 +65,12 @@ text = "Resume"
 layout_mode = 2
 size_flags_vertical = 3
 text = "Codex"
+
+[node name="Settings" type="Button" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Settings
+"
 
 [node name="ReturnToMainMenu" type="Button" parent="PanelContainer/VBoxContainer"]
 layout_mode = 2

@@ -1,10 +1,8 @@
-extends Control
-
-@export_category("Parent Nodes")
-@export var _main_menu_parent: MainMenu
+extends BasePopup
+class_name SettingsPopup
 
 @export_category("Children Nodes")
-@export var _label_info: RichTextLabel
+@export var _label_title: Label
 @export var _slider_master: HSlider
 @export var _value_master: Label
 @export var _slider_bgm: HSlider
@@ -17,8 +15,18 @@ extends Control
 @export var _button_back: Button
 
 
-func _ready() -> void:
-	_button_back.pressed.connect(_start_back)
+func _on_init() -> void:
+	type = POPUP_TYPE.SETTINGS
+	flags = POPUP_FLAG.WILL_PAUSE | POPUP_FLAG.DISMISS_ON_ESCAPE
+
+
+func _on_ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
+
+	_label_title.text = "SETTINGS"
+	_button_back.text = "Back"
+
+	_button_back.pressed.connect(_on_pressed_back)
 	_check_fullscreen.toggled.connect(_on_fullscreen_toggled)
 
 	_slider_master.value_changed.connect(_on_slider_value_changed.bind(AudioManager.BUS_MASTER, _value_master))
@@ -27,7 +35,12 @@ func _ready() -> void:
 	_slider_dialogue.value_changed.connect(_on_slider_value_changed.bind(AudioManager.BUS_DIALOGUE, _value_dialogue))
 
 	_sync_from_settings()
-	_label_info.text = "[center]Adjust overall and per-bus audio levels.\nToggle fullscreen display mode.[/center]"
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("menu_cancel"):
+		_on_pressed_back()
+		get_viewport().set_input_as_handled()
 
 
 func _sync_from_settings() -> void:
@@ -41,8 +54,7 @@ func _sync_from_settings() -> void:
 	_update_percent_label(_value_sfx, _slider_sfx.value)
 	_update_percent_label(_value_dialogue, _slider_dialogue.value)
 
-	if _check_fullscreen:
-		_check_fullscreen.set_pressed_no_signal(DisplaySettings.is_fullscreen())
+	_check_fullscreen.set_pressed_no_signal(DisplaySettings.is_fullscreen())
 
 
 func _set_slider_without_signal(slider: HSlider, value: float) -> void:
@@ -62,6 +74,5 @@ func _on_fullscreen_toggled(enabled: bool) -> void:
 	DisplaySettings.set_fullscreen(enabled)
 
 
-func _start_back() -> void:
-	SignalBus.button_pressed.emit()
-	_main_menu_parent.move_to_main_navigation()
+func _on_pressed_back() -> void:
+	GameManager.dismiss_popup()

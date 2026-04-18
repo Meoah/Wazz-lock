@@ -1,11 +1,14 @@
-[gd_scene load_steps=47 format=3 uid="uid://cepaf77ic4q03"]
+[gd_scene load_steps=50 format=3 uid="uid://cepaf77ic4q03"]
 
 [ext_resource type="Script" uid="uid://d4ibmcipy3vnl" path="res://scripts/actors/player/player_clive.gd" id="1_iwdwx"]
-[ext_resource type="AudioStream" uid="uid://cwrbstsb3gjte" path="res://assets/audio/sfx/punches/punch_randomizer.tres" id="2_mnojv"]
+[ext_resource type="AudioStream" uid="uid://ceacbcjtwkdq3" path="res://assets/audio/sfx/swings/swing_randomizer.tres" id="2_y6aog"]
+[ext_resource type="AudioStream" uid="uid://ysktcy7tnd33" path="res://assets/audio/sfx/clive_hit.ogg" id="3_y6aog"]
+[ext_resource type="AudioStream" uid="uid://c75gq4yspqqvu" path="res://assets/audio/sfx/electro_bubbles_ui.ogg" id="4_1envf"]
 [ext_resource type="PackedScene" uid="uid://bhfb1e2r30ya6" path="res://scenes/components/states/state_machine_component.tscn" id="4_rugy7"]
 [ext_resource type="PackedScene" uid="uid://db63k07edndsu" path="res://scenes/components/states/player/player_attack_state_component.tscn" id="5_7mmbe"]
 [ext_resource type="PackedScene" uid="uid://c73m4bmxe30jw" path="res://scenes/components/states/player/player_idle_state_component.tscn" id="5_bv00o"]
 [ext_resource type="AudioStream" uid="uid://d3bwummsphgfh" path="res://assets/audio/sfx/clive_death.ogg" id="5_ts6xf"]
+[ext_resource type="AudioStream" uid="uid://bxthavsn32cgw" path="res://assets/audio/sfx/plunger.ogg" id="5_udp4g"]
 [ext_resource type="PackedScene" uid="uid://cks7jxboy3wbu" path="res://scenes/components/states/player/player_dead_state_component.tscn" id="6_3hkjg"]
 [ext_resource type="PackedScene" uid="uid://7r8xbtlsdroq" path="res://scenes/components/status_component.tscn" id="6_rugy7"]
 [ext_resource type="PackedScene" uid="uid://ccqileij6fhyv" path="res://scenes/components/states/player/player_walk_state_component.tscn" id="7_7mmbe"]
@@ -627,6 +630,20 @@ tracks/17/keys = {
 "method": &"end_activation"
 }]
 }
+tracks/18/type = "method"
+tracks/18/imported = false
+tracks/18/enabled = true
+tracks/18/path = NodePath(".")
+tracks/18/interp = 1
+tracks/18/loop_wrap = true
+tracks/18/keys = {
+"times": PackedFloat32Array(0.0625),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"play_primary_swing_sfx"
+}]
+}
 
 [sub_resource type="Animation" id="Animation_l31bh"]
 resource_name = "attack_primary_2"
@@ -851,6 +868,20 @@ tracks/17/keys = {
 }, {
 "args": [],
 "method": &"end_activation"
+}]
+}
+tracks/18/type = "method"
+tracks/18/imported = false
+tracks/18/enabled = true
+tracks/18/path = NodePath(".")
+tracks/18/interp = 1
+tracks/18/loop_wrap = true
+tracks/18/keys = {
+"times": PackedFloat32Array(0.125),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"play_primary_swing_sfx"
 }]
 }
 
@@ -1089,6 +1120,20 @@ tracks/18/keys = {
 }, {
 "args": [],
 "method": &"end_activation"
+}]
+}
+tracks/19/type = "method"
+tracks/19/imported = false
+tracks/19/enabled = true
+tracks/19/path = NodePath(".")
+tracks/19/interp = 1
+tracks/19/loop_wrap = true
+tracks/19/keys = {
+"times": PackedFloat32Array(0.3125),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"play_primary_swing_sfx"
 }]
 }
 
@@ -2077,6 +2122,20 @@ tracks/26/keys = {
 "update": 0,
 "values": [0.75, 0.2]
 }
+tracks/27/type = "method"
+tracks/27/imported = false
+tracks/27/enabled = true
+tracks/27/path = NodePath(".")
+tracks/27/interp = 1
+tracks/27/loop_wrap = true
+tracks/27/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"play_charge_release_sfx"
+}]
+}
 
 [sub_resource type="Animation" id="Animation_0ymvp"]
 resource_name = "attack_secondary_start"
@@ -2974,6 +3033,20 @@ tracks/8/keys = {
 "update": 1,
 "values": [12291]
 }
+tracks/9/type = "method"
+tracks/9/imported = false
+tracks/9/enabled = true
+tracks/9/path = NodePath(".")
+tracks/9/interp = 1
+tracks/9/loop_wrap = true
+tracks/9/keys = {
+"times": PackedFloat32Array(0.09375),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"play_dash_sfx"
+}]
+}
 
 [sub_resource type="Animation" id="Animation_cntgg"]
 resource_name = "rolling"
@@ -3284,7 +3357,10 @@ aim = NodePath("PlayerAim")
 hit_box = NodePath("BodyRoot/Hands/Weapon/HitBox")
 hurt_box = NodePath("HurtBox")
 overhead = NodePath("Overhead")
-punch_sfx = ExtResource("2_mnojv")
+punch_sfx = ExtResource("2_y6aog")
+hit_sfx = ExtResource("3_y6aog")
+dash_sfx = ExtResource("4_1envf")
+charge_release_sfx = ExtResource("5_udp4g")
 death_sfx = ExtResource("5_ts6xf")
 animation_player = NodePath("AnimationPlayer")
 body_root = NodePath("BodyRoot")

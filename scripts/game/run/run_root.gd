@@ -1,6 +1,8 @@
 extends Control
 class_name RunRoot
 
+const GAMEPLAY_BGM_PATH: String = "res://assets/audio/bgm/gameplay_track.ogg"
+
 @export_category("Popup Content")
 @export var tutorial_texture: Texture2D
 @export var run_intro_texture: Texture2D
@@ -17,6 +19,8 @@ var is_player_death_sequence_running: bool = false
 func _ready() -> void:
 	set_process(false)
 	add_to_group("run_root")
+	
+	AudioManager.play_bgm_path(GAMEPLAY_BGM_PATH, false, 0.25)
 	
 	minimap_node = GameManager.root_hud.game_hud.minimap_node
 	room_scene_paths = _load_room_scene_paths()

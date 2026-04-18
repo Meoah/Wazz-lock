@@ -33,26 +33,30 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
-	if exploded: return
+	if exploded:
+		return
 
 	var collision: KinematicCollision2D = move_and_collide(direction * speed * delta)
 	if collision != null:
-		_explode()
+		call_deferred("_explode")
 
 
 func _on_hit_confirmed(_hurt_box: HurtBoxComponent, _hit_data: HitData) -> void:
-	_explode()
+	call_deferred("_explode")
 
 
 func _explode() -> void:
-	if exploded: return
+	if exploded:
+		return
+
 	exploded = true
+	velocity = Vector2.ZERO
 
 	if hit_box:
 		hit_box.end_activation()
 
 	if body_collision_shape:
-		body_collision_shape.disabled = true
+		body_collision_shape.set_deferred("disabled", true)
 
 	if body_sprite == null:
 		queue_free()

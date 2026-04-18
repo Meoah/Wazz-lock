@@ -22,10 +22,9 @@ var attack_window_open: bool = false
 
 
 func _on_ready() -> void:
-	detection_radius = melee_detection_radius
+	super._on_ready()
 	
-	if combat_receiver:
-		combat_receiver.hit_received.connect(_on_hit_received_sfx)
+	detection_radius = melee_detection_radius
 
 	if attack_hit_box:
 		attack_hit_box.hit_confirmed.connect(_on_attack_hit_confirmed)

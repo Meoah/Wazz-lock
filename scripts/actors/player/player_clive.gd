@@ -20,6 +20,9 @@ signal death_finished
 
 @export_category("Audio")
 @export var punch_sfx: AudioStream
+@export var hit_sfx: AudioStream
+@export var dash_sfx: AudioStream
+@export var charge_release_sfx: AudioStream
 @export var death_sfx: AudioStream
 
 @export_category("Children Nodes")
@@ -301,8 +304,12 @@ func on_hit_received(_hit_data: HitData) -> void:
 
 func on_hurt_received(_hit_data: HitData) -> void:
 	roll_requested = false
-	
-	if hit_box: hit_box.end_activation()
+
+	if hit_sfx:
+		AudioManager.play_sfx(hit_sfx, "clive_hit", 1.0, 2, 0.03, 0.0)
+
+	if hit_box:
+		hit_box.end_activation()
 
 
 func on_death_received(_hit_data: HitData) -> void:
@@ -391,6 +398,21 @@ func play_idle() -> void:
 func play_walk() -> void:
 	if animation_player.current_animation != "idle": animation_player.play("idle")
 	animation_player.speed_scale = lerp(1.0, 2.0, movement.get_speed_ratio())
+
+
+func play_primary_swing_sfx() -> void:
+	if punch_sfx:
+		AudioManager.play_sfx(punch_sfx, "clive_primary_swing", 1.0, 3, 0.04, 0.0)
+
+
+func play_dash_sfx() -> void:
+	if dash_sfx:
+		AudioManager.play_sfx(dash_sfx, "clive_dash", 1.0, 2, 0.0, 0.0)
+
+
+func play_charge_release_sfx() -> void:
+	if charge_release_sfx:
+		AudioManager.play_sfx(charge_release_sfx, "clive_charge_release", 1.0, 2, 0.0, 0.0)
 
 
 func begin_roll_startup() -> void:
