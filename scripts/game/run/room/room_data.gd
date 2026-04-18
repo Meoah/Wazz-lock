@@ -41,7 +41,7 @@ enum Directions {
 var grid_pos: Vector2i
 var discovered: bool = false
 var cleared: bool = false
-var difficulty: int = 10
+var difficulty_modifier: float = 10.0
 var scene_path: String
 var room_type: RoomType = RoomType.NORMAL
 var objective_type: ObjectiveType = ObjectiveType.EXTERMINATE

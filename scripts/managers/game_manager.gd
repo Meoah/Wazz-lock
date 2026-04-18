@@ -12,6 +12,8 @@ extends Node
 
 
 func _ready() -> void:
+	DisplaySettings.load_settings_from_disk()
+
 	# Check to see if the current scene is the default. If so, kill it.
 	#	This script is attached to an autoload, so it can't also be the initial
 	#	scene as it would have two instances going at once.

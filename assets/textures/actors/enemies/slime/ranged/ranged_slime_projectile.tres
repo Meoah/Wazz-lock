@@ -1,0 +1,44 @@
+[gd_resource type="SpriteFrames" load_steps=6 format=3 uid="uid://cflrme4v66ki2"]
+
+[ext_resource type="Texture2D" uid="uid://daibv376igqjy" path="res://assets/textures/actors/enemies/slime/ranged/Sewer_SpriteSheet.png" id="1_c57w6"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_uvwqh"]
+atlas = ExtResource("1_c57w6")
+region = Rect2(256, 256, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_v8qgi"]
+atlas = ExtResource("1_c57w6")
+region = Rect2(512, 256, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_shuce"]
+atlas = ExtResource("1_c57w6")
+region = Rect2(768, 256, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3hkbi"]
+atlas = ExtResource("1_c57w6")
+region = Rect2(0, 256, 256, 256)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_uvwqh")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_v8qgi")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_shuce")
+}],
+"loop": false,
+"name": &"explode",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3hkbi")
+}],
+"loop": false,
+"name": &"fly",
+"speed": 5.0
+}]

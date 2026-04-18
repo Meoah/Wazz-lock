@@ -1,7 +1,10 @@
-[gd_scene load_steps=12 format=3 uid="uid://bq3b20odg2d4j"]
+[gd_scene load_steps=15 format=3 uid="uid://bq3b20odg2d4j"]
 
 [ext_resource type="Script" uid="uid://cbugcfpqrsaoa" path="res://scripts/game/run/room/exit_drain.gd" id="1_n4mvd"]
 [ext_resource type="Texture2D" uid="uid://lhtq6au2cwts" path="res://assets/textures/props/FloorDrain_Tileset.png" id="2_1d33w"]
+[ext_resource type="AudioStream" uid="uid://tbksha647vk3" path="res://assets/audio/sfx/flush.ogg" id="3_acrlt"]
+[ext_resource type="Texture2D" uid="uid://c4amnypo1jc11" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/keyboard_e.png" id="3_bxoru"]
+[ext_resource type="Texture2D" uid="uid://bg0y6d6qmqh2a" path="res://assets/textures/util/square.png" id="3_gq71u"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_1r480"]
 atlas = ExtResource("2_1d33w")
@@ -71,13 +74,20 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_j4tbw"]
-size = Vector2(64, 64)
+size = Vector2(192, 192)
 
-[node name="ExitDrain" type="Area2D" node_paths=PackedStringArray("_drain_animated_sprite")]
+[node name="ExitDrain" type="Area2D" node_paths=PackedStringArray("_drain_animated_sprite", "_outline_mask", "_interact_icon")]
 collision_layer = 32768
 collision_mask = 16
 script = ExtResource("1_n4mvd")
 _drain_animated_sprite = NodePath("AnimatedSprite2D")
+_outline_mask = NodePath("OutlineMask")
+_interact_icon = NodePath("InteractIcon")
+_interact_icon_texture = ExtResource("3_bxoru")
+flush_sfx = ExtResource("3_acrlt")
+
+[node name="OutlineMask" type="Sprite2D" parent="."]
+texture = ExtResource("3_gq71u")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_qrwy5")
@@ -85,6 +95,11 @@ animation = &"unopened"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_j4tbw")
+
+[node name="InteractIcon" type="Sprite2D" parent="."]
+self_modulate = Color(0.359375, 0.359375, 0.359375, 1)
+z_index = 10
+position = Vector2(0, -90)
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]
 [connection signal="body_exited" from="." to="." method="_on_body_exited"]

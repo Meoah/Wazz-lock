@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="EnemyAffixResource" load_steps=2 format=3 uid="uid://da3mu1x1rkl32"]
+
+[ext_resource type="Script" uid="uid://ch815uvw350cq" path="res://scripts/systems/enemy_affix_resource.gd" id="1_3w3k7"]
+
+[resource]
+script = ExtResource("1_3w3k7")
+id = "brutal"
+display_prefix = "Brutal"
+prefix_color = Color(1, 0.7, 0.35, 1)
+health_multiplier = 1.25
+damage_multiplier = 1.4
+speed_multiplier = 1.12
+metadata/_custom_type_script = "uid://ch815uvw350cq"

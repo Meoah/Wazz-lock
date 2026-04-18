@@ -16,16 +16,19 @@ signal death_finished
 @export var aim: AimComponent
 @export var hit_box: HitBoxComponent
 @export var hurt_box: HurtBoxComponent
+@export var overhead: OverheadComponent
 
 @export_category("Audio")
 @export var punch_sfx: AudioStream
+@export var hit_sfx: AudioStream
+@export var dash_sfx: AudioStream
+@export var charge_release_sfx: AudioStream
 @export var death_sfx: AudioStream
 
 @export_category("Children Nodes")
 @export var animation_player: AnimationPlayer
 @export var body_root: Node2D
 @export var hands: Node2D
-@export var health_bar: ProgressBar
 
 @export_category("Weapon Nodes")
 @export var weapon_sprite: AnimatedSprite2D
@@ -52,6 +55,8 @@ var secondary_attack_held: bool = false
 
 var flash_tween: Tween
 var invuln_tween: Tween
+var reaction_tween: Tween
+var body_root_origin: Vector2 = Vector2.ZERO
 
 var roll_cooldown: float = 0.0
 var invuln_cooldown: float = 0.0
@@ -71,7 +76,10 @@ var action_token: int = 0
 
 func _ready() -> void:
 	_validate_components()
-	
+
+	if body_root:
+		body_root_origin = body_root.position
+
 	if status:
 		status.setup()
 		status.request_active()
@@ -81,11 +89,15 @@ func _ready() -> void:
 	movement.set_movement_enabled(true)
 	movement.request_stop()
 	movement.clear_impulses()
-	
-	if hit_box: hit_box.end_activation()
-	
+
+	if hit_box:
+		hit_box.end_activation()
+
+	if overhead:
+		overhead.setup(self, status, inventory)
+
 	state_machine.setup(self)
-	
+
 	SignalBus.player_ready.emit(self)
 
 
@@ -105,6 +117,10 @@ func _physics_process(delta: float) -> void:
 func _can_accept_gameplay_input() -> bool:
 	var current_state: StateComponent = GameManager.get_current_state()
 	return current_state != null and current_state.state_id == &"play"
+
+
+func _should_charge_dodge_mana() -> bool:
+	return RunManager.is_active_combat_room
 
 
 func _clear_transient_inputs() -> void:
@@ -157,6 +173,9 @@ func _input(event: InputEvent) -> void:
 		secondary_attack_held = false
 		if attack: attack.on_attack_button_released(PlayerAttackComponent.AttackInputType.SECONDARY)
 	
+	if event.is_action_pressed("use_potion"):
+		potion_requested = true
+	
 	_update_move_direction()
 
 
@@ -175,6 +194,7 @@ func get_status_component() -> StatusComponent: return status
 func is_dead() -> bool: return (status_flags & STATUS_FLAG.DEAD) != 0
 func is_invulnerable() -> bool: return (status_flags & STATUS_FLAG.INVULN) != 0
 func is_attacking() -> bool: return (status_flags & STATUS_FLAG.ATTACKING) != 0
+func is_rolling() -> bool: return (status_flags & STATUS_FLAG.ROLLING) != 0
 
 func has_move_input() -> bool: return move_direction != Vector2.ZERO
 func get_move_direction() -> Vector2: return move_direction
@@ -234,7 +254,7 @@ func _validate_components() -> void:
 	if aim == null: push_error("Clive missing AimComponent")
 	if weapon_sprite == null: push_error("Clive missing WeaponSprite")
 	if weapon_vfx == null: push_error("Clive missing WeaponVFX")
-
+	if overhead == null: push_error("Clive missing OverheadComponent")
 
 func _sync_movement_speed_from_status() -> void:
 	if movement and status:
@@ -248,30 +268,24 @@ func _update_timers(delta: float) -> void:
 
 
 func _update_status() -> void:
-	health_bar.max_value = status.max_health
-	health_bar.value = status.current_health
-	
 	var invuln_now: bool = invuln_cooldown > 0.0
 	_set_status_flag(STATUS_FLAG.INVULN, invuln_now)
-	
+
 	hurt_box.monitorable = not invuln_now
 	hurt_box.monitoring = not invuln_now
-	
+
 	_invuln_handler()
 
 
 func _handle_potion() -> void:
 	if !potion_requested: return
-	
 	potion_requested = false
 	
 	if potion_cooldown > 0.0: return
 	
-	if inventory.request_use_item(inventory.HEALTH_POTION):
-		SignalBus.floating_text.emit("+10", position)
-		status.current_health += 10.0
-		status.health_regen = 2.5
-		potion_cooldown = 1.0
+	if inventory and inventory.try_use_health_potion(status):
+		SignalBus.floating_text.emit("[color=#8cff8c]Potion used![/color]", global_position)
+		potion_cooldown = 0.25
 
 
 func _set_input_flag(flag: int, enabled: bool) -> void:
@@ -290,22 +304,28 @@ func on_hit_received(_hit_data: HitData) -> void:
 
 func on_hurt_received(_hit_data: HitData) -> void:
 	roll_requested = false
-	
-	if hit_box: hit_box.end_activation()
 
-
-func on_death_received(_hit_data: HitData) -> void:
-	input_flags = 0
-	roll_requested = false
-	potion_requested = false
+	if hit_sfx:
+		AudioManager.play_sfx(hit_sfx, "clive_hit", 1.0, 2, 0.03, 0.0)
 
 	if hit_box:
 		hit_box.end_activation()
 
-	if movement:
-		movement.request_stop()
-		movement.clear_impulses()
-		movement.set_movement_enabled(false)
+
+func on_death_received(_hit_data: HitData) -> void:
+	_stop_reaction_tween()
+	body_root.position = body_root_origin
+	input_flags = 0
+	roll_requested = false
+	potion_requested = false
+	_clear_transient_inputs()
+
+	if hit_box:
+		hit_box.end_activation()
+
+	if hurt_box:
+		hurt_box.hurtable = false
+		hurt_box.monitoring = false
 
 
 func _update_move_direction() -> void:
@@ -316,14 +336,58 @@ func _update_move_direction() -> void:
 	if move_direction != Vector2.ZERO: move_direction = move_direction.normalized()
 
 
-func consume_roll_request(entry_cost: float = 20.0) -> bool:
-	if not roll_requested: return false
+func consume_roll_request(entry_cost: float = 15.0) -> bool:
+	if !roll_requested: return false
 	roll_requested = false
-	
-	if roll_cooldown > 0.0 or is_dead(): return false
-	if not status.request_mana(entry_cost): return false
-	
+
+	if is_dead(): return false
+	if _should_charge_dodge_mana() and roll_cooldown > 0.0: return false
+	if _should_charge_dodge_mana() and !status.request_mana(entry_cost): return false
+
 	return true
+
+
+func get_overhead_root_name() -> String:
+	if status == null:
+		return "Clive"
+
+	if status.actor_name == "":
+		return "Clive"
+
+	return status.actor_name
+
+
+func get_overhead_prefix_text() -> String:
+	return ""
+
+
+func get_overhead_suffix_text() -> String:
+	return ""
+
+
+func get_overhead_prefix_color() -> Color:
+	return Color.WHITE
+
+
+func get_overhead_suffix_color() -> Color:
+	return Color.WHITE
+
+
+func should_show_overhead_label() -> bool:
+	return false
+
+
+func get_overhead_status_icon_ids() -> Array[StringName]:
+	var icon_ids: Array[StringName] = []
+
+	if inventory and inventory.is_potion_hot_active():
+		icon_ids.append(&"potion_hot")
+
+	return icon_ids
+
+
+func get_current_room() -> Room:
+	return get_tree().get_first_node_in_group("current_room") as Room
 
 
 func play_idle() -> void:
@@ -334,6 +398,21 @@ func play_idle() -> void:
 func play_walk() -> void:
 	if animation_player.current_animation != "idle": animation_player.play("idle")
 	animation_player.speed_scale = lerp(1.0, 2.0, movement.get_speed_ratio())
+
+
+func play_primary_swing_sfx() -> void:
+	if punch_sfx:
+		AudioManager.play_sfx(punch_sfx, "clive_primary_swing", 1.0, 3, 0.04, 0.0)
+
+
+func play_dash_sfx() -> void:
+	if dash_sfx:
+		AudioManager.play_sfx(dash_sfx, "clive_dash", 1.0, 2, 0.0, 0.0)
+
+
+func play_charge_release_sfx() -> void:
+	if charge_release_sfx:
+		AudioManager.play_sfx(charge_release_sfx, "clive_charge_release", 1.0, 2, 0.0, 0.0)
 
 
 func begin_roll_startup() -> void:
@@ -350,8 +429,31 @@ func begin_roll_sustain() -> void:
 
 
 func begin_roll_end() -> void:
+	snap_to_nearest_floor_if_in_water()
 	animation_player.speed_scale = 1.0
 	animation_player.play("postroll")
+
+
+func snap_to_nearest_floor_if_in_water() -> void:
+	var current_room: Room = get_current_room()
+	if current_room == null: return
+	if not current_room.is_global_position_in_water(global_position): return
+
+	var floor_positions: Array[Vector2] = current_room.get_floor_spawn_positions()
+	if floor_positions.is_empty(): return
+
+	var closest_floor_position: Vector2 = floor_positions[0]
+	var closest_distance_squared: float = global_position.distance_squared_to(closest_floor_position)
+
+	for floor_position: Vector2 in floor_positions:
+		var distance_squared: float = global_position.distance_squared_to(floor_position)
+		if distance_squared >= closest_distance_squared:
+			continue
+
+		closest_floor_position = floor_position
+		closest_distance_squared = distance_squared
+
+	global_position = closest_floor_position
 
 
 func start_attack_mode() -> void:
@@ -371,10 +473,65 @@ func stop_attack_mode() -> void:
 func begin_hurt(animation_name: StringName = &"hurt") -> void:
 	if is_dead(): return
 
+	_stop_reaction_tween()
+	body_root.position = body_root_origin
+
 	_cancel_active_action()
 	animation_player.speed_scale = 1.0
 	animation_player.play(animation_name)
 	invuln_cooldown = 1.0
+
+
+func hold_hurt_last_frame(duration: float) -> void:
+	if animation_player == null:
+		await get_tree().create_timer(duration).timeout
+		return
+
+	var animation_length: float = animation_player.current_animation_length
+	if animation_length > 0.0:
+		animation_player.seek(max(animation_length - 0.001, 0.0), true)
+		animation_player.pause()
+
+	await get_tree().create_timer(duration).timeout
+	animation_player.play()
+
+
+func begin_knockup(height: float, duration: float) -> void:
+	if body_root == null:
+		return
+
+	_stop_reaction_tween()
+	body_root.position = body_root_origin
+
+	var half_duration: float = max(duration * 0.5, 0.01)
+	reaction_tween = create_tween()
+	reaction_tween.tween_property(body_root, "position:y", body_root_origin.y - height, half_duration)
+	reaction_tween.tween_property(body_root, "position:y", body_root_origin.y, half_duration)
+
+
+func play_knockup(height: float, duration: float) -> void:
+	if body_root == null:
+		await get_tree().create_timer(duration).timeout
+		return
+
+	begin_knockup(height, duration)
+
+	if reaction_tween:
+		await reaction_tween.finished
+
+
+func get_current_animation_duration() -> float:
+	if animation_player == null:
+		return 0.0
+
+	return animation_player.current_animation_length
+
+
+func _stop_reaction_tween() -> void:
+	if reaction_tween and reaction_tween.is_running():
+		reaction_tween.kill()
+
+	reaction_tween = null
 
 
 func begin_death() -> void:
@@ -437,7 +594,7 @@ func _on_animation_player_animation_finished(anim_name: StringName) -> void:
 			roll_startup_finished.emit()
 
 		&"postroll":
-			roll_cooldown = 0.56
+			roll_cooldown = 0.56 if _should_charge_dodge_mana() else 0.0
 			_set_status_flag(STATUS_FLAG.ROLLING, false)
 			roll_finished.emit()
 

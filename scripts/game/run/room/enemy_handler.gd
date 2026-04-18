@@ -11,13 +11,12 @@ enum SpawnMode {
 const MIN_SAFE_SPAWN_DISTANCE: float = 120.0
 
 var enemy_list: Array[BaseEnemy] = []
-var _spawner_list: Array[EnemySpawner] = []
+var _tile_handler: TileHandler = null
 var _spawning_enabled: bool = true
 
 var _spawn_mode: SpawnMode = SpawnMode.DISABLED
-var _difficulty_percent: float = 0.0
+var _difficulty_modifier: float = 0.0
 var _pending_respawns: Array[Dictionary] = []
-var _boss_spawner: EnemySpawner = null
 var _boss_spawned_once: bool = false
 var _respawn_delay_seconds: float = 3.0
 var _encounter_profile: RoomData.EncounterProfile = RoomData.EncounterProfile.BALANCED
@@ -26,29 +25,26 @@ var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_PAUSABLE
 	_rng.randomize()
-	
-	for child in get_children():
-		if child is EnemySpawner:
-			var spawner: EnemySpawner = child as EnemySpawner
-			_spawner_list.append(spawner)
-			spawner.hide()
-	
 	set_process(false)
 
 
 func _process(delta: float) -> void:
 	if !_spawning_enabled: return
-	
+
 	_prune_enemy_list()
-	
+
 	match _spawn_mode:
 		SpawnMode.SURVIVAL:
 			_tick_pending_respawns(delta)
-			_fill_survival_spawns()
-		
+			_fill_survival_spawns(false)
+
 		SpawnMode.BOSS:
 			_tick_pending_respawns(delta)
-			_fill_survival_spawns()
+			_fill_survival_spawns(false)
+
+
+func setup_spawn_context(tile_handler: TileHandler) -> void:
+	_tile_handler = tile_handler
 
 
 func set_encounter_profile(profile: RoomData.EncounterProfile) -> void:
@@ -59,139 +55,319 @@ func stop_spawning() -> void:
 	_spawning_enabled = false
 	_pending_respawns.clear()
 	set_process(false)
-	
-	for spawner in _spawner_list: spawner.hide()
 
 
 func clear_alive_enemies() -> void:
 	stop_spawning()
 	_prune_enemy_list()
-	
+
+	var remaining_enemies: Array[BaseEnemy] = []
+
+	for enemy in enemy_list:
+		if !is_instance_valid(enemy):
+			continue
+
+		if enemy.is_dead():
+			remaining_enemies.append(enemy)
+			continue
+
+		enemy.queue_free()
+
+	enemy_list = remaining_enemies
+
+
+func clear_all_enemies() -> void:
+	stop_spawning()
+	_prune_enemy_list()
+
 	for enemy in enemy_list:
 		if is_instance_valid(enemy):
 			enemy.queue_free()
-	
+
 	enemy_list.clear()
 
 
 func begin_static_spawn(difficulty_percent: float) -> void:
 	_spawn_mode = SpawnMode.STATIC
-	_difficulty_percent = max(difficulty_percent, 0.0)
+	_difficulty_modifier = max(difficulty_percent, 0.0)
 	_spawning_enabled = true
 	set_process(false)
-	_spawn_static_enemies(_difficulty_percent)
+	_spawn_static_enemies(_difficulty_modifier)
 
 
 func begin_survival_mode(difficulty_percent: float, respawn_delay_seconds: float = 3.0) -> void:
 	_spawn_mode = SpawnMode.SURVIVAL
-	_difficulty_percent = max(difficulty_percent, 0.0)
+	_difficulty_modifier = max(difficulty_percent, 0.0)
 	_respawn_delay_seconds = respawn_delay_seconds
 	_spawning_enabled = true
 	_pending_respawns.clear()
-	_boss_spawner = null
 	_boss_spawned_once = false
 	set_process(true)
-	_fill_survival_spawns()
+	_fill_survival_spawns(true)
 
 
 func begin_boss_mode(difficulty_percent: float, respawn_delay_seconds: float = 3.0) -> void:
 	_spawn_mode = SpawnMode.BOSS
-	_difficulty_percent = max(difficulty_percent, 0.0)
+	_difficulty_modifier = max(difficulty_percent, 0.0)
 	_respawn_delay_seconds = respawn_delay_seconds
 	_spawning_enabled = true
 	_pending_respawns.clear()
 	_boss_spawned_once = false
-	_boss_spawner = _pick_random_spawner(_spawner_list)
 	set_process(true)
-	
+
 	_spawn_boss_once()
-	_fill_survival_spawns()
+	_fill_survival_spawns(true)
 
 
 func _spawn_static_enemies(difficulty_percent: float) -> void:
-	if !_spawning_enabled: return
-	
-	var resolved_difficulty: float = max(difficulty_percent, 0.0)
-	var guaranteed_spawns: int = int(resolved_difficulty / 100.0)
-	var leftover_percent: float = resolved_difficulty - float(guaranteed_spawns * 100)
-	var bonus_spawn_chance: float = clamp(leftover_percent / 100.0, 0.0, 1.0)
-	
-	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
-	rng.randomize()
-	
-	for spawner in _spawner_list:
-		if !_spawning_enabled: return
-		
-		var spawn_count: int = guaranteed_spawns
-		
-		if rng.randf() <= bonus_spawn_chance:
-			spawn_count += 1
-		
-		for i in range(spawn_count):
-			var spawn_archetype: EnemyLibrary.EnemyArchetype = _pick_spawn_archetype(spawner)
-			var spawn_variant: EnemyLibrary.EnemyVariant = _pick_spawn_variant()
-			
-			_spawn_enemy_from_spawner(spawner, spawn_archetype, spawn_variant, "normal", false)
+	if !_spawning_enabled:
+		return
+
+	var target_count: int = _get_static_spawn_count_from_difficulty(difficulty_percent)
+	var attempts_remaining: int = max(target_count * 3, 3)
+
+	while target_count > 0 and attempts_remaining > 0:
+		var spawn_archetype: EnemyLibrary.EnemyArchetype = _pick_spawn_archetype()
+		var spawn_variant: EnemyLibrary.EnemyVariant = _pick_spawn_variant()
+		var spawned: bool = _spawn_enemy(spawn_archetype, spawn_variant, "normal", false, true)
+
+		if spawned:
+			target_count -= 1
+
+		attempts_remaining -= 1
 
 
-func _pick_spawn_archetype(spawner: EnemySpawner) -> EnemyLibrary.EnemyArchetype:
+func _get_static_spawn_count_from_difficulty(difficulty_percent: float) -> int:
+	return max(1, int(ceil(max(difficulty_percent, 1.0) / 10.0)))
+
+
+func _get_spawn_cap_from_difficulty() -> int:
+	return max(2, int(ceil(max(_difficulty_modifier, 1.0) / 7.5)))
+
+
+func _pick_spawn_archetype() -> EnemyLibrary.EnemyArchetype:
 	if _encounter_profile == RoomData.EncounterProfile.SHOP:
 		return EnemyLibrary.EnemyArchetype.MELEE_SLIME
-	
-	return EnemyLibrary.pick_weighted_archetype_for_profile(_encounter_profile, _rng)
+
+	return EnemyLibrary.pick_weighted_archetype_for_spawn(_encounter_profile, _difficulty_modifier, _rng)
+
+
+func _has_room_water() -> bool:
+	if _tile_handler == null:
+		return false
+
+	return not _tile_handler.get_water_spawn_positions().is_empty()
+
+
+func _resolve_spawn_archetype(requested_archetype: EnemyLibrary.EnemyArchetype) -> EnemyLibrary.EnemyArchetype:
+	if requested_archetype != EnemyLibrary.EnemyArchetype.RANGED_SLIME:
+		return requested_archetype
+
+	if _tile_handler == null:
+		return EnemyLibrary.EnemyArchetype.MELEE_SLIME
+
+	if _tile_handler.has_water_spawn_positions():
+		return requested_archetype
+
+	return EnemyLibrary.EnemyArchetype.MELEE_SLIME
 
 
 func _pick_spawn_variant() -> EnemyLibrary.EnemyVariant:
-	return EnemyLibrary.pick_variant_for_spawn(_encounter_profile, _difficulty_percent, _rng)
+	return EnemyLibrary.pick_variant_for_spawn(_encounter_profile, _difficulty_modifier, _rng)
 
 
-func _spawn_enemy_from_spawner(
-	spawner: EnemySpawner,
+func _get_occupied_enemy_positions() -> Array[Vector2]:
+	var positions: Array[Vector2] = []
+	
+	for enemy in enemy_list:
+		if !is_instance_valid(enemy): continue
+		if enemy.is_queued_for_deletion(): continue
+		
+		positions.append(enemy.global_position)
+	
+	return positions
+
+
+func _spawn_enemy(
 	enemy_archetype: EnemyLibrary.EnemyArchetype,
 	enemy_variant: EnemyLibrary.EnemyVariant,
 	spawn_role: String,
-	use_global_aggro: bool
-		) -> void:
-	var enemy_path: String = EnemyLibrary.get_scene_path_for_archetype(enemy_archetype)
-	if enemy_path.is_empty(): return
-	
+	use_global_aggro: bool,
+	allow_drops: bool = true
+) -> bool:
+	if !_tile_handler:
+		return false
+
+	var resolved_enemy_archetype: EnemyLibrary.EnemyArchetype = _resolve_spawn_archetype(enemy_archetype)
+	var enemy_path: String = EnemyLibrary.get_scene_path_for_archetype(resolved_enemy_archetype)
+	if enemy_path.is_empty():
+		return false
+
 	var enemy_scene: PackedScene = load(enemy_path)
-	if !enemy_scene:return
-	
+	if !enemy_scene:
+		return false
+
+	var avoid_global: Vector2 = Vector2.INF
+	var player: Node2D = get_tree().get_first_node_in_group("player") as Node2D
+	if player and use_global_aggro:
+		avoid_global = player.global_position
+
+	var spawn_position: Variant = _tile_handler.pick_spawn_position_for_archetype(
+		resolved_enemy_archetype,
+		_rng,
+		avoid_global,
+		MIN_SAFE_SPAWN_DISTANCE if use_global_aggro else 0.0,
+		_get_occupied_enemy_positions()
+	)
+
+	if spawn_position == null and resolved_enemy_archetype == EnemyLibrary.EnemyArchetype.RANGED_SLIME:
+		resolved_enemy_archetype = EnemyLibrary.EnemyArchetype.MELEE_SLIME
+		enemy_path = EnemyLibrary.get_scene_path_for_archetype(resolved_enemy_archetype)
+		if enemy_path.is_empty():
+			return false
+
+		enemy_scene = load(enemy_path)
+		if !enemy_scene:
+			return false
+
+		spawn_position = _tile_handler.pick_spawn_position_for_archetype(
+			resolved_enemy_archetype,
+			_rng,
+			avoid_global,
+			MIN_SAFE_SPAWN_DISTANCE if use_global_aggro else 0.0,
+			_get_occupied_enemy_positions()
+		)
+
+	if spawn_position == null:
+		return false
+
 	var enemy_child: BaseEnemy = enemy_scene.instantiate() as BaseEnemy
-	if !enemy_child:return
-	
-	enemy_child.position = spawner.position
-	enemy_child.set_meta("enemy_archetype", int(enemy_archetype))
+	if !enemy_child:
+		return false
+
+	enemy_child.global_position = spawn_position
+	enemy_child.set_meta("enemy_archetype", int(resolved_enemy_archetype))
 	enemy_child.set_meta("enemy_variant", int(enemy_variant))
 	enemy_child.set_meta("spawn_role", spawn_role)
-	
+	enemy_child.set_meta("enemy_scene_path", enemy_path)
+	enemy_child.set_meta("allow_drops", allow_drops)
+
 	add_child(enemy_child)
 	enemy_list.append(enemy_child)
-	
+
+	_apply_enemy_display_name(enemy_child, resolved_enemy_archetype)
 	_apply_variant_to_enemy(enemy_child, enemy_variant)
-	
+	_apply_difficulty_modifiers(enemy_child)
+
 	if enemy_child.has_method("set_global_aggro_enabled"):
 		enemy_child.set_global_aggro_enabled(use_global_aggro)
-	
+
 	if enemy_child.combat_receiver and !enemy_child.combat_receiver.death_triggered.is_connected(_on_enemy_death.bind(enemy_child)):
 		enemy_child.combat_receiver.death_triggered.connect(_on_enemy_death.bind(enemy_child))
 
-# TODO give variants actual changes
+	return true
+
 func _apply_variant_to_enemy(enemy: BaseEnemy, enemy_variant: EnemyLibrary.EnemyVariant) -> void:
+	if enemy == null:
+		return
+
 	enemy.set_meta("enemy_variant", int(enemy_variant))
-	
+	enemy.set_meta("display_prefix", "")
+	enemy.set_meta("display_prefix_color", Color.WHITE)
+	enemy.set_meta("display_suffix", "")
+	enemy.set_meta("display_suffix_color", Color.WHITE)
+	enemy.set_meta("affix_id", "")
+
+	var enemy_archetype: EnemyLibrary.EnemyArchetype = enemy.get_meta(
+		"enemy_archetype",
+		EnemyLibrary.EnemyArchetype.MELEE_SLIME
+	)
+
 	match enemy_variant:
 		EnemyLibrary.EnemyVariant.NORMAL:
-			pass
-		
+			enemy.apply_spawn_variant_modifiers({
+				"scale_multiplier": 1.0
+			})
+
 		EnemyLibrary.EnemyVariant.ELITE:
-			pass
+			var elite_affix: EnemyAffixResource = EnemyLibrary.pick_random_affix_for_archetype(enemy_archetype, _rng)
+			if elite_affix == null:
+				return
+
+			enemy.set_meta("affix_id", elite_affix.id)
+			enemy.set_meta("display_prefix", elite_affix.display_prefix)
+			enemy.set_meta("display_prefix_color", elite_affix.prefix_color)
+
+			enemy.apply_spawn_variant_modifiers({
+				"health_multiplier": elite_affix.health_multiplier,
+				"damage_multiplier": elite_affix.damage_multiplier,
+				"defense_multiplier": elite_affix.defense_multiplier,
+				"poise_multiplier": elite_affix.poise_multiplier,
+				"speed_multiplier": elite_affix.speed_multiplier,
+				"scale_multiplier": 1.5
+			})
+
+		EnemyLibrary.EnemyVariant.BOSS:
+			var boss_affix: EnemyAffixResource = EnemyLibrary.pick_random_affix_for_archetype(enemy_archetype, _rng)
+			if boss_affix == null:
+				return
+
+			enemy.set_meta("affix_id", boss_affix.id)
+			enemy.set_meta("display_prefix", boss_affix.display_prefix)
+			enemy.set_meta("display_prefix_color", boss_affix.prefix_color)
+			enemy.set_meta("display_suffix", "[BOSS]")
+			enemy.set_meta("display_suffix_color", Color(1.0, 0.25, 0.25, 1.0))
+
+			enemy.apply_spawn_variant_modifiers({
+				"health_multiplier": boss_affix.health_multiplier * 2.0,
+				"damage_multiplier": boss_affix.damage_multiplier * 1.5,
+				"defense_multiplier": boss_affix.defense_multiplier * 1.35,
+				"poise_multiplier": boss_affix.poise_multiplier * 1.5,
+				"speed_multiplier": boss_affix.speed_multiplier,
+				"scale_multiplier": 2.0
+			})
+
+
+func _apply_difficulty_modifiers(enemy: BaseEnemy) -> void:
+	if enemy == null:
+		return
+
+	var difficulty_modifiers: Dictionary = EnemyLibrary.get_difficulty_stat_multipliers(_difficulty_modifier)
+	enemy.apply_spawn_variant_modifiers(difficulty_modifiers)
+
+
+func _apply_enemy_display_name(enemy: BaseEnemy, enemy_archetype: EnemyLibrary.EnemyArchetype) -> void:
+	if enemy == null:
+		return
+
+	if enemy.status == null:
+		return
+
+	enemy.status.actor_name = EnemyLibrary.get_archetype_display_name(enemy_archetype)
+
+
+func _award_currency_drops(enemy: BaseEnemy) -> void:
+	if not bool(enemy.get_meta("allow_drops", true)): return
+
+	var drops: Dictionary = EnemyLibrary.roll_currency_drop(enemy, _rng, _difficulty_modifier)
+	var silver: float = float(drops.get("silver", 0.0))
+	var gold: float = float(drops.get("gold", 0.0))
+	var drop_position: Vector2 = enemy.global_position
+
+	if silver > 0:
+		RunManager.add_silver(silver)
+		SignalBus.floating_text.emit("[font_size=64][color=#a1a1a1]+%.2f Silver[/color][/font_size]" % silver, drop_position)
+
+	if gold > 0:
+		RunManager.add_gold(gold)
+		SignalBus.floating_text.emit("[font_size=64][color=#ffd34d]+%.2f Gold[/color][/font_size]" % gold, drop_position + Vector2(0, -20))
 
 
 func _on_enemy_death(_hit_data: HitData, enemy: BaseEnemy) -> void:
 	if !is_instance_valid(enemy): return
-
+	
+	_award_currency_drops(enemy)
+	
 	var role: String = str(enemy.get_meta("spawn_role", "normal"))
 	var enemy_archetype: EnemyLibrary.EnemyArchetype = enemy.get_meta("enemy_archetype", EnemyLibrary.EnemyArchetype.MELEE_SLIME)
 	var enemy_variant: EnemyLibrary.EnemyVariant = enemy.get_meta("enemy_variant", EnemyLibrary.EnemyVariant.NORMAL)
@@ -204,103 +380,195 @@ func _on_enemy_death(_hit_data: HitData, enemy: BaseEnemy) -> void:
 			if role == "normal": _queue_respawn(enemy_archetype, enemy_variant, "normal")
 
 
-func _get_spawn_cap_from_difficulty() -> int:
-	return max(1, int(ceil(max(_difficulty_percent, 1.0) / 100.0)))
-
-
 func get_alive_normal_enemy_count() -> int:
 	_prune_enemy_list()
-	
+
 	var count: int = 0
 	for enemy in enemy_list:
 		if !is_instance_valid(enemy):
 			continue
-		if str(enemy.get_meta("spawn_role", "normal")) == "normal":
-			count += 1
-	
+
+		if enemy.is_dead():
+			continue
+
+		if str(enemy.get_meta("spawn_role", "normal")) != "normal":
+			continue
+
+		count += 1
+
 	return count
 
 
-func _pick_random_spawner(source_spawners: Array[EnemySpawner]) -> EnemySpawner:
-	if source_spawners.is_empty(): return null
-	return source_spawners.pick_random()
-
-
-func _pick_random_spawner_far_from_player(source_spawners: Array[EnemySpawner], min_distance: float = MIN_SAFE_SPAWN_DISTANCE) -> EnemySpawner:
-	if source_spawners.is_empty(): return null
-	
-	var player: Node2D = get_tree().get_first_node_in_group("player") as Node2D
-	if !player: return source_spawners.pick_random()
-	
-	var valid_spawners: Array[EnemySpawner] = []
-	for spawner in source_spawners:
-		if spawner.global_position.distance_to(player.global_position) >= min_distance:
-			valid_spawners.append(spawner)
-	
-	if valid_spawners.is_empty(): return source_spawners.pick_random()
-	
-	return valid_spawners.pick_random()
-
-
-func _fill_survival_spawns() -> void:
+func _fill_survival_spawns(allow_drops: bool = false) -> void:
 	if !_spawning_enabled: return
-	
+
 	var target_cap: int = _get_spawn_cap_from_difficulty()
 	var current_alive: int = get_alive_normal_enemy_count()
 	var pending_normal: int = _get_pending_respawn_count("normal")
-	
-	while current_alive + pending_normal < target_cap:
-		var spawner_pool: Array[EnemySpawner] = _get_non_boss_spawners()
-		var spawner: EnemySpawner = _pick_random_spawner_far_from_player(spawner_pool)
-		if !spawner: return
-		
-		_spawn_enemy_from_spawner(spawner, spawner.enemy_archetype, spawner.default_variant, "normal", true)
-		current_alive += 1
+	var attempts_remaining: int = max(target_cap * 3, 6)
+
+	while current_alive + pending_normal < target_cap and attempts_remaining > 0:
+		var spawn_archetype: EnemyLibrary.EnemyArchetype = _pick_spawn_archetype()
+		var spawn_variant: EnemyLibrary.EnemyVariant = _pick_spawn_variant()
+		var spawned: bool = _spawn_enemy(spawn_archetype, spawn_variant, "normal", true, allow_drops)
+
+		if spawned:
+			current_alive += 1
+
+		attempts_remaining -= 1
 
 
 func _spawn_boss_once() -> void:
 	if !_spawning_enabled: return
 	if _boss_spawned_once: return
-	if !_boss_spawner: return
-	
-	var rng: RandomNumberGenerator = RandomNumberGenerator.new()
-	rng.randomize()
-	
-	var boss_scene_path: String = EnemyLibrary.pick_random_boss_scene_path(rng, 1)
+	if !_tile_handler: return
+
+	var allow_ranged: bool = _has_room_water()
+	var boss_archetype: EnemyLibrary.EnemyArchetype = EnemyLibrary.pick_random_boss_archetype(
+		_rng,
+		RunManager.get_current_boss_pool_id(),
+		allow_ranged
+	)
+
+	var boss_scene_path: String = EnemyLibrary.get_scene_path_for_archetype(boss_archetype)
 	if boss_scene_path.is_empty(): return
-	
+
 	var boss_scene: PackedScene = load(boss_scene_path)
 	if !boss_scene: return
-	
+
+	var spawn_position: Variant = _tile_handler.pick_spawn_position_for_archetype(
+		boss_archetype,
+		_rng,
+		(get_tree().get_first_node_in_group("player") as Node2D).global_position if get_tree().get_first_node_in_group("player") else Vector2.INF,
+		MIN_SAFE_SPAWN_DISTANCE,
+		_get_occupied_enemy_positions()
+	)
+	if !spawn_position: return
+
 	var boss_child: BaseEnemy = boss_scene.instantiate() as BaseEnemy
 	if !boss_child: return
-	
-	boss_child.position = _boss_spawner.position
+
+	boss_child.global_position = spawn_position
 	boss_child.set_meta("spawn_role", "boss")
-	boss_child.set_meta("enemy_variant", -1)
-	boss_child.set_meta("enemy_archetype", -1)
-	
+	boss_child.set_meta("enemy_variant", int(EnemyLibrary.EnemyVariant.BOSS))
+	boss_child.set_meta("enemy_archetype", int(boss_archetype))
+	boss_child.set_meta("enemy_scene_path", boss_scene_path)
+
 	add_child(boss_child)
 	enemy_list.append(boss_child)
-	
+
+	_apply_enemy_display_name(boss_child, boss_archetype)
+	_apply_variant_to_enemy(boss_child, EnemyLibrary.EnemyVariant.BOSS)
+	_apply_difficulty_modifiers(boss_child)
+
 	if boss_child.has_method("set_global_aggro_enabled"):
 		boss_child.set_global_aggro_enabled(true)
-	
+
 	if boss_child.combat_receiver and !boss_child.combat_receiver.death_triggered.is_connected(_on_enemy_death.bind(boss_child)):
 		boss_child.combat_receiver.death_triggered.connect(_on_enemy_death.bind(boss_child))
-	
+
 	_boss_spawned_once = true
 
 
-func _get_non_boss_spawners() -> Array[EnemySpawner]:
-	var result: Array[EnemySpawner] = []
+func configure_runtime_mode_from_room(room_clear_condition: int, difficulty_percent: float, respawn_delay_seconds: float = 3.0) -> void:
+	_difficulty_modifier = max(difficulty_percent, 0.0)
+	_respawn_delay_seconds = respawn_delay_seconds
+	_spawning_enabled = true
 	
-	for spawner in _spawner_list:
-		if _spawn_mode == SpawnMode.BOSS and spawner == _boss_spawner:
-			continue
-		result.append(spawner)
+	match room_clear_condition:
+		Room.ClearConditions.EXTERMINATE:
+			_spawn_mode = SpawnMode.STATIC
+			set_process(false)
+		
+		Room.ClearConditions.SURVIVAL:
+			_spawn_mode = SpawnMode.SURVIVAL
+			set_process(true)
+		
+		Room.ClearConditions.BOSS:
+			_spawn_mode = SpawnMode.BOSS
+			set_process(true)
+		
+		_:
+			_spawn_mode = SpawnMode.DISABLED
+			set_process(false)
+
+
+func capture_runtime_state() -> Array[Dictionary]:
+	_prune_enemy_list()
 	
-	return result
+	var snapshots: Array[Dictionary] = []
+	
+	for enemy in enemy_list:
+		if !is_instance_valid(enemy): continue
+		if enemy.is_queued_for_deletion(): continue
+		
+		var current_health: float = 0.0
+		if enemy.status:
+			current_health = enemy.status.current_health
+		
+		snapshots.append({
+			"scene_path": str(enemy.get_meta("enemy_scene_path", "")),
+			"position": [enemy.global_position.x, enemy.global_position.y],
+			"spawn_role": str(enemy.get_meta("spawn_role", "normal")),
+			"enemy_archetype": enemy.get_meta("enemy_archetype", -1),
+			"enemy_variant": enemy.get_meta("enemy_variant", -1),
+			"current_health": current_health,
+			"global_aggro_enabled": enemy.global_aggro_enabled if "global_aggro_enabled" in enemy else false,
+			"allow_drops": bool(enemy.get_meta("allow_drops", true))
+		})
+	
+	return snapshots
+
+
+func restore_runtime_state(snapshots: Array) -> void:
+	clear_all_enemies()
+	
+	for snapshot in snapshots:
+		_restore_enemy_snapshot(snapshot)
+
+
+func _restore_enemy_snapshot(snapshot: Dictionary) -> void:
+	var scene_path: String = str(snapshot.get("scene_path", ""))
+	if scene_path.is_empty(): return
+	
+	var packed: PackedScene = load(scene_path)
+	if !packed: return
+	
+	var enemy_child: BaseEnemy = packed.instantiate() as BaseEnemy
+	if !enemy_child: return
+	
+	var pos_data: Array = snapshot.get("position", [0.0, 0.0])
+	enemy_child.global_position = Vector2(float(pos_data[0]), float(pos_data[1]))
+	
+	var spawn_role: String = str(snapshot.get("spawn_role", "normal"))
+	var enemy_archetype = snapshot.get("enemy_archetype", -1)
+	var enemy_variant = snapshot.get("enemy_variant", -1)
+	
+	enemy_child.set_meta("spawn_role", spawn_role)
+	enemy_child.set_meta("enemy_archetype", enemy_archetype)
+	enemy_child.set_meta("enemy_variant", enemy_variant)
+	enemy_child.set_meta("enemy_scene_path", scene_path)
+	enemy_child.set_meta("allow_drops", bool(snapshot.get("allow_drops", true)))
+	
+	add_child(enemy_child)
+	enemy_list.append(enemy_child)
+	
+	if spawn_role != "boss" and int(enemy_variant) >= 0:
+		_apply_variant_to_enemy(enemy_child, enemy_variant)
+		_apply_difficulty_modifiers(enemy_child)
+		
+	if enemy_child.status:
+		enemy_child.status.current_health = clamp(
+			float(snapshot.get("current_health", enemy_child.status.max_health)),
+			0.0,
+			enemy_child.status.max_health
+				)
+	
+	if enemy_child.has_method("set_global_aggro_enabled"):
+		enemy_child.set_global_aggro_enabled(bool(snapshot.get("global_aggro_enabled", false)))
+	
+	if enemy_child.combat_receiver and !enemy_child.combat_receiver.death_triggered.is_connected(_on_enemy_death.bind(enemy_child)):
+		enemy_child.combat_receiver.death_triggered.connect(_on_enemy_death.bind(enemy_child))
 
 
 func _tick_pending_respawns(delta: float) -> void:
@@ -315,12 +583,10 @@ func _tick_pending_respawns(delta: float) -> void:
 		var role: String = str(pending.get("role", "normal"))
 		var enemy_archetype: EnemyLibrary.EnemyArchetype = pending.get("enemy_archetype", EnemyLibrary.EnemyArchetype.MELEE_SLIME)
 		var enemy_variant: EnemyLibrary.EnemyVariant = pending.get("enemy_variant", EnemyLibrary.EnemyVariant.NORMAL)
-		var spawner_pool: Array[EnemySpawner] = _get_non_boss_spawners()
-		var spawner: EnemySpawner = _pick_random_spawner_far_from_player(spawner_pool)
 		
-		if spawner: _spawn_enemy_from_spawner(spawner, enemy_archetype, enemy_variant, role, true)
-		
-		_pending_respawns.remove_at(i)
+		var spawned: bool = _spawn_enemy(enemy_archetype, enemy_variant, role, true, false)
+		if spawned:
+			_pending_respawns.remove_at(i)
 
 
 func _queue_respawn(enemy_archetype: EnemyLibrary.EnemyArchetype, enemy_variant: EnemyLibrary.EnemyVariant, role: String) -> void:
@@ -353,7 +619,31 @@ func has_alive_enemies() -> bool:
 
 func get_alive_enemy_count() -> int:
 	_prune_enemy_list()
-	return enemy_list.size()
+
+	var count: int = 0
+	for enemy in enemy_list:
+		if !is_instance_valid(enemy):
+			continue
+
+		if enemy.is_dead():
+			continue
+
+		count += 1
+
+	return count
+
+
+func get_active_boss_enemy() -> BaseEnemy:
+	_prune_enemy_list()
+
+	for enemy in enemy_list:
+		if !is_instance_valid(enemy): continue
+		if enemy.is_dead(): continue
+		if str(enemy.get_meta("spawn_role", "")) != "boss": continue
+
+		return enemy
+
+	return null
 
 
 func has_alive_boss_enemies() -> bool:
@@ -368,16 +658,39 @@ func get_alive_boss_enemy_count() -> int:
 		if !is_instance_valid(enemy):
 			continue
 
-		if str(enemy.get_meta("spawn_role", "")) == "boss":
-			count += 1
+		if enemy.is_dead():
+			continue
+
+		if str(enemy.get_meta("spawn_role", "")) != "boss":
+			continue
+
+		count += 1
 
 	return count
 
+
 func _prune_enemy_list() -> void:
 	var alive_enemies: Array[BaseEnemy] = []
-	
+
 	for enemy in enemy_list:
-		if is_instance_valid(enemy):
-			alive_enemies.append(enemy)
-	
+		if !is_instance_valid(enemy):
+			continue
+
+		if enemy.is_queued_for_deletion():
+			continue
+
+		alive_enemies.append(enemy)
+
 	enemy_list = alive_enemies
+
+
+func on_player_death_started() -> void:
+	stop_spawning()
+	_prune_enemy_list()
+
+	for enemy in enemy_list:
+		if !is_instance_valid(enemy):
+			continue
+
+		if enemy.has_method("on_player_death_started"):
+			enemy.on_player_death_started()

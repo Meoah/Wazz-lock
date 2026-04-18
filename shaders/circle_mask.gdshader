@@ -13,5 +13,6 @@ void fragment() {
 		discard;
 	}
 
-	COLOR = texture(viewport_tex, uv);
+	vec4 viewport_color = texture(viewport_tex, uv);
+	COLOR = viewport_color * COLOR;
 }

@@ -13,22 +13,24 @@ extends Control
 @export var _value_sfx: Label
 @export var _slider_dialogue: HSlider
 @export var _value_dialogue: Label
+@export var _check_fullscreen: CheckButton
 @export var _button_back: Button
 
 
 func _ready() -> void:
 	_button_back.pressed.connect(_start_back)
+	_check_fullscreen.toggled.connect(_on_fullscreen_toggled)
 
 	_slider_master.value_changed.connect(_on_slider_value_changed.bind(AudioManager.BUS_MASTER, _value_master))
 	_slider_bgm.value_changed.connect(_on_slider_value_changed.bind(AudioManager.BUS_BGM, _value_bgm))
 	_slider_sfx.value_changed.connect(_on_slider_value_changed.bind(AudioManager.BUS_SFX, _value_sfx))
 	_slider_dialogue.value_changed.connect(_on_slider_value_changed.bind(AudioManager.BUS_DIALOGUE, _value_dialogue))
 
-	_sync_from_audio_manager()
-	_label_info.text = "[center]Adjust overall and per-bus audio levels.[/center]"
+	_sync_from_settings()
+	_label_info.text = "[center]Adjust overall and per-bus audio levels.\nToggle fullscreen display mode.[/center]"
 
 
-func _sync_from_audio_manager() -> void:
+func _sync_from_settings() -> void:
 	_set_slider_without_signal(_slider_master, AudioManager.get_bus_volume_linear(AudioManager.BUS_MASTER))
 	_set_slider_without_signal(_slider_bgm, AudioManager.get_bus_volume_linear(AudioManager.BUS_BGM))
 	_set_slider_without_signal(_slider_sfx, AudioManager.get_bus_volume_linear(AudioManager.BUS_SFX))
@@ -38,6 +40,9 @@ func _sync_from_audio_manager() -> void:
 	_update_percent_label(_value_bgm, _slider_bgm.value)
 	_update_percent_label(_value_sfx, _slider_sfx.value)
 	_update_percent_label(_value_dialogue, _slider_dialogue.value)
+
+	if _check_fullscreen:
+		_check_fullscreen.set_pressed_no_signal(DisplaySettings.is_fullscreen())
 
 
 func _set_slider_without_signal(slider: HSlider, value: float) -> void:
@@ -51,6 +56,10 @@ func _update_percent_label(label: Label, value: float) -> void:
 func _on_slider_value_changed(value: float, bus_name: String, value_label: Label) -> void:
 	AudioManager.set_bus_volume_linear(bus_name, value)
 	_update_percent_label(value_label, value)
+
+
+func _on_fullscreen_toggled(enabled: bool) -> void:
+	DisplaySettings.set_fullscreen(enabled)
 
 
 func _start_back() -> void:

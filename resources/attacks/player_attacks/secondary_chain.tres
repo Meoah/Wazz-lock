@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" uid="uid://bcb72e44wqhkh" path="res://scripts/systems/combat/attacks/attack_chain_resource.gd" id="1_3vkek"]
 [ext_resource type="Script" uid="uid://ce7k5u25qaxdt" path="res://scripts/systems/combat/attacks/attack_stage_resource.gd" id="2_ohxub"]
-[ext_resource type="Resource" uid="uid://dgn4d5n2iavs5" path="res://resources/attacks/player_attacks/secondary_start.tres" id="3_nj7ab"]
-[ext_resource type="Resource" uid="uid://bepvf0mcdhwrh" path="res://resources/attacks/player_attacks/secondary_hold.tres" id="4_rju18"]
+[ext_resource type="Resource" uid="uid://dgn4d5n2iavs5" path="res://resources/attacks/player_attacks/secondary/secondary_start.tres" id="3_nj7ab"]
+[ext_resource type="Resource" uid="uid://bepvf0mcdhwrh" path="res://resources/attacks/player_attacks/secondary/secondary_hold.tres" id="4_rju18"]
 
 [resource]
 script = ExtResource("1_3vkek")

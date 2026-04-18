@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="AttackChargeTier" load_steps=2 format=3 uid="uid://5fcqgef27b3b"]
+
+[ext_resource type="Script" uid="uid://cbjn2t2y5w37x" path="res://scripts/systems/combat/attacks/attack_charge_tier_resource.gd" id="1_y26cu"]
+
+[resource]
+script = ExtResource("1_y26cu")
+tier_id = &"secondary_charge_tier_1"
+release_animation_name = &"attack_secondary_release"
+damage_multiplier = 3.0
+metadata/_custom_type_script = "uid://cbjn2t2y5w37x"

@@ -1,24 +1,24 @@
 [gd_scene load_steps=26 format=3 uid="uid://c5d81avm06wq6"]
 
-[ext_resource type="Texture2D" uid="uid://bakvtes34qef5" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/panel_brown_corners_b.png" id="1_2r04i"]
 [ext_resource type="Texture2D" uid="uid://bbv2qsiavk038" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/banner_classic_curtain.png" id="1_jgro5"]
 [ext_resource type="Script" uid="uid://8tawfnwb1v7j" path="res://scripts/ui/main_menu/save_slot.gd" id="2_7jev8"]
-[ext_resource type="Texture2D" uid="uid://42ei7qig066p" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/panel_brown_damaged.png" id="3_ao746"]
+[ext_resource type="Texture2D" uid="uid://dyvjy4tmkdote" path="res://assets/textures/ui/nine_slice/Message_03_1.png" id="2_ao746"]
+[ext_resource type="Texture2D" uid="uid://dacwqdq6hqt8b" path="res://assets/textures/ui/nine_slice/Transparent.png" id="3_rtx5h"]
 [ext_resource type="Texture2D" uid="uid://croq8g2o017rm" path="res://assets/textures/actors/clive/spritesheets/Clive_Spritesheet.png" id="4_ao746"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_e21yp"]
-texture = ExtResource("1_2r04i")
-texture_margin_left = 16.0
-texture_margin_top = 16.0
-texture_margin_right = 16.0
-texture_margin_bottom = 16.0
+texture = ExtResource("2_ao746")
+texture_margin_left = 8.0
+texture_margin_top = 8.0
+texture_margin_right = 8.0
+texture_margin_bottom = 8.0
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_rtx5h"]
-texture = ExtResource("3_ao746")
-texture_margin_left = 16.0
-texture_margin_top = 16.0
-texture_margin_right = 16.0
-texture_margin_bottom = 16.0
+texture = ExtResource("3_rtx5h")
+texture_margin_left = 8.0
+texture_margin_top = 8.0
+texture_margin_right = 8.0
+texture_margin_bottom = 8.0
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_7ma8l"]
 atlas = ExtResource("4_ao746")
@@ -159,7 +159,7 @@ script = ExtResource("2_7jev8")
 _animated_sprite_clive_body = NodePath("PanelContainer/MarginContainer/VBoxContainer/MarginContainer/PanelContainer/CliveBody")
 _animated_sprite_clive_hands = NodePath("PanelContainer/MarginContainer/VBoxContainer/MarginContainer/PanelContainer/CliveHands")
 _label_slot_number = NodePath("TextureRect/SlotNumber")
-_label_save_data = NodePath("PanelContainer/MarginContainer/VBoxContainer/SaveData/RichTextLabel")
+_label_save_data = NodePath("PanelContainer/MarginContainer/VBoxContainer/SaveDataPanel/RichTextLabel")
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
 layout_mode = 1
@@ -205,19 +205,17 @@ sprite_frames = SubResource("SpriteFrames_qsepa")
 autoplay = "default"
 centered = false
 
-[node name="SaveData" type="Control" parent="PanelContainer/MarginContainer/VBoxContainer"]
+[node name="SaveDataPanel" type="PanelContainer" parent="PanelContainer/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(256, 256)
 layout_mode = 2
-size_flags_vertical = 3
+size_flags_horizontal = 3
+size_flags_vertical = 2
 mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_rtx5h")
 
-[node name="RichTextLabel" type="RichTextLabel" parent="PanelContainer/MarginContainer/VBoxContainer/SaveData"]
+[node name="RichTextLabel" type="RichTextLabel" parent="PanelContainer/MarginContainer/VBoxContainer/SaveDataPanel"]
 modulate = Color(0, 0, 0, 1)
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+layout_mode = 2
 mouse_filter = 2
 bbcode_enabled = true
 text = "Save Data Info"

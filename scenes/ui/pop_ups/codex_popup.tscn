@@ -1,0 +1,72 @@
+[gd_scene load_steps=6 format=3 uid="uid://bwa2m5i15n682"]
+
+[ext_resource type="Script" uid="uid://dnbm7ugp7khfo" path="res://scripts/ui/pop_ups/codex_popup.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://btprjpbbxhlss" path="res://assets/textures/ui/nine_slice/Message_01_1.png" id="2"]
+[ext_resource type="Texture2D" uid="uid://dacwqdq6hqt8b" path="res://assets/textures/ui/nine_slice/Transparent.png" id="3"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_panel"]
+texture = ExtResource("2")
+texture_margin_left = 8.0
+texture_margin_top = 8.0
+texture_margin_right = 8.0
+texture_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_clear"]
+texture = ExtResource("3")
+texture_margin_left = 8.0
+texture_margin_top = 8.0
+texture_margin_right = 8.0
+texture_margin_bottom = 8.0
+
+[node name="CodexPopup" type="Control" node_paths=PackedStringArray("_label_title", "_button_list", "_button_back")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+_label_title = NodePath("PanelContainer/VBoxContainer/Title")
+_button_list = NodePath("PanelContainer/VBoxContainer/ScrollContainer/ButtonList")
+_button_back = NodePath("PanelContainer/VBoxContainer/Back")
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -320.0
+offset_top = -240.0
+offset_right = 320.0
+offset_bottom = 240.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_panel")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer"]
+custom_minimum_size = Vector2(640, 480)
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Title" type="Label" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 34
+text = "Codex"
+horizontal_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxTexture_clear")
+
+[node name="ButtonList" type="VBoxContainer" parent="PanelContainer/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="Back" type="Button" parent="PanelContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+text = "Back"

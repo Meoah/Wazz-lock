@@ -1,6 +1,29 @@
-[gd_scene load_steps=2 format=3 uid="uid://bo1g4iy30q74e"]
+[gd_scene load_steps=5 format=3 uid="uid://bo1g4iy30q74e"]
 
 [ext_resource type="Script" uid="uid://driavuxpgymxi" path="res://scripts/actors/friendlies/shop_npc.gd" id="1_5qrea"]
+[ext_resource type="Texture2D" uid="uid://dr7j5mmcrdyxx" path="res://assets/textures/actors/friendlies/humbolt/humbolt_sprite.png" id="2_lh7xr"]
+[ext_resource type="Texture2D" uid="uid://c4amnypo1jc11" path="res://assets/PLACEHOLDERS/OUTSOURCED-OKAY-TO-USE/kenney/keyboard_e.png" id="3_bgt8s"]
 
-[node name="ShopNPC" type="Node2D"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_vibox"]
+size = Vector2(256, 256)
+
+[node name="ShopNPC" type="Area2D" node_paths=PackedStringArray("_sprite", "_interact_icon")]
+collision_layer = 32768
+collision_mask = 16
 script = ExtResource("1_5qrea")
+_sprite = NodePath("Sprite2D")
+_interact_icon = NodePath("InteractIcon")
+_interact_icon_texture = ExtResource("3_bgt8s")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_lh7xr")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_vibox")
+
+[node name="InteractIcon" type="Sprite2D" parent="."]
+self_modulate = Color(0.359375, 0.359375, 0.359375, 1)
+position = Vector2(0, -100)
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="body_exited" from="." to="." method="_on_body_exited"]

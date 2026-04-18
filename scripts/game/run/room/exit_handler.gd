@@ -14,16 +14,28 @@ func _ready() -> void:
 func setup_exits(room_data: RoomData) -> void:
 	for exit_drain in exit_list:
 		var destination: RoomData = room_data.connections.get(exit_drain.exit_direction)
-		
-		if destination:
-			exit_drain.show()
-			exit_drain.set_destination(destination)
-			exit_drain.is_opened = room_data.cleared
-			exit_drain.setup()
-		else:
+
+		if destination == null:
 			exit_drain.hide()
 			exit_drain.set_destination(null)
+			continue
 
+		var block_boss_backtrack: bool = (
+			room_data.objective_type == RoomData.ObjectiveType.BOSS
+			and destination.cleared
+		)
+
+		if block_boss_backtrack:
+			exit_drain.show()
+			exit_drain.set_destination(destination)
+			exit_drain.is_opened = false
+			exit_drain.setup()
+			continue
+
+		exit_drain.show()
+		exit_drain.set_destination(destination)
+		exit_drain.is_opened = room_data.cleared or destination.cleared
+		exit_drain.setup()
 
 func get_spawn_exit(entrance_direction: int = -1) -> ExitDrain:
 	var valid_exits: Array[ExitDrain] = []
@@ -59,3 +71,8 @@ func request_open_exit(exit_direction: RoomData.Directions) -> bool:
 			exit_drain.open()
 			return true
 	return false
+
+
+func refresh_exit_interaction_states() -> void:
+	for exit_drain in exit_list:
+		exit_drain.call_deferred("_refresh_player_proximity_state")

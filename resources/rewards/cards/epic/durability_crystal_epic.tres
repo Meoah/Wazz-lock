@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="RewardCardData" load_steps=5 format=3 uid="uid://ghwvutqyw6jg"]
+
+[ext_resource type="Script" uid="uid://dia3qnhck4r1o" path="res://scripts/systems/rewards/reward_effect_data_resource.gd" id="1"]
+[ext_resource type="Script" uid="uid://dq4iblqldg3v0" path="res://scripts/systems/rewards/reward_card_data_resource.gd" id="2"]
+[ext_resource type="Texture2D" uid="uid://dxqy1lp6nr23f" path="res://assets/textures/ui/icons/defense.png" id="2_4o65n"]
+
+[sub_resource type="Resource" id="RewardEffect_1"]
+script = ExtResource("1")
+target_id = "defense"
+amount = 10.0
+
+[resource]
+script = ExtResource("2")
+card_id = "durability_crystal_epic"
+display_name = "Durability Crystal"
+description = "+10 Defense"
+icon = ExtResource("2_4o65n")
+rarity = 3
+hidden_difficulty_modifier = 5.0
+effects = Array[ExtResource("1")]([SubResource("RewardEffect_1")])

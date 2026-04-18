@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="RewardCardData" load_steps=5 format=3 uid="uid://cml5y4ad8asv0"]
+
+[ext_resource type="Script" uid="uid://dia3qnhck4r1o" path="res://scripts/systems/rewards/reward_effect_data_resource.gd" id="1"]
+[ext_resource type="Script" uid="uid://dq4iblqldg3v0" path="res://scripts/systems/rewards/reward_card_data_resource.gd" id="2"]
+[ext_resource type="Texture2D" uid="uid://c0bsbro87yhey" path="res://assets/textures/ui/icons/damage.png" id="2_40yp2"]
+
+[sub_resource type="Resource" id="RewardEffect_1"]
+script = ExtResource("1")
+amount = 25.0
+
+[resource]
+script = ExtResource("2")
+card_id = "might_artifact_legendary"
+display_name = "Might Artifact"
+description = "+25 Damage"
+icon = ExtResource("2_40yp2")
+rarity = 4
+hidden_difficulty_modifier = 7.0
+effects = Array[ExtResource("1")]([SubResource("RewardEffect_1")])

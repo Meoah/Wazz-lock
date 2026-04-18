@@ -19,11 +19,14 @@ func physics_update(delta: float) -> void:
 		return
 
 	timer -= delta
-	parent.move_toward_point(parent.last_known_target_position, 0.0, search_speed_multiplier)
 
 	if parent.reached_point(parent.last_known_target_position) or timer <= 0.0:
+		parent.play_idle_visual()
 		machine.transition_to(wander_state_id)
+		return
 
+	parent.play_move_visual()
+	parent.move_toward_point(parent.last_known_target_position, 0.0, search_speed_multiplier)
 
 func exit(_next_state: StateComponent) -> void:
 	parent.movement.request_stop()

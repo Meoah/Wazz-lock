@@ -36,30 +36,42 @@ func _update_save_data_tint() -> void:
 	_label_save_data.modulate = SAVE_DATA_DELETE_COLOR if _delete_mode else SAVE_DATA_NORMAL_COLOR
 
 
-func _set_preview_visible(visible: bool) -> void:
-	_animated_sprite_clive_body.visible = visible
-	_animated_sprite_clive_hands.visible = visible
+func _set_preview_visible(_visible: bool) -> void:
+	_animated_sprite_clive_body.visible = _visible
+	_animated_sprite_clive_hands.visible = _visible
 
 
 func refresh_summary() -> void:
-	var summary := SaveManager.get_slot_summary(_save_slot_index)
+	var summary: Dictionary = SaveManager.get_slot_summary(_save_slot_index)
+	var has_slot_data: bool = summary.get("has_slot_data", false)
 	var has_save: bool = summary.get("has_save", false)
-
-	_set_preview_visible(has_save)
+	
+	_set_preview_visible(has_slot_data)
 	_update_save_data_tint()
-
-	if !has_save:
+	
+	if !has_slot_data:
 		_label_save_data.text = "[center]Empty Slot[/center]"
 		return
-
+	
 	@warning_ignore("integer_division")
 	var play_minutes: int = int(summary.get("play_time_seconds", 0)) / 60
-
-	_label_save_data.text = "[center][b]%s[/b]\nChapter %s\n%dm played[/center]" % [
+	var total_gold: float = float(summary.get("total_gold", 0.0))
+	
+	if !has_save:
+		_label_save_data.text = "[center][b]%s[/b]\n%s\nGold: %.2f\n%d minutes played[/center]" % [
+			str(summary.get("display_name", "Player")),
+			str(summary.get("chapter", "No Active Run")),
+			total_gold,
+			play_minutes
+				]
+		return
+	
+	_label_save_data.text = "[center][b]%s[/b]\nArea:  %s\nGold: %.2f\n%d minutes played[/center]" % [
 		str(summary.get("display_name", "Player")),
 		str(summary.get("chapter", 1)),
+		total_gold,
 		play_minutes
-	]
+			]
 
 
 func _on_mouse_entered() -> void:

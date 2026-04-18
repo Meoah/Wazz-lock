@@ -1,6 +1,11 @@
 extends Control
 class_name RunRoot
 
+const GAMEPLAY_BGM_PATH: String = "res://assets/audio/bgm/gameplay_track.ogg"
+
+@export_category("Popup Content")
+@export var tutorial_texture: Texture2D
+@export var run_intro_texture: Texture2D
 
 var minimap_node: Minimap
 var room_scene_paths: Array[String] = []
@@ -8,11 +13,15 @@ var current_level_data: Dictionary[Vector2i, RoomData]
 var current_room_instance: Room = null
 var is_changing_room: bool = false
 var current_room_grid_pos: Vector2i = Vector2i.ZERO
+var is_player_death_sequence_running: bool = false
+var drain_interaction_locked_until_release: bool = false
 
 
 func _ready() -> void:
-	set_process(false)
+	set_process(true)
 	add_to_group("run_root")
+	
+	AudioManager.play_bgm_path(GAMEPLAY_BGM_PATH, false, 0.25)
 	
 	minimap_node = GameManager.root_hud.game_hud.minimap_node
 	room_scene_paths = _load_room_scene_paths()
@@ -21,6 +30,10 @@ func _ready() -> void:
 		SignalBus.change_room.connect(_on_change_room)
 	if !SignalBus.request_run_save.is_connected(save_run):
 		SignalBus.request_run_save.connect(save_run)
+	if !SignalBus.request_minimap_refresh.is_connected(_refresh_minimap):
+		SignalBus.request_minimap_refresh.connect(_refresh_minimap)
+	if !SignalBus.open_shop_popup.is_connected(_open_current_room_shop_popup):
+		SignalBus.open_shop_popup.connect(_open_current_room_shop_popup)
 	
 	GameManager.root_hud.show_game_hud()
 	
@@ -30,16 +43,28 @@ func _ready() -> void:
 	var saved_state: Dictionary = save_blob.get("state", {})
 	
 	if boot_mode == RunManager.BootMode.CONTINUE_RUN and saved_state.get("mode", "") == "run":
-		_apply_saved_run_state(saved_state)
+		call_deferred("_run_continue_transition", saved_state)
 	else:
 		current_level_data = _generate_and_build_level()
-		minimap_node.draw_minimap(current_level_data)
-		
+		minimap_node.draw_minimap(current_level_data, current_room_grid_pos)
+
 		var first_room: RoomData = current_level_data.get(Vector2i.ZERO)
 		if first_room:
 			enter_room(first_room)
 			_apply_current_weapon_to_player()
 			save_run()
+
+			if boot_mode == RunManager.BootMode.NEW_RUN:
+				call_deferred("_run_new_run_intro_sequence")
+
+
+func _process(_delta: float) -> void:
+	if drain_interaction_locked_until_release and not Input.is_action_pressed("interact"):
+		drain_interaction_locked_until_release = false
+
+
+func is_drain_interaction_locked() -> bool:
+	return is_changing_room or drain_interaction_locked_until_release
 
 
 func _load_room_scene_paths() -> Array[String]:
@@ -70,15 +95,17 @@ func _load_room_scene_paths() -> Array[String]:
 
 
 func _generate_and_build_level() -> Dictionary[Vector2i, RoomData]:
-	# TODO save data functionality
-	# TODO variable number of generated rooms
-	
 	var level_data: Dictionary[Vector2i, RoomData]
-	level_data = LevelGenerator.new().generate_rooms(10)
-	
+	level_data = LevelGenerator.new().generate_rooms(RunManager.get_current_level_room_count())
+
+	var base_difficulty_modifier: float = float(RunManager.get_current_level_start_difficulty())
+
 	for room_data in level_data.values():
 		var scene_path: String = _get_random_room_scene()
-		if scene_path: room_data.scene_path = scene_path
+		if scene_path:
+			room_data.scene_path = scene_path
+		
+		room_data.difficulty_modifier = base_difficulty_modifier
 	
 	return level_data
 
@@ -117,28 +144,91 @@ func _get_player() -> Clive:
 	return get_tree().get_first_node_in_group("player") as Clive
 
 
+func _start_new_floor() -> void:
+	current_level_data = _generate_and_build_level()
+	minimap_node.draw_minimap(current_level_data, current_room_grid_pos)
+
+	var first_room: RoomData = current_level_data.get(Vector2i.ZERO)
+	if first_room:
+		enter_room(first_room)
+		_apply_current_weapon_to_player()
+		save_run()
+
+
+func advance_to_next_level() -> void:
+	RunManager.advance_to_next_floor()
+	_start_new_floor()
+
+
+func enter_endless_mode() -> void:
+	RunManager.enter_endless_mode()
+	_start_new_floor()
+
+
+func begin_player_death_sequence(player: Clive) -> void:
+	if is_player_death_sequence_running:
+		return
+
+	is_player_death_sequence_running = true
+	RunManager.is_timer_active = false
+
+	if current_room_instance:
+		current_room_instance.on_player_death_started()
+
+	call_deferred("_run_player_death_sequence", player)
+
+
+func _run_player_death_sequence(player: Clive) -> void:
+	await _play_player_death_slowmo(player)
+	
+	if is_instance_valid(player):
+		await player.death_finished
+		
+		if player.movement:
+			player.movement.request_stop()
+			player.movement.clear_impulses()
+			player.movement.set_movement_enabled(false)
+	
+	await get_tree().create_timer(0.5).timeout
+	
+	GameManager.show_popup(
+		BasePopup.POPUP_TYPE.GAME_OVER,
+		RunManager.build_game_over_popup_params()
+			)
+
+
+func _play_player_death_slowmo(_player: Clive) -> void:
+	Engine.time_scale = 0.15
+	await get_tree().create_timer(0.5, true, false, true).timeout
+	
+	Engine.time_scale = 0.45
+	await get_tree().create_timer(0.5, true, false, true).timeout
+	
+	Engine.time_scale = 1.0
+
+
 func apply_reward_card_choice(card: RewardCardData) -> void:
 	var player: Clive = get_tree().get_first_node_in_group("player") as Clive
 	if player:
-		RewardLibrary.apply_card_to_player(card, player)
+		RewardLibrary.apply_card_to_player(card, player, true)
 
-	var total_difficulty_increase: int = RewardLibrary.FLAT_PICK_DIFFICULTY_INCREASE + int(card.hidden_difficulty_increase)
-	_increase_uncleared_room_difficulty(total_difficulty_increase)
+	var total_difficulty_modifier: float = RewardLibrary.FLAT_PICK_DIFFICULTY_MODIFIER + float(card.hidden_difficulty_modifier)
+	_increase_uncleared_room_difficulty_modifier(total_difficulty_modifier)
 
 	save_run()
 
 
 func apply_reward_skip() -> void:
-	_increase_uncleared_room_difficulty(RewardLibrary.FLAT_PICK_DIFFICULTY_INCREASE)
+	_increase_uncleared_room_difficulty_modifier(RewardLibrary.FLAT_PICK_DIFFICULTY_MODIFIER)
 	save_run()
 
 
-func _increase_uncleared_room_difficulty(amount: int) -> void:
+func _increase_uncleared_room_difficulty_modifier(amount: float) -> void:
 	for room_data in current_level_data.values():
 		if room_data.cleared:
 			continue
 
-		room_data.difficulty += amount
+		room_data.difficulty_modifier += amount
 
 
 func _apply_current_weapon_to_player() -> void:
@@ -147,16 +237,45 @@ func _apply_current_weapon_to_player() -> void:
 		player.apply_weapon_loadout(RunManager.current_weapon_id)
 
 
-func _apply_saved_player_bonuses() -> void:
-	var player: Clive = get_tree().get_first_node_in_group("player") as Clive
-	if !player or !player.status: return
+func _reapply_saved_reward_effects() -> void:
+	var player: Clive = _get_player()
+	if !player: return
 	
-	for stat_id in RunManager.player_stat_bonuses.keys():
-		var amount: float = float(RunManager.player_stat_bonuses[stat_id])
-		if is_zero_approx(amount):
-			continue
-		
-		player.status.apply_permanent_stat_bonus(stat_id, amount)
+	for effect_snapshot in RunManager.applied_reward_effects:
+		RewardLibrary.apply_effect_snapshot_to_player(effect_snapshot, player, false)
+
+
+func _apply_saved_player_runtime_state(saved_state: Dictionary) -> void:
+	var player: Clive = _get_player()
+	if !player or !player.status: return
+
+	var player_status_data: Dictionary = saved_state.get("player_status", {})
+
+	player.status.current_health = clamp(
+		float(player_status_data.get("current_health", player.status.max_health)),
+		0.0,
+		player.status.max_health
+	)
+
+	player.status.current_mana = clamp(
+		float(player_status_data.get("current_mana", player.status.max_mana)),
+		0.0,
+		player.status.max_mana
+	)
+
+
+func _apply_saved_player_inventory_state(saved_state: Dictionary) -> void:
+	var player: Clive = _get_player()
+	if !player or !player.inventory: return
+	
+	var inventory_data: Dictionary = saved_state.get("player_inventory", {})
+	
+	player.inventory.max_health_potions = int(inventory_data.get("max_health_potions", player.inventory.max_health_potions))
+	player.inventory.current_health_potions = clamp(
+		int(inventory_data.get("current_health_potions", player.inventory.current_health_potions)),
+		0,
+		player.inventory.max_health_potions
+			)
 
 
 func _serialize_level_data(level_data: Dictionary[Vector2i, RoomData]) -> Dictionary:
@@ -190,7 +309,7 @@ func _serialize_level_data(level_data: Dictionary[Vector2i, RoomData]) -> Dictio
 			"grid_pos": [room_data.grid_pos.x, room_data.grid_pos.y],
 			"discovered": room_data.discovered,
 			"cleared": room_data.cleared,
-			"difficulty": room_data.difficulty,
+			"difficulty_modifier": room_data.difficulty_modifier,
 			"scene_path": room_data.scene_path,
 			"room_type": room_data.room_type as RoomData.RoomType,
 			"objective_type": room_data.objective_type as RoomData.ObjectiveType,
@@ -213,7 +332,7 @@ func _deserialize_level_data(saved_level_data: Dictionary) -> Dictionary[Vector2
 		room_data.grid_pos = _array_to_grid(room_dict.get("grid_pos", [0, 0]))
 		room_data.discovered = bool(room_dict.get("discovered", false))
 		room_data.cleared = bool(room_dict.get("cleared", false))
-		room_data.difficulty = int(room_dict.get("difficulty", 0))
+		room_data.difficulty_modifier = float(room_dict.get("difficulty_modifier", room_dict.get("difficulty", 0.0)))
 		room_data.scene_path = str(room_dict.get("scene_path", ""))
 		room_data.room_type = room_dict.get("room_type", RoomData.RoomType.NORMAL) as RoomData.RoomType
 		room_data.objective_type = room_dict.get("objective_type", RoomData.ObjectiveType.EXTERMINATE) as RoomData.ObjectiveType
@@ -267,14 +386,29 @@ func build_save_state() -> Dictionary:
 		"weapon_id": RunManager.current_weapon_id,
 		"current_room_grid_pos": [current_room_grid_pos.x, current_room_grid_pos.y],
 		"player_global_position": [player.global_position.x, player.global_position.y],
+		"player_status": {
+			"current_health": player.status.current_health if player.status else 0.0,
+			"current_mana": player.status.current_mana if player.status else 0.0,
+				},
 		"level_data": _serialize_level_data(current_level_data),
 		"run_manager": {
 			"current_money": RunManager.current_money,
 			"current_meta": RunManager.current_meta,
 			"current_run_timer": RunManager.current_run_timer,
-			"player_stat_bonuses": RunManager.player_stat_bonuses.duplicate(true)
-		}
-	}
+			"applied_reward_effects": RunManager.applied_reward_effects.duplicate(true),
+			"current_level_phase": int(RunManager.current_level_phase),
+			"endless_depth": RunManager.endless_depth,
+			"current_level_timer": RunManager.current_level_timer,
+			"current_level_silver_gained": RunManager.current_level_silver_gained,
+			"current_level_gold_gained": RunManager.current_level_gold_gained,
+			"total_run_silver_gained": RunManager.total_run_silver_gained,
+			"total_run_gold_gained": RunManager.total_run_gold_gained,
+				},
+		"player_inventory": {
+			"current_health_potions": player.inventory.current_health_potions if player.inventory else 0,
+			"max_health_potions": player.inventory.max_health_potions if player.inventory else 0
+				},
+			}
 
 
 func save_run() -> void:
@@ -287,9 +421,10 @@ func save_run() -> void:
 	
 	SaveManager.save_current_slot(state, {
 		"player_name": "Clive",
-		"chapter": 1,
-		"play_time_seconds": int(RunManager.current_run_timer)
-	})
+		"chapter": RunManager.get_current_level_label(),
+		"play_time_seconds": int(RunManager.current_run_timer),
+		"total_gold": RunManager.current_meta
+			})
 
 
 func _apply_saved_run_state(saved_state: Dictionary) -> void:
@@ -299,17 +434,20 @@ func _apply_saved_run_state(saved_state: Dictionary) -> void:
 	if current_level_data.is_empty():
 		current_level_data = _generate_and_build_level()
 	
-	minimap_node.draw_minimap(current_level_data)
+	minimap_node.draw_minimap(current_level_data, current_room_grid_pos)
 	
 	var run_manager_data: Dictionary = saved_state.get("run_manager", {})
 	RunManager.current_money = float(run_manager_data.get("current_money", 0.0))
 	RunManager.current_meta = float(run_manager_data.get("current_meta", 0.0))
 	RunManager.current_run_timer = float(run_manager_data.get("current_run_timer", 0.0))
-	
-	RunManager.player_stat_bonuses = run_manager_data.get(
-		"player_stat_bonuses",
-		RunManager.PLAYER_BONUS_DEFAULTS.duplicate(true)
-			)
+	RunManager.current_level_phase = run_manager_data.get("current_level_phase", RunManager.LevelPhase.FLOOR_1)
+	RunManager.endless_depth = int(run_manager_data.get("endless_depth", 0))
+	RunManager.current_level_timer = float(run_manager_data.get("current_level_timer", 0.0))
+	RunManager.current_level_silver_gained = float(run_manager_data.get("current_level_silver_gained", 0.0))
+	RunManager.current_level_gold_gained = float(run_manager_data.get("current_level_gold_gained", 0.0))
+	RunManager.total_run_silver_gained = float(run_manager_data.get("total_run_silver_gained", 0.0))
+	RunManager.total_run_gold_gained = float(run_manager_data.get("total_run_gold_gained", 0.0))
+	RunManager.applied_reward_effects = run_manager_data.get("applied_reward_effects", [])
 	
 	current_room_grid_pos = _array_to_grid(saved_state.get("current_room_grid_pos", [0, 0]))
 	var room_data: RoomData = current_level_data.get(current_room_grid_pos)
@@ -326,7 +464,55 @@ func _apply_saved_run_state(saved_state: Dictionary) -> void:
 			player.global_position = _array_to_vector2(saved_state.get("player_global_position", [0.0, 0.0]))
 		
 		_apply_current_weapon_to_player()
-		_apply_saved_player_bonuses()
+		_reapply_saved_reward_effects()
+		_apply_saved_player_runtime_state(saved_state)
+		_apply_saved_player_inventory_state(saved_state)
+
+
+func _run_continue_transition(saved_state: Dictionary) -> void:
+	if GameManager.root_hud == null or GameManager.root_hud.fade_blocker == null:
+		_apply_saved_run_state(saved_state)
+		return
+
+	GameManager.root_hud.fade_blocker.hold_black()
+	_apply_saved_run_state(saved_state)
+	await get_tree().process_frame
+	await GameManager.root_hud.fade_blocker.swirl_in(0.35)
+
+
+func _run_new_run_intro_sequence() -> void:
+	if GameManager.root_hud == null:
+		_show_tutorial_popup()
+		return
+
+	await GameManager.root_hud.play_new_run_intro_sequence(
+		run_intro_texture,
+		Callable()
+	)
+
+	_show_tutorial_popup()
+
+
+func _show_tutorial_popup() -> void:
+	GameManager.show_popup(BasePopup.POPUP_TYPE.IMAGE, {
+		"title": "Tutorial",
+		"texture": tutorial_texture,
+		"button_text": "Start",
+		"flags": BasePopup.POPUP_FLAG.WILL_PAUSE
+	})
+
+
+func finalize_game_over_to_main_menu() -> void:
+	Engine.time_scale = 1.0
+	RunManager.is_timer_active = false
+
+	if SaveManager.has_current_slot():
+		SaveManager.clear_current_run_but_keep_meta({
+			"player_name": "Clive",
+			"chapter": "Run Failed",
+			"play_time_seconds": int(RunManager.current_run_timer),
+			"total_gold": RunManager.current_meta
+		})
 
 
 func enter_room(room_data: RoomData, entrance_direction: int = -1) -> void:
@@ -334,6 +520,8 @@ func enter_room(room_data: RoomData, entrance_direction: int = -1) -> void:
 	room_data.discovered = true
 	
 	if current_room_instance:
+		current_room_instance.on_room_exited()
+		current_room_instance.write_back_runtime_state()
 		current_room_instance.queue_free()
 		current_room_instance = null
 	
@@ -347,22 +535,46 @@ func enter_room(room_data: RoomData, entrance_direction: int = -1) -> void:
 	current_room_instance.setup(room_data)
 	
 	var player: Clive = get_tree().get_first_node_in_group("player") as Clive
-	var spawn_exit: ExitDrain = current_room_instance.get_spawn_exit(entrance_direction)
-	
+	var is_initial_room_entry: bool = (
+		room_data.grid_pos == Vector2i.ZERO
+		and entrance_direction == -1
+	)
+
 	if player:
-		if spawn_exit:
-			player.global_position = spawn_exit.global_position
-			spawn_exit.disarm_until_leave()
+		if is_initial_room_entry:
+			player.global_position = current_room_instance.get_random_floor_spawn_position()
 		else:
-			player.global_position = current_room_instance.global_position
+			var spawn_exit: ExitDrain = current_room_instance.get_spawn_exit(entrance_direction)
+
+			if spawn_exit:
+				player.global_position = spawn_exit.global_position
+			else:
+				player.global_position = current_room_instance.global_position
 	
+	minimap_node.draw_minimap(current_level_data, room_data.grid_pos)
 	minimap_node.move_player_marker_to_room(room_data)
+	current_room_instance.refresh_exit_interaction_states()
 
 func _on_change_room(room_data: RoomData, entrance_direction: int) -> void:
-	if is_changing_room: return
-	
+	if is_changing_room:
+		return
+
 	is_changing_room = true
-	call_deferred("_finish_change_room", room_data, entrance_direction)
+	drain_interaction_locked_until_release = true
+	call_deferred("_run_room_transition", room_data, entrance_direction)
+
+
+func _run_room_transition(room_data: RoomData, entrance_direction: int) -> void:
+	if GameManager.root_hud == null:
+		await _finish_change_room(room_data, entrance_direction)
+		return
+
+	await GameManager.root_hud.play_room_transition(
+		Callable(self, "_finish_change_room").bind(room_data, entrance_direction),
+		0.35,
+		0.2
+	)
+
 
 func _finish_change_room(room_data: RoomData, entrance_direction: int) -> void:
 	enter_room(room_data, entrance_direction)
@@ -383,3 +595,18 @@ func _unhandled_input(event: InputEvent) -> void:
 
 	GameManager.show_popup(BasePopup.POPUP_TYPE.PAUSE)
 	get_viewport().set_input_as_handled()
+
+
+func _refresh_minimap() -> void:
+	minimap_node.draw_minimap(current_level_data, current_room_grid_pos)
+	minimap_node.move_player_marker_to_room(current_level_data.get(current_room_grid_pos))
+
+
+func _open_current_room_shop_popup() -> void:
+	if !current_room_instance: return
+	
+	var shop_state: Dictionary = current_room_instance.get_or_create_shop_state()
+	
+	GameManager.show_popup(BasePopup.POPUP_TYPE.SHOP, {
+			"shop_state": shop_state
+	})

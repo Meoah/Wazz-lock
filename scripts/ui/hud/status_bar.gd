@@ -36,13 +36,21 @@ func _update_mana_bar(player_status: StatusComponent) -> void:
 
 
 func _update_boss_health_bar() -> void:
-	if !RunManager.is_boss_active:
-		get_parent().hide()
+	var bar_container: Control = get_parent() as Control
+	if !bar_container: return
+
+	if !RunManager.is_boss_active or !is_instance_valid(RunManager.boss_node):
+		bar_container.hide()
 		return
-	
-	var boss_node = RunManager.boss_node
-	var boss_status = boss_node.status
-	
+
+	bar_container.show()
+
+	var _boss_node: BaseEnemy = RunManager.boss_node
+	var boss_status: StatusComponent = _boss_node.status
+	if !boss_status: return
+
 	max_value = boss_status.max_health
 	value = boss_status.current_health
-	_enemy_name.text = boss_status.actor_name
+
+	if _enemy_name:
+		_enemy_name.text = boss_status.actor_name

@@ -84,12 +84,15 @@ func _flip_h(negative: bool) -> void:
 	if !body_root:
 		return
 
-	if negative:
-		body_root.scale.y = -1.0
-		body_root.rotation_degrees = 180.0
-	else:
-		body_root.scale.y = 1.0
-		body_root.rotation_degrees = 0.0
+	var current_scale: Vector2 = body_root.scale
+	var scale_y_magnitude: float = absf(current_scale.y)
+
+	body_root.scale = Vector2(
+		current_scale.x,
+		-scale_y_magnitude if negative else scale_y_magnitude
+	)
+
+	body_root.rotation_degrees = 180.0 if negative else 0.0
 
 
 func lock_facing(enabled: bool) -> void:

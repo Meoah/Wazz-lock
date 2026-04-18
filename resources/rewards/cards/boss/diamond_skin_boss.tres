@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="RewardCardData" load_steps=5 format=3 uid="uid://cjsc5vructmsi"]
+
+[ext_resource type="Script" uid="uid://dia3qnhck4r1o" path="res://scripts/systems/rewards/reward_effect_data_resource.gd" id="1"]
+[ext_resource type="Script" uid="uid://dq4iblqldg3v0" path="res://scripts/systems/rewards/reward_card_data_resource.gd" id="2"]
+[ext_resource type="Texture2D" uid="uid://dxqy1lp6nr23f" path="res://assets/textures/ui/icons/defense.png" id="2_qah3u"]
+
+[sub_resource type="Resource" id="RewardEffect_1"]
+script = ExtResource("1")
+kind = 1
+target_id = "defense"
+amount = 1.05
+
+[resource]
+script = ExtResource("2")
+card_id = "diamond_skin_boss"
+display_name = "Diamond Skin"
+description = "+5% Durability"
+icon = ExtResource("2_qah3u")
+rarity = 5
+hidden_difficulty_modifier = 7.0
+effects = Array[ExtResource("1")]([SubResource("RewardEffect_1")])

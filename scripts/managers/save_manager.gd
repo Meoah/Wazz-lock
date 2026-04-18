@@ -28,16 +28,46 @@ func get_current_slot_summary() -> Dictionary:
 
 	return get_slot_summary(current_slot_index)
 
+func get_slot_meta_value(slot_index: int, key: String, default_value: Variant = null) -> Variant:
+	if not slot_file_exists(slot_index):
+		return default_value
+
+	var loaded_data: Dictionary = load_slot_data(slot_index)
+	if loaded_data.is_empty():
+		return default_value
+
+	var meta: Dictionary = loaded_data.get("meta", {})
+	return meta.get(key, default_value)
+
+
+func get_current_slot_total_gold() -> float:
+	if not has_current_slot():
+		return 0.0
+
+	return float(get_slot_meta_value(current_slot_index, "total_gold", 0.0))
+
+
+func slot_file_exists(slot_index: int) -> bool:
+	if not _is_valid_slot(slot_index):
+		return false
+
+	return FileAccess.file_exists(get_slot_path(slot_index))
+
 
 func get_slot_path(slot_index: int) -> String:
 	return SAVE_PATH_TEMPLATE % slot_index
 
 
 func slot_has_save(slot_index: int) -> bool:
-	if not _is_valid_slot(slot_index):
+	if not slot_file_exists(slot_index):
 		return false
 
-	return FileAccess.file_exists(get_slot_path(slot_index))
+	var loaded_data: Dictionary = load_slot_data(slot_index)
+	if loaded_data.is_empty():
+		return false
+
+	var meta: Dictionary = loaded_data.get("meta", {})
+	return bool(meta.get("has_save", true))
 
 
 func get_all_slot_summaries() -> Array[Dictionary]:
@@ -52,27 +82,30 @@ func get_all_slot_summaries() -> Array[Dictionary]:
 func get_slot_summary(slot_index: int) -> Dictionary:
 	var summary: Dictionary = {
 		"slot_index": slot_index,
+		"has_slot_data": false,
 		"has_save": false,
 		"display_name": "Empty Slot",
 		"chapter": "",
 		"play_time_seconds": 0,
-		"last_saved_unix": 0
+		"last_saved_unix": 0,
+		"total_gold": 0.0
 	}
-
-	if not slot_has_save(slot_index):
-		return summary
-
+	
+	if not slot_file_exists(slot_index): return summary
+	
 	var loaded_data: Dictionary = load_slot_data(slot_index)
-	if loaded_data.is_empty():
-		return summary
-
+	if loaded_data.is_empty(): return summary
+	
 	var meta: Dictionary = loaded_data.get("meta", {})
-	summary["has_save"] = true
+	
+	summary["has_slot_data"] = true
+	summary["has_save"] = bool(meta.get("has_save", true))
 	summary["display_name"] = meta.get("player_name", "Player")
 	summary["chapter"] = meta.get("chapter", "")
 	summary["play_time_seconds"] = meta.get("play_time_seconds", 0)
 	summary["last_saved_unix"] = meta.get("last_saved_unix", 0)
-
+	summary["total_gold"] = float(meta.get("total_gold", 0.0))
+	
 	return summary
 
 
@@ -92,11 +125,12 @@ func save_slot_data(slot_index: int, game_state: Dictionary, meta_overrides: Dic
 	var save_data: Dictionary = {
 		"meta": {
 			"slot_index": slot_index,
-			"has_save": true,
+			"has_save": meta_overrides.get("has_save", true),
 			"player_name": meta_overrides.get("player_name", "Player"),
 			"chapter": meta_overrides.get("chapter", 1),
 			"play_time_seconds": meta_overrides.get("play_time_seconds", 0),
-			"last_saved_unix": Time.get_unix_time_from_system()
+			"last_saved_unix": Time.get_unix_time_from_system(),
+			"total_gold": float(meta_overrides.get("total_gold", 0.0)),
 		},
 		"state": game_state
 	}
@@ -119,7 +153,7 @@ func load_current_slot() -> Dictionary:
 
 
 func load_slot_data(slot_index: int) -> Dictionary:
-	if not slot_has_save(slot_index):
+	if not slot_file_exists(slot_index):
 		return {}
 
 	var file: FileAccess = FileAccess.open(get_slot_path(slot_index), FileAccess.READ)
@@ -151,6 +185,22 @@ func delete_slot(slot_index: int) -> bool:
 		clear_current_slot()
 
 	return was_deleted
+
+
+func clear_current_run_but_keep_meta(meta_overrides: Dictionary = {}) -> bool:
+	if not _is_valid_slot(current_slot_index):
+		return false
+
+	var existing: Dictionary = load_slot_data(current_slot_index)
+	var existing_meta: Dictionary = existing.get("meta", {})
+
+	return save_slot_data(current_slot_index, {}, {
+		"has_save": false,
+		"player_name": meta_overrides.get("player_name", existing_meta.get("player_name", "Player")),
+		"chapter": meta_overrides.get("chapter", ""),
+		"play_time_seconds": meta_overrides.get("play_time_seconds", existing_meta.get("play_time_seconds", 0)),
+		"total_gold": float(meta_overrides.get("total_gold", existing_meta.get("total_gold", 0.0)))
+	})
 
 
 func _is_valid_slot(slot_index: int) -> bool:

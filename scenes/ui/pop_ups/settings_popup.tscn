@@ -1,0 +1,144 @@
+[gd_scene load_steps=4 format=3 uid="uid://c7cnk7is5nao1"]
+
+[ext_resource type="Script" uid="uid://fufpla3slg26" path="res://scripts/ui/pop_ups/settings_popup.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://bib7um0qpf24g" path="res://assets/textures/ui/nine_slice/Button_-_Red.png" id="2"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_panel"]
+texture = ExtResource("2")
+texture_margin_left = 8.0
+texture_margin_top = 8.0
+texture_margin_right = 8.0
+texture_margin_bottom = 8.0
+axis_stretch_horizontal = 2
+axis_stretch_vertical = 2
+region_rect = Rect2(0, 0, 64, 64)
+
+[node name="SettingsPopup" type="Control" node_paths=PackedStringArray("_label_title", "_slider_master", "_value_master", "_slider_bgm", "_value_bgm", "_slider_sfx", "_value_sfx", "_slider_dialogue", "_value_dialogue", "_check_fullscreen", "_button_back")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+_label_title = NodePath("PanelContainer/VBoxContainer/Title")
+_slider_master = NodePath("PanelContainer/VBoxContainer/MasterRow/HSlider")
+_value_master = NodePath("PanelContainer/VBoxContainer/MasterRow/Value")
+_slider_bgm = NodePath("PanelContainer/VBoxContainer/BGMRow/HSlider")
+_value_bgm = NodePath("PanelContainer/VBoxContainer/BGMRow/Value")
+_slider_sfx = NodePath("PanelContainer/VBoxContainer/SFXRow/HSlider")
+_value_sfx = NodePath("PanelContainer/VBoxContainer/SFXRow/Value")
+_slider_dialogue = NodePath("PanelContainer/VBoxContainer/DialogueRow/HSlider")
+_value_dialogue = NodePath("PanelContainer/VBoxContainer/DialogueRow/Value")
+_check_fullscreen = NodePath("PanelContainer/VBoxContainer/Fullscreen")
+_button_back = NodePath("PanelContainer/VBoxContainer/Back")
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(480, 360)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -240.0
+offset_top = -180.0
+offset_right = 240.0
+offset_bottom = 180.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_panel")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Title" type="Label" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "SETTINGS"
+
+[node name="MasterRow" type="HBoxContainer" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="PanelContainer/VBoxContainer/MasterRow"]
+layout_mode = 2
+size_flags_horizontal = 10
+text = "MASTER"
+
+[node name="HSlider" type="HSlider" parent="PanelContainer/VBoxContainer/MasterRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+max_value = 1.0
+step = 0.05
+
+[node name="Value" type="Label" parent="PanelContainer/VBoxContainer/MasterRow"]
+layout_mode = 2
+size_flags_horizontal = 2
+
+[node name="BGMRow" type="HBoxContainer" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="PanelContainer/VBoxContainer/BGMRow"]
+layout_mode = 2
+size_flags_horizontal = 10
+text = "BGM"
+
+[node name="HSlider" type="HSlider" parent="PanelContainer/VBoxContainer/BGMRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+max_value = 1.0
+step = 0.05
+
+[node name="Value" type="Label" parent="PanelContainer/VBoxContainer/BGMRow"]
+layout_mode = 2
+size_flags_horizontal = 2
+
+[node name="SFXRow" type="HBoxContainer" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="PanelContainer/VBoxContainer/SFXRow"]
+layout_mode = 2
+size_flags_horizontal = 10
+text = "SFX"
+
+[node name="HSlider" type="HSlider" parent="PanelContainer/VBoxContainer/SFXRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+max_value = 1.0
+step = 0.05
+
+[node name="Value" type="Label" parent="PanelContainer/VBoxContainer/SFXRow"]
+layout_mode = 2
+size_flags_horizontal = 2
+
+[node name="DialogueRow" type="HBoxContainer" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="PanelContainer/VBoxContainer/DialogueRow"]
+layout_mode = 2
+size_flags_horizontal = 10
+text = "Dialogue"
+
+[node name="HSlider" type="HSlider" parent="PanelContainer/VBoxContainer/DialogueRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+max_value = 1.0
+step = 0.05
+
+[node name="Value" type="Label" parent="PanelContainer/VBoxContainer/DialogueRow"]
+layout_mode = 2
+size_flags_horizontal = 2
+
+[node name="Fullscreen" type="CheckButton" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "FULLSCREEN"
+
+[node name="Back" type="Button" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 10
+text = "Back"

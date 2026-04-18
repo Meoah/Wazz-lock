@@ -8,12 +8,37 @@ class_name EnemyHurtStateComponent
 
 
 func enter(_previous_state: StateComponent, data: Dictionary = {}) -> void:
-	var duration: float = data.get("recover_time", hurt_duration)
+	var hit_data: HitData = data.get("hit_data", null)
+	var reaction_animation: StringName = data.get("reaction_animation", &"hurt")
+	var configured_duration: float = data.get("recover_time", hurt_duration)
+	var hurt_type: HitData.HurtType = HitData.HurtType.NORMAL
+	var animation_duration: float = parent.get_animation_duration(reaction_animation)
+	var resolved_duration: float = max(configured_duration, animation_duration)
+
+	if hit_data != null:
+		hurt_type = hit_data.hurt_type
 
 	parent.movement.request_stop()
 	parent.movement.set_movement_enabled(false)
+	parent.begin_hurt(reaction_animation)
 
-	await parent.get_tree().create_timer(duration).timeout
+	match hurt_type:
+		HitData.HurtType.STUN:
+			await parent.get_tree().create_timer(resolved_duration).timeout
+			if machine.current_state != self:
+				return
+
+			await parent.hold_hurt_last_frame(hit_data.stun_duration)
+
+		HitData.HurtType.KNOCKUP:
+			parent.begin_knockup(hit_data.knockup_height, hit_data.knockup_duration)
+
+			var total_wait_duration: float = max(resolved_duration, hit_data.knockup_duration)
+			await parent.get_tree().create_timer(total_wait_duration).timeout
+
+		_:
+			await parent.get_tree().create_timer(resolved_duration).timeout
+
 	if machine.current_state != self:
 		return
 
@@ -30,3 +55,4 @@ func enter(_previous_state: StateComponent, data: Dictionary = {}) -> void:
 
 func exit(_next_state: StateComponent) -> void:
 	parent.movement.set_movement_enabled(true)
+	parent.end_reaction_visuals()

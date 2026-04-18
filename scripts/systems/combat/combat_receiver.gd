@@ -13,6 +13,7 @@ enum HitResponseMode {
 
 @export var hit_response_mode: HitResponseMode = HitResponseMode.INTERRUPTIBLE
 @export_range(0.0, 1.0, 0.01) var block_damage_scale: float = 0.0
+@export_range(0.0, 1.0, 0.01) var super_armor_damage_scale: float = 1.0
 @export var block_reaction_animation: StringName = &"block_hit"
 
 @export_category("References")
@@ -56,21 +57,22 @@ func can_receive_hit(hit_data: HitData) -> bool:
 
 
 func receive_hit(hit_data: HitData) -> bool:
-	if not can_receive_hit(hit_data):
-		return false
+	if not can_receive_hit(hit_data): return false
 
-	var damage_to_apply := hit_data.damage
-	var should_apply_knockback := apply_knockback
-	var should_trigger_hurt := false
+	var damage_to_apply: float = hit_data.damage
+	var should_apply_knockback: bool = apply_knockback
+	var should_trigger_hurt: bool = false
 	var reaction_animation: StringName = &"hurt"
+	var should_force_hurt: bool = _should_force_hurt(hit_data)
 
 	match hit_response_mode:
 		HitResponseMode.INTERRUPTIBLE:
-			should_trigger_hurt = hit_data.poise_damage > status.poise
+			should_trigger_hurt = should_force_hurt or hit_data.poise_damage > status.poise
 
 		HitResponseMode.SUPER_ARMOR:
+			damage_to_apply *= super_armor_damage_scale
 			should_apply_knockback = false
-			should_trigger_hurt = false
+			should_trigger_hurt = hit_data.hurt_type == HitData.HurtType.KNOCKUP
 
 		HitResponseMode.BLOCK:
 			damage_to_apply *= block_damage_scale
@@ -78,22 +80,25 @@ func receive_hit(hit_data: HitData) -> bool:
 			should_trigger_hurt = true
 			reaction_animation = block_reaction_animation
 
-	var accepted := true
+	var accepted: bool = true
+	if damage_to_apply > 0.0 and status:
+		damage_to_apply = status.resolve_damage_after_defense(damage_to_apply)
+	
 	if damage_to_apply > 0.0:
 		accepted = status.request_damage(damage_to_apply)
-
+		
 	if not accepted:
 		return false
 
 	if use_floating_text:
 		_emit_damage_text_value(damage_to_apply)
 
-	if should_apply_knockback:
-		var impulse := _resolve_impulse(hit_data)
+	if should_apply_knockback and hit_data.hurt_type != HitData.HurtType.KNOCKUP:
+		var impulse: Vector2 = _resolve_impulse(hit_data)
 		if impulse != Vector2.ZERO:
 			_apply_impulse(impulse, hit_data)
 
-	var killed := status.current_health <= 0.0
+	var killed: bool = status.current_health <= 0.0
 
 	_notify_actor_of_hit(hit_data)
 	hit_received.emit(hit_data)
@@ -106,8 +111,27 @@ func receive_hit(hit_data: HitData) -> bool:
 	return true
 
 
+func set_super_armor_enabled(enabled: bool, damage_scale: float = 1.0) -> void:
+	if enabled:
+		hit_response_mode = HitResponseMode.SUPER_ARMOR
+		super_armor_damage_scale = clamp(damage_scale, 0.0, 1.0)
+		return
+
+	hit_response_mode = HitResponseMode.INTERRUPTIBLE
+	super_armor_damage_scale = 1.0
+
+
+func _should_force_hurt(hit_data: HitData) -> bool:
+	return (
+		hit_data.hurt_type == HitData.HurtType.STUN
+		or hit_data.hurt_type == HitData.HurtType.KNOCKUP
+	)
+
+
 func _resolve_impulse(hit_data: HitData) -> Vector2:
-	var final_force : float = max(hit_data.knockback_force - status.poise, 0.0)
+	if hit_data.hurt_type == HitData.HurtType.KNOCKUP: return Vector2.ZERO
+
+	var final_force: float = max(hit_data.knockback_force - status.poise, 0.0)
 	return hit_data.direction * final_force * knockback_scale
 
 
@@ -133,7 +157,11 @@ func _handle_hurt(hit_data: HitData, reaction_animation: StringName = &"hurt") -
 			"reaction_animation": reaction_animation
 		})
 
-	var resolved_actor := _get_actor()
+	var resolved_actor: Node = _get_actor()
+
+	if resolved_actor and resolved_actor.has_method("aggro_on_hurt"):
+		resolved_actor.aggro_on_hurt()
+
 	if resolved_actor and resolved_actor.has_method("on_hurt_received"):
 		resolved_actor.on_hurt_received(hit_data)
 

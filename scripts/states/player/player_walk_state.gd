@@ -15,7 +15,7 @@ func physics_update(_delta: float) -> void:
 func update(_delta: float) -> void:
 	if parent is Clive:
 		parent.play_walk()
-		if		parent.consume_roll_request(20.0):		machine.transition_to(&"roll")
+		if		parent.consume_roll_request():		machine.transition_to(&"roll")
 		elif	!parent.has_move_input():			machine.transition_to(&"idle")
 		else:
 			var attack_input: int = parent.attack.consume_start_input()

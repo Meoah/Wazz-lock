@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://dyihk6vxoys8h"]
+
+[ext_resource type="Script" uid="uid://cdtrk2mgan0c5" path="res://scripts/states/enemies/ranged_slime_combat_state.gd" id="1_ikmwr"]
+
+[node name="RangedSlimeCombatStateComponent" type="Node"]
+script = ExtResource("1_ikmwr")
+state_id = &"combat"
+allowed_transitions = Array[StringName]([&"hurt", &"dead"])
