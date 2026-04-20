@@ -15,6 +15,7 @@ class_name BaseEnemy
 
 @export_category("Nodes")
 @export var body_root: Node2D
+@export var vfx_root: Node2D
 
 @export_category("Targeting")
 @export var target_group: StringName = &"player"
@@ -356,6 +357,9 @@ func apply_spawn_variant_modifiers(config: Dictionary) -> void:
 
 	if body_root:
 		body_root.scale *= scale_multiplier
+	
+	if vfx_root:
+		vfx_root.scale *= scale_multiplier
 
 	_apply_collision_scale(scale_multiplier)
 

@@ -37,7 +37,7 @@ radius = 75.0
 [sub_resource type="CircleShape2D" id="CircleShape2D_a87v6"]
 radius = 324.0
 
-[node name="TankSlime" type="CharacterBody2D" node_paths=PackedStringArray("attack_vfx_sprite", "state_machine", "movement", "combat_receiver", "status", "hurt_box", "hit_box", "attack_hit_box", "overhead", "body_root")]
+[node name="TankSlime" type="CharacterBody2D" node_paths=PackedStringArray("attack_vfx_sprite", "state_machine", "movement", "combat_receiver", "status", "hurt_box", "hit_box", "attack_hit_box", "overhead", "body_root", "vfx_root")]
 y_sort_enabled = true
 collision_layer = 256
 collision_mask = 4359
@@ -55,6 +55,7 @@ hit_box = NodePath("PassiveHitBox")
 attack_hit_box = NodePath("ActiveHitBox")
 overhead = NodePath("Overhead")
 body_root = NodePath("Body")
+vfx_root = NodePath("VFX")
 
 [node name="StateMachine" parent="." instance=ExtResource("4_ejlud")]
 initial_state_id = &"wander"
